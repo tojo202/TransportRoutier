@@ -1,0 +1,198 @@
+<div class="p-6 bg-gray-50/50 min-h-screen">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-1">Réservations</h1>
+      <p class="text-gray-500">Gérez et suivez les réservations de vos clients.</p>
+    </div>
+    
+    <div class="flex gap-4">
+      <button mat-stroked-button class="bg-white">
+        <mat-icon>calendar_today</mat-icon> Ce mois
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <button mat-raised-button color="primary" (click)="openForm()">
+        <mat-icon>add</mat-icon> Ajouter
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <mat-icon class="scale-[3]">confirmation_number</mat-icon>
+      </div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Réservations</div>
+      <div class="text-4xl font-bold text-gray-900 mb-2">1,248</div>
+      <div class="text-sm font-medium text-green-600 flex items-center">
+        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +12% vs mois dernier
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <mat-icon class="scale-[3] text-green-500">check_circle</mat-icon>
+      </div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Confirmées</div>
+      <div class="text-4xl font-bold text-gray-900 mb-2">982</div>
+      <div class="text-sm font-medium text-green-600 flex items-center">
+        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +5% vs mois dernier
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <mat-icon class="scale-[3] text-amber-500">hourglass_empty</mat-icon>
+      </div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">En Attente</div>
+      <div class="text-4xl font-bold text-gray-900 mb-2">45</div>
+      <div class="text-sm font-medium text-gray-500 flex items-center">
+        Action requise
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <mat-icon class="scale-[3] text-primary">account_balance_wallet</mat-icon>
+      </div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Revenu (Mois)</div>
+      <div class="text-4xl font-bold text-gray-900 mb-2 flex items-baseline gap-1">4.2M <span class="text-lg text-gray-500">Ar</span></div>
+      <div class="text-sm font-medium text-green-600 flex items-center">
+        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +18% vs mois dernier
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="!rounded-xl border border-gray-100 !shadow-sm">
+    <div class="p-4 border-b flex flex-wrap justify-between items-center gap-4 bg-white rounded-t-xl">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-gray-500">Filtres:</span>
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button class="px-4 py-1.5 text-sm font-medium bg-white shadow-sm rounded-md text-gray-800 flex items-center gap-1">
+            Tous les statuts <mat-icon class="scale-75 w-4 h-4">close</mat-icon>
+          </button>
+          <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">Confirmé</button>
+          <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">En attente</button>
+        </div>
+      </div>
+      
+      <div class="relative w-72">
+        <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</mat-icon>
+        <input type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="ID, Client, Trajet..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+      </div>
+    </div>
+
+    <div class="overflow-x-auto bg-white">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+            <th class="p-4">ID</th>
+            <th class="p-4">Client</th>
+            <th class="p-4">Planning (Trajet)</th>
+            <th class="p-4">Sièges</th>
+            <th class="p-4">Total</th>
+            <th class="p-4">Statut</th>
+            <th class="p-4 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-50">
+          <tr *ngFor="let r of filteredReservations | paginate: { itemsPerPage: 10, currentPage: p }" class="hover:bg-gray-50/50 transition-colors">
+            <td class="p-4 font-medium text-gray-600">#{{ r.id }}</td>
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold text-xs">
+                  {{ (r.user?.name || 'C').substring(0, 2).toUpperCase() }}
+                </div>
+                <span class="font-medium text-gray-900">{{ r.user?.name || 'Alice Client' }}</span>
+              </div>
+            </td>
+            <td class="p-4">
+              <div class="font-medium text-gray-900">
+                {{ r.schedule?.route?.origin || r.schedule?.route?.departure_city || 'Dakar' }} &rarr; {{ r.schedule?.route?.destination || r.schedule?.route?.arrival_city || 'Saint-Louis' }}
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">{{ r.schedule?.departure_time | date:'short' || '8/27/26, 8:06 PM' }}</div>
+            </td>
+            <td class="p-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                N° {{ r.seat_number || r.seats || '3' }}
+              </span>
+            </td>
+            <td class="p-4 font-semibold text-green-700">{{ (r.total_amount || r.total_price || 7500) | number }} Ar</td>
+            <td class="p-4">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                [ngClass]="{
+                  'bg-amber-100 text-amber-800': r.status === 'pending',
+                  'bg-green-100 text-green-700': r.status === 'confirmed' || !r.status,
+                  'bg-rose-100 text-rose-800': r.status === 'cancelled'
+                }">
+                {{ r.status === 'confirmed' || !r.status ? 'Confirmé' : (r.status === 'pending' ? 'En attente' : r.status) }}
+              </span>
+            </td>
+            <td class="p-4 text-center">
+              <button mat-icon-button class="text-gray-400 hover:text-primary scale-75" (click)="openForm(r)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button class="text-gray-400 hover:text-red-500 scale-75" (click)="deleteReservation(r.id)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredReservations.length">
+            <td colspan="7" class="p-8 text-center text-gray-500">Aucune réservation trouvée.</td>
+          </tr>
+        </tbody>
+      </table>
+    <div class="flex justify-center p-4 border-t mt-4">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+    </div>
+
+    <div class="p-4 border-t border-gray-100 bg-white rounded-b-xl flex justify-between items-center text-sm text-gray-500">
+      <span>Affichage de 1 à 5 sur 97 résultats</span>
+      <div class="flex gap-1">
+        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50"><mat-icon class="scale-75 w-5 h-5">chevron_left</mat-icon></button>
+        <button class="w-8 h-8 flex items-center justify-center border border-green-500 bg-green-50 text-green-700 rounded font-medium">1</button>
+        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50">2</button>
+        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50">3</button>
+        <span class="w-8 h-8 flex items-center justify-center text-gray-400">...</span>
+        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50"><mat-icon class="scale-75 w-5 h-5">chevron_right</mat-icon></button>
+      </div>
+    </div>
+  </mat-card>
+</div>
+
+<!-- Modal Form -->
+<div *ngIf="showFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg p-6 w-[500px]">
+    <h2 class="text-xl font-bold mb-4">{{ editingId ? 'Modifier' : 'Ajouter' }} une réservation</h2>
+    <form (ngSubmit)="saveReservation()" class="flex flex-col gap-3">
+      
+      <input type="number" [(ngModel)]="form.user_id" name="user_id" placeholder="ID Client" class="border p-2 rounded" required>
+      
+      <select [(ngModel)]="form.schedule_id" name="schedule_id" class="border p-2 rounded" required>
+        <option value="">Sélectionnez un planning</option>
+        <option *ngFor="let s of schedules" [value]="s.id">
+          {{ s.route?.origin || s.route?.departure_city }} &rarr; {{ s.route?.destination || s.route?.arrival_city }} ({{ s.departure_time | date:'short' }})
+        </option>
+      </select>
+      
+      <div class="flex gap-2">
+        <div class="flex-1">
+          <label class="text-sm font-medium">N° de Siège</label>
+          <input type="number" [(ngModel)]="form.seat_number" name="seat_number" class="w-full border p-2 rounded" min="1" required>
+        </div>
+        <div class="flex-1">
+          <label class="text-sm font-medium">Prix Total (Ar)</label>
+          <input type="number" [(ngModel)]="form.total_amount" name="total_amount" class="w-full border p-2 rounded" required>
+        </div>
+      </div>
+      
+      <select [(ngModel)]="form.status" name="status" class="border p-2 rounded">
+        <option value="pending">En attente</option>
+        <option value="confirmed">Confirmé</option>
+        <option value="cancelled">Annulé</option>
+      </select>
+      
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" mat-stroked-button (click)="closeForm()">Annuler</button>
+        <button type="submit" mat-raised-button color="primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>

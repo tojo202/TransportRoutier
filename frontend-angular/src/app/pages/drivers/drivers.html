@@ -1,0 +1,142 @@
+<div class="page-shell p-6">
+
+  <!-- En-tête -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Chauffeurs</h1>
+      <p class="page-subtitle">Gestion du personnel de conduite</p>
+    </div>
+    <div class="page-actions">
+      <div class="search-field">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          placeholder="Nom, numéro de permis..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="applyFilter()"
+          (input)="applyFilter()"
+          class="form-input"
+          style="padding-left:2.6rem; border-radius:999px; width:280px;">
+      </div>
+      <button class="btn-primary" (click)="openForm()">
+        <span class="material-icons">person_add</span> Ajouter un chauffeur
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!filteredDrivers.length" class="section-card">
+    <div class="empty-state">
+      <span class="material-icons">badge</span>
+      <p>Tapez dans la recherche pour afficher les chauffeurs.</p>
+    </div>
+  </div>
+
+    <div class="flex justify-center p-4 border-t mt-4 w-full">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+
+  <!-- Grille de cartes -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" *ngIf="filteredDrivers.length">
+    <div *ngFor="let d of filteredDrivers | paginate: { itemsPerPage: 10, currentPage: p }" class="driver-card section-card">
+
+      <div class="driver-card-top">
+        <div class="driver-avatar">
+          {{ (d.name || d.first_name || 'C').charAt(0) | uppercase }}
+        </div>
+        <span class="badge badge-success" *ngIf="d.status === 'active' || !d.status">
+          <span class="dot"></span> Actif
+        </span>
+        <span class="badge badge-danger" *ngIf="d.status && d.status !== 'active'">
+          <span class="dot"></span> {{ d.status }}
+        </span>
+      </div>
+
+      <div class="driver-card-body">
+        <h3 class="driver-name">{{ d.name || (d.first_name ? d.first_name + ' ' + d.last_name : 'N/A') }}</h3>
+        <p class="driver-agency">{{ d.agency?.name || 'Aucune agence' }}</p>
+
+        <div class="driver-info-list">
+          <div class="driver-info-row">
+            <span class="material-icons">badge</span>
+            <span>Permis : {{ d.license_number || '—' }}</span>
+          </div>
+          <div class="driver-info-row">
+            <span class="material-icons">phone</span>
+            <span>{{ d.phone || '—' }}</span>
+          </div>
+          <div class="driver-info-row">
+            <span class="material-icons">work_history</span>
+            <span>{{ d.experience_years || 0 }} ans d'expérience</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="driver-card-footer">
+        <button class="icon-btn edit" (click)="openForm(d)" title="Modifier">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="icon-btn delete" (click)="deleteDriver(d.id)" title="Supprimer">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Modal Formulaire ── -->
+<div *ngIf="showFormModal" class="modal-overlay" (click)="closeForm()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-icons">{{ editingId ? 'edit' : 'person_add' }}</span>
+        {{ editingId ? 'Modifier le chauffeur' : 'Ajouter un chauffeur' }}
+      </h2>
+      <button class="modal-close" (click)="closeForm()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveDriver()" class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Nom complet <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.name" name="name"
+            placeholder="Prénom Nom" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Numéro de permis <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.license_number" name="license_number"
+            placeholder="Permis de conduire" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.phone" name="phone"
+            placeholder="+261 XX XX XXX XX" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Années d'expérience</label>
+          <input type="number" [(ngModel)]="form.experience_years" name="experience_years"
+            placeholder="0" class="form-input" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Agence</label>
+          <select [(ngModel)]="form.agency_id" name="agency_id" class="form-select">
+            <option value="">Sélectionner une agence (optionnel)</option>
+            <option *ngFor="let a of agencies" [value]="a.id">{{ a.name }}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeForm()">Annuler</button>
+      <button type="submit" class="btn-primary" (click)="saveDriver()">
+        <span class="material-icons">save</span> Enregistrer
+      </button>
+    </div>
+  </div>
+</div>

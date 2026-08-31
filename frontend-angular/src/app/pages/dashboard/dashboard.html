@@ -1,0 +1,305 @@
+<div class="page-shell p-6">
+
+  <!-- ── En-tête ── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tableau de Bord</h1>
+      <p class="page-subtitle">Vue d'ensemble de l'activité TransExpress</p>
+    </div>
+    <div class="page-actions">
+      <mat-form-field appearance="outline" style="width:180px; margin-bottom:-1.25em">
+        <mat-label>Période</mat-label>
+        <mat-select [(ngModel)]="selectedFilter" (selectionChange)="onFilterChange()">
+          <mat-option value="all">Global</mat-option>
+          <mat-option value="today">Aujourd'hui</mat-option>
+          <mat-option value="week">Cette semaine</mat-option>
+          <mat-option value="month">Ce mois</mat-option>
+          <mat-option value="year">Cette année</mat-option>
+          <mat-option value="custom">Personnalisé</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <ng-container *ngIf="selectedFilter === 'custom'">
+        <input type="date" [(ngModel)]="customStartDate" class="form-input" style="width:148px">
+        <input type="date" [(ngModel)]="customEndDate" class="form-input" style="width:148px">
+        <button class="btn-primary" (click)="applyCustomFilter()">
+          <span class="material-icons">filter_alt</span> Appliquer
+        </button>
+      </ng-container>
+
+      <button class="btn-secondary" (click)="refreshDashboard()">
+        <span class="material-icons">refresh</span> Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Chargement ── -->
+  <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- ── Erreur ── -->
+  <div *ngIf="error" class="section-card" style="padding:1rem 1.5rem; border-left: 4px solid var(--danger); background: var(--danger-light); color: var(--danger); margin-bottom:1.5rem;">
+    <span class="material-icons" style="vertical-align:middle; margin-right:8px">error_outline</span>{{ error }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error && stats">
+
+    <!-- ── Cartes stats ── -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-6">
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">Réservations</p>
+          <div class="stat-icon primary">
+            <span class="material-icons">receipt</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.total_reservations }}</div>
+      </div>
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">Billets Vendus</p>
+          <div class="stat-icon success">
+            <span class="material-icons">confirmation_number</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.tickets_sold }}</div>
+      </div>
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">Véhicules Disponibles</p>
+          <div class="stat-icon warning">
+            <span class="material-icons">directions_car</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.total_vehicles - stats.vehicles_in_transit }}</div>
+      </div>
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">En Trajet</p>
+          <div class="stat-icon accent">
+            <span class="material-icons">local_shipping</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.vehicles_in_transit }}</div>
+      </div>
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">Chauffeurs</p>
+          <div class="stat-icon info">
+            <span class="material-icons">person</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.total_drivers }}</div>
+      </div>
+
+      <div class="card-stat">
+        <div class="stat-card-header">
+          <p class="stat-label">Bagages</p>
+          <div class="stat-icon neutral">
+            <span class="material-icons">work</span>
+          </div>
+        </div>
+        <div class="stat-value">{{ stats.total_baggage }}</div>
+      </div>
+
+    </div>
+
+    <!-- ── CA ── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+      <div class="card-stat" style="background: linear-gradient(135deg, #2b302c 0%, #3d4540 100%); border-color:transparent; color:#fff;">
+        <div class="stat-card-header">
+          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA du Jour</p>
+          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+            <span class="material-icons">today</span>
+          </div>
+        </div>
+        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.today_revenue | number }} Ar</div>
+      </div>
+      <div class="card-stat" style="background: linear-gradient(135deg, #3d4540 0%, #4a5a4e 100%); border-color:transparent; color:#fff;">
+        <div class="stat-card-header">
+          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA du Mois</p>
+          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+            <span class="material-icons">calendar_month</span>
+          </div>
+        </div>
+        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.month_revenue | number }} Ar</div>
+      </div>
+      <div class="card-stat" style="background: linear-gradient(135deg, #556b2f 0%, #7ba05b 100%); border-color:transparent; color:#fff;">
+        <div class="stat-card-header">
+          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA Annuel</p>
+          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+            <span class="material-icons">bar_chart</span>
+          </div>
+        </div>
+        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.year_revenue | number }} Ar</div>
+      </div>
+    </div>
+
+    <!-- ── Actions rapides ── -->
+    <div class="section-card mb-6">
+      <div class="section-card-header">
+        <h3 class="section-card-title"><span class="material-icons">bolt</span> Accès Rapide</h3>
+      </div>
+      <div class="section-card-body" style="display:flex; gap:12px; flex-wrap:wrap; padding:1rem 1.5rem;">
+        <button class="btn-secondary" (click)="viewAll('gps')">
+          <span class="material-icons">gps_fixed</span> Suivi GPS
+        </button>
+        <button class="btn-secondary" (click)="viewAll('reports')">
+          <span class="material-icons">analytics</span> Rapports
+        </button>
+        <button class="btn-secondary" (click)="viewAll('tickets')">
+          <span class="material-icons">confirmation_number</span> Billets
+        </button>
+        <button class="btn-secondary" (click)="viewAll('baggages')">
+          <span class="material-icons">luggage</span> Bagages
+        </button>
+        <button class="btn-secondary" (click)="viewAll('reservations')">
+          <span class="material-icons">event_seat</span> Réservations
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Graphes ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6" *ngIf="stats.charts">
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3 class="section-card-title"><span class="material-icons">insights</span> Réservations / Mois</h3>
+        </div>
+        <div class="section-card-body chart-container">
+          <canvas *ngIf="resChartData.datasets.length"
+            baseChart
+            [data]="resChartData"
+            [options]="barChartOptions"
+            [type]="barChartType">
+          </canvas>
+          <div *ngIf="!resChartData.datasets.length" class="chart-empty">
+            <span class="material-icons">bar_chart</span>
+            <p>Aucune donnée disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3 class="section-card-title"><span class="material-icons">payments</span> Recettes / Mois (Ar)</h3>
+        </div>
+        <div class="section-card-body chart-container">
+          <canvas *ngIf="revChartData.datasets.length"
+            baseChart
+            [data]="revChartData"
+            [options]="barChartOptions"
+            [type]="barChartType">
+          </canvas>
+          <div *ngIf="!revChartData.datasets.length" class="chart-empty">
+            <span class="material-icons">bar_chart</span>
+            <p>Aucune donnée disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3 class="section-card-title"><span class="material-icons">directions_bus</span> Occupation Véhicules</h3>
+        </div>
+        <div class="section-card-body chart-container chart-pie">
+          <canvas *ngIf="occChartData.datasets[0]?.data?.length"
+            baseChart
+            [data]="occChartData"
+            [options]="pieChartOptions"
+            [type]="pieChartType">
+          </canvas>
+          <div *ngIf="!occChartData.datasets[0]?.data?.length" class="chart-empty">
+            <span class="material-icons">pie_chart</span>
+            <p>Aucune donnée disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3 class="section-card-title"><span class="material-icons">alt_route</span> Répartition des Trajets</h3>
+        </div>
+        <div class="section-card-body chart-container chart-pie">
+          <canvas *ngIf="routeChartData.datasets[0]?.data?.length"
+            baseChart
+            [data]="routeChartData"
+            [options]="pieChartOptions"
+            [type]="pieChartType">
+          </canvas>
+          <div *ngIf="!routeChartData.datasets[0]?.data?.length" class="chart-empty">
+            <span class="material-icons">pie_chart</span>
+            <p>Aucune donnée disponible</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card lg:col-span-2">
+        <div class="section-card-header">
+          <h3 class="section-card-title"><span class="material-icons">business</span> Stats des Agences</h3>
+        </div>
+        <div class="section-card-body chart-container chart-pie">
+          <canvas *ngIf="agencyChartData.datasets[0]?.data?.length"
+            baseChart
+            [data]="agencyChartData"
+            [options]="pieChartOptions"
+            [type]="pieChartType">
+          </canvas>
+          <div *ngIf="!agencyChartData.datasets[0]?.data?.length" class="chart-empty">
+            <span class="material-icons">pie_chart</span>
+            <p>Aucune donnée disponible</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Réservations récentes ── -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h3 class="section-card-title"><span class="material-icons">schedule</span> Réservations Récentes</h3>
+        <button class="btn-ghost" (click)="viewAll('reservations')">
+          Voir tout <span class="material-icons" style="font-size:18px">arrow_forward</span>
+        </button>
+      </div>
+
+      <div *ngIf="!stats.recent_reservations?.length" class="empty-state">
+        <span class="material-icons">event_busy</span>
+        <p>Aucune réservation récente</p>
+      </div>
+
+      <ul class="divide-y" *ngIf="stats.recent_reservations?.length">
+        <li *ngFor="let res of stats.recent_reservations" class="recent-res-item">
+          <div class="avatar-chip">
+            {{ (res.user?.name || 'C').charAt(0) | uppercase }}
+          </div>
+          <div style="flex:1; min-width:0;">
+            <p style="font-weight:600; color:var(--text-primary); margin:0 0 2px 0;">{{ res.user?.name || 'Client' }}</p>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">
+              {{ res.schedule?.route?.departure_city }} &rarr; {{ res.schedule?.route?.arrival_city }}
+            </p>
+          </div>
+          <div style="text-align:right;">
+            <span class="badge"
+              [ngClass]="{
+                'badge-success': res.status === 'confirmed',
+                'badge-warning': res.status === 'pending',
+                'badge-danger':  res.status === 'cancelled',
+                'badge-neutral': res.status !== 'confirmed' && res.status !== 'pending' && res.status !== 'cancelled'
+              }">
+              <span class="dot"></span>{{ res.status }}
+            </span>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0;">{{ res.created_at | date:'short' }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </ng-container>
+</div>

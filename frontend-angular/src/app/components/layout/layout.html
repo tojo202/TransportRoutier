@@ -1,0 +1,202 @@
+<div class="layout-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <!-- Logo Header -->
+    <div class="logo-container">
+      <div class="logo-icon">
+        <span class="material-icons">directions_bus</span>
+      </div>
+      <div class="logo-text">
+        <div class="logo-title">TransExpress</div>
+        <div class="logo-subtitle">Gestion &amp; Logistique</div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+      <div class="nav-section-title">Vue Principale</div>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+            <span class="material-icons">dashboard</span>
+            <span>Tableau de bord</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section-title">Flotte &amp; Personnel</div>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/agencies" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">business</span>
+            <span>Agences</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/vehicles" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">directions_bus</span>
+            <span>Véhicules</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/drivers" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">badge</span>
+            <span>Chauffeurs</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section-title">Lignes &amp; Réservations</div>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/routes" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">alt_route</span>
+            <span>Lignes &amp; Trajets</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">schedule</span>
+            <span>Horaires</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">confirmation_number</span>
+            <span>Réservations</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">receipt_long</span>
+            <span>Billetterie</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section-title">Suivi &amp; Gestion</div>
+      <ul class="nav-list">
+        <li>
+          <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">payments</span>
+            <span>Paiements</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">luggage</span>
+            <span>Bagages</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/gps" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">my_location</span>
+            <span>Suivi GPS</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/reports" routerLinkActive="active-link" class="nav-item">
+            <span class="material-icons">analytics</span>
+            <span>Rapports &amp; Stats</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+    <!-- Header Top Navbar -->
+    <header class="top-header">
+      <div class="header-left">
+        <div class="search-bar">
+          <span class="material-icons search-icon">search</span>
+          <input type="text" placeholder="Rechercher une réservation, véhicule..." class="search-input" />
+        </div>
+      </div>
+
+      <div class="header-right">
+
+        <!-- ── Notifications ── -->
+        <div class="notif-wrapper" (clickOutside)="closeNotifications()">
+          <button class="notification-btn" (click)="toggleNotifications()" [class.active]="showNotifications" title="Notifications">
+            <span class="material-icons">notifications</span>
+            <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+          </button>
+
+          <!-- Dropdown Panel -->
+          <div class="notif-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+            <div class="notif-header">
+              <span class="notif-title">
+                <span class="material-icons">notifications</span>
+                Notifications
+                <span class="notif-count" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+              </span>
+              <button class="notif-mark-all" (click)="markAllRead()" *ngIf="unreadCount > 0">
+                Tout lire
+              </button>
+            </div>
+
+            <ul class="notif-list">
+              <li *ngFor="let n of notifications"
+                  class="notif-item"
+                  [class.unread]="!n.read"
+                  (click)="markRead(n.id)">
+                <span class="notif-icon notif-icon-{{ n.iconColor }}">
+                  <span class="material-icons">{{ n.icon }}</span>
+                </span>
+                <div class="notif-body">
+                  <p class="notif-message">{{ n.message }}</p>
+                  <span class="notif-time">{{ n.time }}</span>
+                </div>
+                <span class="notif-dot" *ngIf="!n.read"></span>
+              </li>
+            </ul>
+
+            <div class="notif-footer">
+              <button class="notif-view-all" (click)="closeNotifications()">Fermer</button>
+            </div>
+          </div>
+        </div>
+        <!-- ── /Notifications ── -->
+
+        <div class="header-divider"></div>
+
+        <a routerLink="/profile" class="user-profile cursor-pointer hover:opacity-80 transition-opacity">
+          <div class="user-avatar">
+            {{ (username ? username.charAt(0) : 'A') | uppercase }}
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ username || 'Administrateur' }}</span>
+            <span class="user-role">{{ role || 'ADMIN' }}</span>
+          </div>
+        </a>
+
+        <div class="header-divider"></div>
+
+        <button (click)="logout()" class="logout-btn" title="Se déconnecter">
+          <span class="material-icons">logout</span>
+          <span>Déconnexion</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs-container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb-list">
+          <li *ngFor="let crumb of breadcrumbs; let last = last; let i = index" class="breadcrumb-item" [class.active]="last">
+            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+            <span *ngIf="last">{{ crumb.label }}</span>
+            <span class="material-icons breadcrumb-separator" *ngIf="!last">chevron_right</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <!-- Page Body -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

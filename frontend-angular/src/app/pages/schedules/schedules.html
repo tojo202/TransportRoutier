@@ -1,0 +1,110 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Plannings</h1>
+    <div class="flex gap-4">
+      <mat-form-field appearance="outline" class="w-64 mb-[-1.25em]">
+        <mat-label>Rechercher...</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="openForm()"><mat-icon>add</mat-icon> Ajouter</button>
+    </div>
+  </div>
+
+  <mat-card>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-4 border-b">Trajet</th>
+            <th class="p-4 border-b">Véhicule</th>
+            <th class="p-4 border-b">Chauffeur</th>
+            <th class="p-4 border-b">Départ / Arrivée</th>
+            <th class="p-4 border-b">Statut</th>
+            <th class="p-4 border-b text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of filteredSchedules | paginate: { itemsPerPage: 10, currentPage: p }" class="border-b hover:bg-gray-50">
+            <td class="p-4 font-bold">{{ s.route?.origin || s.route?.departure_city }} &rarr; {{ s.route?.destination || s.route?.arrival_city }}</td>
+            <td class="p-4">{{ s.vehicle?.plate_number }} ({{ s.vehicle?.brand }})</td>
+            <td class="p-4">{{ s.driver?.name || (s.driver?.first_name ? s.driver.first_name + ' ' + s.driver.last_name : 'Non assigné') }}</td>
+            <td class="p-4">
+              D: {{ s.departure_time | date:'short' }} <br>
+              A: {{ s.arrival_time ? (s.arrival_time | date:'short') : 'N/A' }}
+            </td>
+            <td class="p-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="{
+                  'bg-blue-100 text-blue-800': s.status === 'scheduled',
+                  'bg-amber-100 text-amber-800': s.status === 'in_progress',
+                  'bg-emerald-100 text-emerald-800': s.status === 'completed',
+                  'bg-rose-100 text-rose-800': s.status === 'cancelled'
+                }">
+                {{ s.status }}
+              </span>
+            </td>
+            <td class="p-4 text-center">
+              <button mat-icon-button color="primary" (click)="openForm(s)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button color="warn" (click)="deleteSchedule(s.id)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredSchedules.length">
+            <td colspan="6" class="p-8 text-center text-gray-500">Aucun planning trouvé.</td>
+          </tr>
+        </tbody>
+      </table>
+    <div class="flex justify-center p-4 border-t mt-4">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+    </div>
+  </mat-card>
+</div>
+
+<!-- Modal Form -->
+<div *ngIf="showFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg p-6 w-[500px]">
+    <h2 class="text-xl font-bold mb-4">{{ editingId ? 'Modifier' : 'Ajouter' }} un planning</h2>
+    <form (ngSubmit)="saveSchedule()" class="flex flex-col gap-3">
+      
+      <select [(ngModel)]="form.route_id" name="route_id" class="border p-2 rounded" required>
+        <option value="">Sélectionnez un trajet</option>
+        <option *ngFor="let r of routes" [value]="r.id">{{ r.origin || r.departure_city }} - {{ r.destination || r.arrival_city }}</option>
+      </select>
+      
+      <select [(ngModel)]="form.vehicle_id" name="vehicle_id" class="border p-2 rounded" required>
+        <option value="">Sélectionnez un véhicule</option>
+        <option *ngFor="let v of vehicles" [value]="v.id">{{ v.plate_number }} ({{ v.brand }} {{ v.model }})</option>
+      </select>
+      
+      <select [(ngModel)]="form.driver_id" name="driver_id" class="border p-2 rounded">
+        <option value="">Sélectionnez un chauffeur</option>
+        <option *ngFor="let d of drivers" [value]="d.id">{{ d.name || (d.first_name + ' ' + d.last_name) }}</option>
+      </select>
+
+      <div class="flex gap-2">
+        <div class="flex-1">
+          <label class="text-sm">Départ</label>
+          <input type="datetime-local" [(ngModel)]="form.departure_time" name="departure_time" class="w-full border p-2 rounded" required>
+        </div>
+        <div class="flex-1">
+          <label class="text-sm">Arrivée</label>
+          <input type="datetime-local" [(ngModel)]="form.arrival_time" name="arrival_time" class="w-full border p-2 rounded">
+        </div>
+      </div>
+      
+      <select [(ngModel)]="form.status" name="status" class="border p-2 rounded">
+        <option value="scheduled">Programmé</option>
+        <option value="in_progress">En cours</option>
+        <option value="completed">Terminé</option>
+        <option value="cancelled">Annulé</option>
+      </select>
+      
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" mat-stroked-button (click)="closeForm()">Annuler</button>
+        <button type="submit" mat-raised-button color="primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>

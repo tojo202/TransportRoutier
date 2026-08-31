@@ -1,0 +1,84 @@
+/* vehicles.css */
+
+/* Carte véhicule */
+.vehicle-card {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Bandeau haut coloré */
+.vehicle-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.status-available { background: var(--success-light); }
+.status-transit   { background: var(--info-light); }
+.status-maint     { background: var(--warning-light); }
+
+.vehicle-icon {
+  font-size: 32px;
+  color: var(--text-secondary);
+}
+.status-available .vehicle-icon { color: var(--success); }
+.status-transit   .vehicle-icon { color: var(--info); }
+.status-maint     .vehicle-icon { color: var(--warning); }
+
+/* Corps */
+.vehicle-card-body {
+  padding: 1rem 1.25rem;
+  flex: 1;
+}
+
+.vehicle-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.vehicle-plate {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin: 0 0 0.75rem 0;
+}
+
+.vehicle-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vehicle-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.vehicle-info-row .material-icons {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.vehicle-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface);
+}

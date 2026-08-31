@@ -1,0 +1,82 @@
+<div class="p-6 h-full flex flex-col">
+  <div class="flex justify-between items-center mb-6 hide-on-print">
+    <h1 class="text-2xl font-bold text-gray-800">Rapports & Statistiques</h1>
+    
+    <div class="flex gap-2">
+      <button mat-stroked-button (click)="exportExcel()">
+        <mat-icon>table_view</mat-icon> Excel
+      </button>
+      <button mat-stroked-button color="warn" (click)="exportPDF()">
+        <mat-icon>picture_as_pdf</mat-icon> PDF
+      </button>
+      <button mat-raised-button color="primary" (click)="printReport()">
+        <mat-icon>print</mat-icon> Imprimer
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="mb-6 hide-on-print">
+    <div class="p-4 flex flex-wrap gap-4 items-end">
+      <div class="flex flex-col">
+        <label class="text-sm text-gray-600 mb-1">Type de rapport</label>
+        <select [(ngModel)]="reportType" class="border p-2 rounded bg-gray-50 h-[42px] min-w-[200px]" (change)="generateReport()">
+          <option value="reservations">Réservations</option>
+          <option value="payments">Paiements</option>
+          <option value="tickets">Billets</option>
+        </select>
+      </div>
+      
+      <div class="flex flex-col">
+        <label class="text-sm text-gray-600 mb-1">Date début</label>
+        <input type="date" [(ngModel)]="startDate" class="border p-2 rounded bg-gray-50 h-[42px]">
+      </div>
+      
+      <div class="flex flex-col">
+        <label class="text-sm text-gray-600 mb-1">Date fin</label>
+        <input type="date" [(ngModel)]="endDate" class="border p-2 rounded bg-gray-50 h-[42px]">
+      </div>
+      
+      <button mat-raised-button color="primary" class="h-[42px]" (click)="generateReport()">Générer</button>
+      
+      <div class="ml-auto">
+        <input type="text" placeholder="Rechercher..." [(ngModel)]="searchTerm" (keyup)="applyFilter()" class="border p-2 rounded h-[42px]">
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="flex-1 overflow-hidden flex flex-col">
+    <div class="p-4 bg-gray-50 border-b font-bold flex justify-between">
+      <span>Aperçu du Rapport : {{ reportType | uppercase }}</span>
+      <span>Total : {{ filteredData.length }} éléments</span>
+    </div>
+    
+    <div *ngIf="isLoading" class="p-8 text-center text-gray-500">
+      Chargement des données...
+    </div>
+    
+    <div class="overflow-auto flex-1 p-0" id="print-area" *ngIf="!isLoading">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-100 sticky top-0">
+          <tr>
+            <th *ngFor="let col of columns | paginate: { itemsPerPage: 10, currentPage: p }" class="p-3 border-b">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!filteredData.length">
+            <td [attr.colspan]="columns.length" class="p-8 text-center text-gray-500">Aucune donnée pour cette période.</td>
+          </tr>
+          <tr *ngFor="let item of filteredData" class="border-b hover:bg-gray-50 text-sm">
+            <td *ngFor="let val of getRowData(item)" class="p-3">{{ val }}</td>
+          </tr>
+        </tbody>
+      </table>
+    <div class="flex justify-center p-4 border-t mt-4">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+    </div>
+    <div class="p-4 border-t">
+      <app-vertical-pagination [currentPage]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-vertical-pagination>
+    </div>
+  </mat-card>
+</div>

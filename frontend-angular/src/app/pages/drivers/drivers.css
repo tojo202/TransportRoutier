@@ -1,0 +1,86 @@
+/* drivers.css */
+
+/* Carte chauffeur */
+.driver-card {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.driver-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* En-tête carte */
+.driver-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.75rem;
+  background: var(--primary-soft);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Avatar */
+.driver-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8aa868, #556b2f);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  box-shadow: 0 3px 10px rgba(85, 107, 47, 0.25);
+}
+
+/* Corps */
+.driver-card-body {
+  padding: 1rem 1.25rem;
+  flex: 1;
+}
+
+.driver-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.driver-agency {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+}
+
+.driver-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.driver-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.driver-info-row .material-icons {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.driver-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface);
+}

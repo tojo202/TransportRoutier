@@ -1,0 +1,5 @@
+<div class="vertical-pager flex flex-col items-center gap-2">
+  <button mat-icon-button (click)="prev()" [disabled]="currentPage<=1"><mat-icon>chevron_up</mat-icon></button>
+  <div class="page-indicator text-sm">{{ currentPage }} / {{ totalPages }}</div>
+  <button mat-icon-button (click)="next()" [disabled]="currentPage>=totalPages"><mat-icon>chevron_down</mat-icon></button>
+</div>

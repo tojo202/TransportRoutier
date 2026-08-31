@@ -1,0 +1,50 @@
+/* dashboard.css */
+
+/* Graphe containers */
+.chart-container {
+  position: relative;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.chart-pie {
+  height: 280px;
+}
+
+/* Empty state pour les graphes */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  height: 100%;
+}
+.chart-empty .material-icons {
+  font-size: 42px;
+  color: #c9c7bf;
+}
+.chart-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Réservations récentes */
+.recent-res-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0.95rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.12s ease;
+}
+.recent-res-item:last-child { border-bottom: none; }
+.recent-res-item:hover { background: var(--primary-soft); }

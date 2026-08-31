@@ -1,0 +1,71 @@
+<div class="mb-6 flex justify-between items-center">
+  <div>
+    <h2 class="text-2xl font-bold text-[var(--text-primary)]">Mon Profil</h2>
+    <p class="text-sm text-[var(--text-secondary)]">Gérez vos informations personnelles et paramètres de compte</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- Profile Card -->
+  <div class="glass-panel p-6 rounded-2xl md:col-span-1 text-center">
+    <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-[var(--primary)] to-indigo-400 text-white flex items-center justify-center font-bold text-3xl mx-auto shadow-lg mb-4">
+      {{ getInitials() }}
+    </div>
+    <h3 class="text-xl font-bold text-[var(--text-primary)]">{{ user?.name || 'Utilisateur' }}</h3>
+    <p class="text-[var(--text-secondary)] text-sm mb-4">{{ user?.email || 'email@example.com' }}</p>
+    
+    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[var(--primary-light)] text-[var(--primary-hover)] uppercase tracking-wider">
+      🛡️ {{ user?.role || 'client' }}
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-[var(--border-color)] text-left space-y-3 text-sm">
+      <div class="flex justify-between">
+        <span class="text-[var(--text-secondary)]">Statut du compte :</span>
+        <span class="font-medium text-emerald-600 font-semibold">Actif</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-[var(--text-secondary)]">Inscrit depuis :</span>
+        <span class="font-medium text-[var(--text-primary)]">Août 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Form -->
+  <div class="glass-panel p-6 rounded-2xl md:col-span-2">
+    <h3 class="text-lg font-bold text-[var(--text-primary)] mb-4">Modifier mes informations</h3>
+    
+    <form (ngSubmit)="updateProfile()" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nom complet</label>
+          <input type="text" [(ngModel)]="form.name" name="name" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Adresse Email</label>
+          <input type="email" [(ngModel)]="form.email" name="email" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
+        </div>
+      </div>
+
+      <hr class="my-4 border-[var(--border-color)]" />
+      <h4 class="text-md font-semibold text-[var(--text-primary)]">Changer le mot de passe</h4>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Mot de passe actuel</label>
+          <input type="password" [(ngModel)]="form.current_password" name="current_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nouveau mot de passe</label>
+          <input type="password" [(ngModel)]="form.new_password" name="new_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-6">
+        <button type="submit" [disabled]="isLoading" class="btn-primary px-6 py-2.5">
+          <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+          Enregistrer les modifications
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

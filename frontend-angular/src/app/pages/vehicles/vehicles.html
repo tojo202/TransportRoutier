@@ -1,0 +1,153 @@
+<div class="page-shell p-6">
+
+  <!-- En-tête -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Véhicules</h1>
+      <p class="page-subtitle">Gestion de la flotte de véhicules</p>
+    </div>
+    <div class="page-actions">
+      <div class="search-field">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          placeholder="Immatriculation, marque, modèle..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="applyFilter()"
+          (input)="applyFilter()"
+          class="form-input"
+          style="padding-left:2.6rem; border-radius:999px; width:280px;">
+      </div>
+      <button class="btn-primary" (click)="openForm()">
+        <span class="material-icons">add</span> Ajouter un véhicule
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!filteredVehicles.length" class="section-card">
+    <div class="empty-state">
+      <span class="material-icons">directions_car</span>
+      <p>Tapez dans la recherche pour afficher les véhicules.</p>
+    </div>
+  </div>
+
+    <div class="flex justify-center p-4 border-t mt-4 w-full">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+
+  <!-- Grille de cartes -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" *ngIf="filteredVehicles.length">
+    <div *ngFor="let v of filteredVehicles | paginate: { itemsPerPage: 10, currentPage: p }" class="vehicle-card section-card">
+
+      <!-- Couleur selon statut -->
+      <div class="vehicle-card-top"
+        [ngClass]="{
+          'status-available': v.status === 'available',
+          'status-transit':   v.status === 'in_transit',
+          'status-maint':     v.status === 'maintenance'
+        }">
+        <span class="material-icons vehicle-icon">directions_bus</span>
+        <span class="badge"
+          [ngClass]="{
+            'badge-success': v.status === 'available',
+            'badge-info':    v.status === 'in_transit',
+            'badge-warning': v.status === 'maintenance'
+          }">
+          <span class="dot"></span>
+          {{ v.status === 'available' ? 'Disponible' : v.status === 'in_transit' ? 'En trajet' : 'Maintenance' }}
+        </span>
+      </div>
+
+      <div class="vehicle-card-body">
+        <h3 class="vehicle-title">{{ v.brand }} {{ v.model }}</h3>
+        <p class="vehicle-plate">{{ v.plate_number }}</p>
+
+        <div class="vehicle-info-list">
+          <div class="vehicle-info-row">
+            <span class="material-icons">groups</span>
+            <span>{{ v.capacity }} places</span>
+          </div>
+          <div class="vehicle-info-row">
+            <span class="material-icons">business</span>
+            <span>{{ v.agency?.name || 'Aucune agence' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vehicle-card-footer">
+        <button class="icon-btn edit" (click)="openForm(v)" title="Modifier">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="icon-btn delete" (click)="deleteVehicle(v.id)" title="Supprimer">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Modal Formulaire ── -->
+<div *ngIf="showFormModal" class="modal-overlay" (click)="closeForm()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-icons">{{ editingId ? 'edit' : 'add_circle' }}</span>
+        {{ editingId ? 'Modifier le véhicule' : 'Ajouter un véhicule' }}
+      </h2>
+      <button class="modal-close" (click)="closeForm()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveVehicle()" class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Immatriculation <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.plate_number" name="plate_number"
+            placeholder="Ex: TB-1234" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Marque <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.brand" name="brand"
+            placeholder="Toyota, Mercedes..." class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modèle <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.model" name="model"
+            placeholder="Hiace, Sprinter..." class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capacité (places) <span class="required">*</span></label>
+          <input type="number" [(ngModel)]="form.capacity" name="capacity"
+            placeholder="15" class="form-input" required min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select [(ngModel)]="form.status" name="status" class="form-select">
+            <option value="available">Disponible</option>
+            <option value="in_transit">En trajet</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Agence <span class="required">*</span></label>
+          <select [(ngModel)]="form.agency_id" name="agency_id" class="form-select" required>
+            <option value="">Sélectionner une agence</option>
+            <option *ngFor="let a of agencies" [value]="a.id">{{ a.name }}</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeForm()">Annuler</button>
+      <button type="submit" class="btn-primary" (click)="saveVehicle()">
+        <span class="material-icons">save</span> Enregistrer
+      </button>
+    </div>
+  </div>
+</div>

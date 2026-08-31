@@ -1,0 +1,69 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Trajets</h1>
+    <div class="flex gap-4">
+      <mat-form-field appearance="outline" class="w-64 mb-[-1.25em]">
+        <mat-label>Rechercher...</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="openForm()"><mat-icon>add</mat-icon> Ajouter</button>
+    </div>
+  </div>
+
+  <mat-card>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-4 border-b">Départ</th>
+            <th class="p-4 border-b">Arrivée</th>
+            <th class="p-4 border-b">Distance (km)</th>
+            <th class="p-4 border-b">Durée estimée</th>
+            <th class="p-4 border-b">Prix par défaut</th>
+            <th class="p-4 border-b text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRoutes | paginate: { itemsPerPage: 10, currentPage: p }" class="border-b hover:bg-gray-50">
+            <td class="p-4 font-bold">{{ r.origin || r.departure_city }}</td>
+            <td class="p-4 font-bold">{{ r.destination || r.arrival_city }}</td>
+            <td class="p-4">{{ r.distance_km || r.distance }} km</td>
+            <td class="p-4">{{ r.estimated_duration_hours || r.estimated_duration }} h</td>
+            <td class="p-4 font-semibold text-emerald-600">{{ (r.price || r.default_price || 0) | number }} Ar</td>
+            <td class="p-4 text-center">
+              <button mat-icon-button color="primary" (click)="openForm(r)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button color="warn" (click)="deleteRoute(r.id)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredRoutes.length">
+            <td colspan="6" class="p-8 text-center text-gray-500">Aucun trajet trouvé.</td>
+          </tr>
+        </tbody>
+      </table>
+    <div class="flex justify-center p-4 border-t mt-4">
+      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+    </div>
+
+    </div>
+  </mat-card>
+</div>
+
+<!-- Modal Form -->
+<div *ngIf="showFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg p-6 w-96">
+    <h2 class="text-xl font-bold mb-4">{{ editingId ? 'Modifier' : 'Ajouter' }} un trajet</h2>
+    <form (ngSubmit)="saveRoute()" class="flex flex-col gap-3">
+      <input type="text" [(ngModel)]="form.origin" name="origin" placeholder="Ville de départ" class="border p-2 rounded" required>
+      <input type="text" [(ngModel)]="form.destination" name="destination" placeholder="Ville d'arrivée" class="border p-2 rounded" required>
+      <input type="number" [(ngModel)]="form.distance_km" name="distance_km" placeholder="Distance (km)" class="border p-2 rounded" required>
+      <input type="number" step="0.5" [(ngModel)]="form.estimated_duration_hours" name="estimated_duration_hours" placeholder="Durée estimée (heures, ex: 4.5)" class="border p-2 rounded" required>
+      <input type="number" [(ngModel)]="form.price" name="price" placeholder="Prix du trajet (Ar)" class="border p-2 rounded" required>
+      
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" mat-stroked-button (click)="closeForm()">Annuler</button>
+        <button type="submit" mat-raised-button color="primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
