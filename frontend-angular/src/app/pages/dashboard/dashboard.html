@@ -1,34 +1,34 @@
-<div class="page-shell p-6">
+<div class="page-shell">
 
-  <!-- ── En-tête ── -->
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Tableau de Bord</h1>
-      <p class="page-subtitle">Vue d'ensemble de l'activité TransExpress</p>
-    </div>
-    <div class="page-actions">
-      <mat-form-field appearance="outline" style="width:180px; margin-bottom:-1.25em">
-        <mat-label>Période</mat-label>
-        <mat-select [(ngModel)]="selectedFilter" (selectionChange)="onFilterChange()">
-          <mat-option value="all">Global</mat-option>
-          <mat-option value="today">Aujourd'hui</mat-option>
-          <mat-option value="week">Cette semaine</mat-option>
-          <mat-option value="month">Ce mois</mat-option>
-          <mat-option value="year">Cette année</mat-option>
-          <mat-option value="custom">Personnalisé</mat-option>
-        </mat-select>
-      </mat-form-field>
+  <!-- ── En-tête avec SectionBadge ── -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8" revealOnScroll revealClass="reveal-up">
+    <app-section-badge
+      tagline="Supervision &amp; Performance Globale"
+      icon="speed"
+      title="Tableau de Bord TransExpress"
+      description="Indicateurs clés en direct, réservations, recettes et statut de la flotte.">
+    </app-section-badge>
+
+    <div class="flex items-center gap-3 flex-wrap">
+      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()" class="form-select text-xs font-bold" style="width: 160px; padding: 0.6rem 1rem; border-radius: 9999px;">
+        <option value="all">Période : Global</option>
+        <option value="today">Aujourd'hui</option>
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois</option>
+        <option value="year">Cette année</option>
+        <option value="custom">Personnalisé</option>
+      </select>
 
       <ng-container *ngIf="selectedFilter === 'custom'">
-        <input type="date" [(ngModel)]="customStartDate" class="form-input" style="width:148px">
-        <input type="date" [(ngModel)]="customEndDate" class="form-input" style="width:148px">
-        <button class="btn-primary" (click)="applyCustomFilter()">
-          <span class="material-icons">filter_alt</span> Appliquer
+        <input type="date" [(ngModel)]="customStartDate" class="form-input text-xs font-bold" style="width:130px; padding:0.5rem 0.8rem;">
+        <input type="date" [(ngModel)]="customEndDate" class="form-input text-xs font-bold" style="width:130px; padding:0.5rem 0.8rem;">
+        <button class="btn-primary btn-sm" (click)="applyCustomFilter()">
+          <span class="material-icons text-sm">filter_alt</span> Appliquer
         </button>
       </ng-container>
 
-      <button class="btn-secondary" (click)="refreshDashboard()">
-        <span class="material-icons">refresh</span> Actualiser
+      <button class="btn-secondary btn-sm" (click)="refreshDashboard()">
+        <span class="material-icons text-sm">refresh</span> Actualiser
       </button>
     </div>
   </div>
@@ -39,250 +39,169 @@
   </div>
 
   <!-- ── Erreur ── -->
-  <div *ngIf="error" class="section-card" style="padding:1rem 1.5rem; border-left: 4px solid var(--danger); background: var(--danger-light); color: var(--danger); margin-bottom:1.5rem;">
+  <div *ngIf="error" class="section-card" style="padding:1rem 1.5rem; border-left: 5px solid var(--danger); background: var(--danger-light); color: var(--danger); margin-bottom:1.5rem;">
     <span class="material-icons" style="vertical-align:middle; margin-right:8px">error_outline</span>{{ error }}
   </div>
 
   <ng-container *ngIf="!isLoading && !error && stats">
 
-    <!-- ── Cartes stats ── -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-6">
+    <!-- ── Cartes stats avec effet de relief & rotation douce ── -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-8">
 
-      <div class="card-stat">
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="50">
         <div class="stat-card-header">
-          <p class="stat-label">Réservations</p>
           <div class="stat-icon primary">
             <span class="material-icons">receipt</span>
           </div>
+          <p class="stat-label">Réservations</p>
         </div>
         <div class="stat-value">{{ stats.total_reservations }}</div>
       </div>
 
-      <div class="card-stat">
+
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="100">
         <div class="stat-card-header">
-          <p class="stat-label">Billets Vendus</p>
           <div class="stat-icon success">
             <span class="material-icons">confirmation_number</span>
           </div>
+          <p class="stat-label">Billets Vendus</p>
         </div>
         <div class="stat-value">{{ stats.tickets_sold }}</div>
       </div>
 
-      <div class="card-stat">
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="150">
         <div class="stat-card-header">
-          <p class="stat-label">Véhicules Disponibles</p>
           <div class="stat-icon warning">
             <span class="material-icons">directions_car</span>
           </div>
+          <p class="stat-label">Véhicules Dispo</p>
         </div>
         <div class="stat-value">{{ stats.total_vehicles - stats.vehicles_in_transit }}</div>
       </div>
 
-      <div class="card-stat">
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="200">
         <div class="stat-card-header">
-          <p class="stat-label">En Trajet</p>
           <div class="stat-icon accent">
             <span class="material-icons">local_shipping</span>
           </div>
+          <p class="stat-label">En Trajet</p>
         </div>
         <div class="stat-value">{{ stats.vehicles_in_transit }}</div>
       </div>
 
-      <div class="card-stat">
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="250">
         <div class="stat-card-header">
-          <p class="stat-label">Chauffeurs</p>
           <div class="stat-icon info">
-            <span class="material-icons">person</span>
+            <span class="material-icons">badge</span>
           </div>
+          <p class="stat-label">Chauffeurs</p>
         </div>
         <div class="stat-value">{{ stats.total_drivers }}</div>
       </div>
 
-      <div class="card-stat">
+      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="300">
         <div class="stat-card-header">
-          <p class="stat-label">Bagages</p>
           <div class="stat-icon neutral">
-            <span class="material-icons">work</span>
+            <span class="material-icons">luggage</span>
           </div>
+          <p class="stat-label">Bagages</p>
         </div>
         <div class="stat-value">{{ stats.total_baggage }}</div>
       </div>
 
     </div>
 
-    <!-- ── CA ── -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-      <div class="card-stat" style="background: linear-gradient(135deg, #2b302c 0%, #3d4540 100%); border-color:transparent; color:#fff;">
+    <!-- ── CA en Cartes Épurées Flat ── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="150">
+      <!-- CA du Jour -->
+      <div class="card-stat" style="background: var(--text-primary); border: 1px solid #20150E; color:#FFFFFB;">
         <div class="stat-card-header">
-          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA du Jour</p>
-          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+          <div class="stat-icon" style="background: rgba(197, 160, 89, 0.25); color: var(--gold);">
             <span class="material-icons">today</span>
           </div>
+          <p class="stat-label" style="color: rgba(255, 255, 251, 0.75);">CA du Jour</p>
         </div>
-        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.today_revenue | number }} Ar</div>
+        <div class="stat-value text-[#DFB76C]" style="font-size: 2.1rem;">
+          {{ stats.today_revenue | number }} <span class="text-sm font-bold text-gray-300">Ar</span>
+        </div>
       </div>
-      <div class="card-stat" style="background: linear-gradient(135deg, #3d4540 0%, #4a5a4e 100%); border-color:transparent; color:#fff;">
+
+      <!-- CA du Mois -->
+      <div class="card-stat" style="background: var(--card-bg); border: 1px solid var(--border-color);">
         <div class="stat-card-header">
-          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA du Mois</p>
-          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+          <div class="stat-icon" style="background: var(--gold-light); color: var(--gold-strong);">
             <span class="material-icons">calendar_month</span>
           </div>
+          <p class="stat-label" style="color: var(--text-secondary);">CA du Mois</p>
         </div>
-        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.month_revenue | number }} Ar</div>
+        <div class="stat-value text-[#5B7036]" style="font-size: 2.1rem;">
+          {{ stats.month_revenue | number }} <span class="text-sm font-bold text-gray-500">Ar</span>
+        </div>
       </div>
-      <div class="card-stat" style="background: linear-gradient(135deg, #556b2f 0%, #7ba05b 100%); border-color:transparent; color:#fff;">
+
+      <!-- CA Annuel -->
+      <div class="card-stat" style="background: var(--primary); border: 1px solid var(--primary-strong); color:#FFFFFB;">
         <div class="stat-card-header">
-          <p class="stat-label" style="color:rgba(255,255,255,0.6)">CA Annuel</p>
-          <div class="stat-icon" style="background:rgba(255,255,255,0.12); color:#fff;">
+          <div class="stat-icon" style="background: rgba(255, 255, 251, 0.2); color:#FFFFFB;">
             <span class="material-icons">bar_chart</span>
           </div>
+          <p class="stat-label" style="color: rgba(255, 255, 251, 0.85);">CA Annuel</p>
         </div>
-        <div class="stat-value" style="color:#fff; font-size:1.5rem">{{ stats.year_revenue | number }} Ar</div>
+        <div class="stat-value" style="font-size: 2.1rem; color: #FFFFFB;">
+          {{ stats.year_revenue | number }} <span class="text-sm font-bold text-white/80">Ar</span>
+        </div>
       </div>
     </div>
 
     <!-- ── Actions rapides ── -->
-    <div class="section-card mb-6">
-      <div class="section-card-header">
-        <h3 class="section-card-title"><span class="material-icons">bolt</span> Accès Rapide</h3>
+    <div class="section-card mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="180">
+      <div class="section-card-header header-gold">
+        <h3 class="section-card-title"><span class="material-icons text-[#C5A059]">bolt</span> Accès Rapide aux Modules</h3>
       </div>
-      <div class="section-card-body" style="display:flex; gap:12px; flex-wrap:wrap; padding:1rem 1.5rem;">
-        <button class="btn-secondary" (click)="viewAll('gps')">
-          <span class="material-icons">gps_fixed</span> Suivi GPS
+      <div class="section-card-body flex gap-3 flex-wrap items-center">
+        <button class="btn-primary btn-sm" (click)="viewAll('gps')">
+          <span class="material-icons text-base">gps_fixed</span> Suivi GPS
         </button>
-        <button class="btn-secondary" (click)="viewAll('reports')">
-          <span class="material-icons">analytics</span> Rapports
+        <button class="btn-secondary btn-sm" (click)="viewAll('reports')">
+          <span class="material-icons text-base">analytics</span> Rapports &amp; Stats
         </button>
-        <button class="btn-secondary" (click)="viewAll('tickets')">
-          <span class="material-icons">confirmation_number</span> Billets
+        <button class="btn-dark btn-sm" (click)="viewAll('tickets')">
+          <span class="material-icons text-base">confirmation_number</span> Billetterie
         </button>
-        <button class="btn-secondary" (click)="viewAll('baggages')">
-          <span class="material-icons">luggage</span> Bagages
+        <button class="btn-cream btn-sm" (click)="viewAll('baggages')">
+          <span class="material-icons text-base">luggage</span> Gestion Bagages
         </button>
-        <button class="btn-secondary" (click)="viewAll('reservations')">
-          <span class="material-icons">event_seat</span> Réservations
+        <button class="btn-outline btn-sm" (click)="viewAll('reservations')">
+          <span class="material-icons text-base">event_seat</span> Réservations
         </button>
       </div>
-    </div>
-
-    <!-- ── Graphes ── -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6" *ngIf="stats.charts">
-
-      <div class="section-card">
-        <div class="section-card-header">
-          <h3 class="section-card-title"><span class="material-icons">insights</span> Réservations / Mois</h3>
-        </div>
-        <div class="section-card-body chart-container">
-          <canvas *ngIf="resChartData.datasets.length"
-            baseChart
-            [data]="resChartData"
-            [options]="barChartOptions"
-            [type]="barChartType">
-          </canvas>
-          <div *ngIf="!resChartData.datasets.length" class="chart-empty">
-            <span class="material-icons">bar_chart</span>
-            <p>Aucune donnée disponible</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-header">
-          <h3 class="section-card-title"><span class="material-icons">payments</span> Recettes / Mois (Ar)</h3>
-        </div>
-        <div class="section-card-body chart-container">
-          <canvas *ngIf="revChartData.datasets.length"
-            baseChart
-            [data]="revChartData"
-            [options]="barChartOptions"
-            [type]="barChartType">
-          </canvas>
-          <div *ngIf="!revChartData.datasets.length" class="chart-empty">
-            <span class="material-icons">bar_chart</span>
-            <p>Aucune donnée disponible</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-header">
-          <h3 class="section-card-title"><span class="material-icons">directions_bus</span> Occupation Véhicules</h3>
-        </div>
-        <div class="section-card-body chart-container chart-pie">
-          <canvas *ngIf="occChartData.datasets[0]?.data?.length"
-            baseChart
-            [data]="occChartData"
-            [options]="pieChartOptions"
-            [type]="pieChartType">
-          </canvas>
-          <div *ngIf="!occChartData.datasets[0]?.data?.length" class="chart-empty">
-            <span class="material-icons">pie_chart</span>
-            <p>Aucune donnée disponible</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-card-header">
-          <h3 class="section-card-title"><span class="material-icons">alt_route</span> Répartition des Trajets</h3>
-        </div>
-        <div class="section-card-body chart-container chart-pie">
-          <canvas *ngIf="routeChartData.datasets[0]?.data?.length"
-            baseChart
-            [data]="routeChartData"
-            [options]="pieChartOptions"
-            [type]="pieChartType">
-          </canvas>
-          <div *ngIf="!routeChartData.datasets[0]?.data?.length" class="chart-empty">
-            <span class="material-icons">pie_chart</span>
-            <p>Aucune donnée disponible</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card lg:col-span-2">
-        <div class="section-card-header">
-          <h3 class="section-card-title"><span class="material-icons">business</span> Stats des Agences</h3>
-        </div>
-        <div class="section-card-body chart-container chart-pie">
-          <canvas *ngIf="agencyChartData.datasets[0]?.data?.length"
-            baseChart
-            [data]="agencyChartData"
-            [options]="pieChartOptions"
-            [type]="pieChartType">
-          </canvas>
-          <div *ngIf="!agencyChartData.datasets[0]?.data?.length" class="chart-empty">
-            <span class="material-icons">pie_chart</span>
-            <p>Aucune donnée disponible</p>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <!-- ── Réservations récentes ── -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <h3 class="section-card-title"><span class="material-icons">schedule</span> Réservations Récentes</h3>
-        <button class="btn-ghost" (click)="viewAll('reservations')">
-          Voir tout <span class="material-icons" style="font-size:18px">arrow_forward</span>
+    <div class="section-card mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="150">
+      <div class="section-card-header header-olive">
+        <h3 class="section-card-title"><span class="material-icons text-primary">schedule</span> Dernières Réservations Enregistrées</h3>
+        <button class="btn-cream btn-sm" (click)="viewAll('reservations')">
+          <span>Voir tout</span> <span class="material-icons text-sm">arrow_forward</span>
         </button>
       </div>
 
-      <div *ngIf="!stats.recent_reservations?.length" class="empty-state">
-        <span class="material-icons">event_busy</span>
-        <p>Aucune réservation récente</p>
+      <div *ngIf="!stats.recent_reservations?.length" class="p-8">
+        <div class="placeholder-stripes max-w-sm mx-auto">
+          <span class="material-icons">event_busy</span>
+          <p class="text-sm font-bold text-gray-500">Aucune réservation récente</p>
+        </div>
       </div>
 
-      <ul class="divide-y" *ngIf="stats.recent_reservations?.length">
-        <li *ngFor="let res of stats.recent_reservations" class="recent-res-item">
+      <ul class="divide-y divide-[var(--border-color)] bg-[var(--card-bg)]" *ngIf="stats.recent_reservations?.length">
+        <li *ngFor="let res of stats.recent_reservations" class="recent-res-item hover:bg-[var(--surface)]">
           <div class="avatar-chip">
             {{ (res.user?.name || 'C').charAt(0) | uppercase }}
           </div>
           <div style="flex:1; min-width:0;">
-            <p style="font-weight:600; color:var(--text-primary); margin:0 0 2px 0;">{{ res.user?.name || 'Client' }}</p>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">
-              {{ res.schedule?.route?.departure_city }} &rarr; {{ res.schedule?.route?.arrival_city }}
+            <p style="font-family: var(--font-heading); font-weight:700; color:var(--text-primary); margin:0 0 2px 0;">{{ res.user?.name || 'Voyageur' }}</p>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin:0; font-weight:600;">
+              {{ res.schedule?.route?.departure_city || 'Départ' }} &rarr; {{ res.schedule?.route?.arrival_city || 'Arrivée' }}
             </p>
           </div>
           <div style="text-align:right;">
@@ -293,13 +212,15 @@
                 'badge-danger':  res.status === 'cancelled',
                 'badge-neutral': res.status !== 'confirmed' && res.status !== 'pending' && res.status !== 'cancelled'
               }">
-              <span class="dot"></span>{{ res.status }}
+              <span class="dot"></span>{{ res.status === 'confirmed' ? 'Confirmé' : (res.status === 'pending' ? 'En attente' : res.status) }}
             </span>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0;">{{ res.created_at | date:'short' }}</p>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0; font-weight:600;">{{ res.created_at | date:'short' }}</p>
           </div>
         </li>
       </ul>
     </div>
+
+
 
   </ng-container>
 </div>

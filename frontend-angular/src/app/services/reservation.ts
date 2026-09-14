@@ -1,15 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Reservation {
   id?: number;
+  user_id?: number;
   schedule_id: number;
-  customer_name: string;
-  customer_phone: string;
-  seat_number: string;
+  seat_number: number | string;
   status: string;
+  total_amount?: number;
+  payment_method?: string;
+  created_at?: string;
+  user?: any;
+  schedule?: any;
+  ticket?: any;
+  payment?: any;
+  baggages?: any[];
 }
 
 @Injectable({
@@ -20,15 +27,21 @@ export class ReservationService {
 
   constructor(private http: HttpClient) { }
 
-  getReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(this.apiUrl);
+  getReservations(filters: any = {}): Observable<Reservation[]> {
+    let params = new HttpParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params = params.set(key, filters[key]);
+      }
+    });
+    return this.http.get<Reservation[]>(this.apiUrl, { params });
   }
 
   getReservation(id: number): Observable<Reservation> {
     return this.http.get<Reservation>(`${this.apiUrl}/${id}`);
   }
 
-  createReservation(reservation: Reservation): Observable<Reservation> {
+  createReservation(reservation: any): Observable<Reservation> {
     return this.http.post<Reservation>(this.apiUrl, reservation);
   }
 

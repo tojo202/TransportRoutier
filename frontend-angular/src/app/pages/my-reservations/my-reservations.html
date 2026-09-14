@@ -1,0 +1,152 @@
+<div class="reservations-page">
+  <div class="page-header-box">
+    <div class="header-left">
+      <h1 class="page-title">Mes Réservations &amp; Billets</h1>
+      <p class="page-subtitle">Consultez vos billets avec QR Code, échangez avec votre chauffeur et évaluez vos trajets.</p>
+    </div>
+    <div class="header-right">
+      <a routerLink="/platform" class="btn-new-booking">
+        <span class="material-icons">search</span>
+        <span>Trouver un autre trajet</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement de vos réservations...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && reservations.length === 0">
+    <span class="material-icons empty-icon">receipt_long</span>
+    <h3>Aucune réservation trouvée</h3>
+    <p>Vous n'avez pas encore réservé de voyage. Découvrez nos lignes et réservez votre siège en ligne !</p>
+    <a routerLink="/platform" class="btn-cta">Explorer les trajets</a>
+  </div>
+
+  <!-- Reservations List -->
+  <div class="reservations-grid" *ngIf="!isLoading && reservations.length > 0">
+    <div class="res-card" *ngFor="let res of reservations">
+      <div class="res-top">
+        <div class="res-ticket-number">
+          <span class="material-icons">confirmation_number</span>
+          <span>{{ res.ticket?.ticket_number || 'TKT-' + res.id }}</span>
+        </div>
+        <div class="res-status-badge" [class.confirmed]="res.status === 'confirmed'" [class.cancelled]="res.status === 'cancelled'">
+          {{ res.status === 'confirmed' ? 'Confirmé' : (res.status === 'cancelled' ? 'Annulé' : res.status) }}
+        </div>
+      </div>
+
+      <div class="res-route-info">
+        <div class="route-cities">
+          <span class="origin">{{ res.schedule?.route?.origin }}</span>
+          <span class="material-icons arrow">arrow_forward</span>
+          <span class="destination">{{ res.schedule?.route?.destination }}</span>
+        </div>
+        <div class="departure-time">
+          <span class="material-icons">schedule</span>
+          <span>{{ res.schedule?.departure_time | date:'EEEE dd MMMM yyyy à HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="res-details-row">
+        <div class="detail-item">
+          <span class="label">Siège</span>
+          <span class="val seat">N° {{ res.seat_number }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Montant</span>
+          <span class="val">{{ res.total_amount | number }} FCFA</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Chauffeur</span>
+          <span class="val">{{ res.schedule?.driver?.name || 'Chauffeur Express' }}</span>
+        </div>
+      </div>
+
+      <div class="res-actions">
+        <button class="btn-qr" (click)="viewTicket(res)">
+          <span class="material-icons">qr_code_2</span>
+          <span>Voir Billet &amp; QR</span>
+        </button>
+
+        <button class="btn-chat" (click)="openChat(res.schedule_id)" title="Chat direct avec le chauffeur et passagers">
+          <span class="material-icons">chat</span>
+          <span>Discussion</span>
+        </button>
+
+        <button class="btn-review" *ngIf="res.schedule?.driver_id" (click)="openReview(res.schedule.driver_id, res.schedule_id)" title="Laisser un avis sur le chauffeur">
+          <span class="material-icons">star</span>
+          <span>Avis</span>
+        </button>
+
+        <button class="btn-cancel" *ngIf="res.status !== 'cancelled'" (click)="cancelReservation(res)" title="Annuler">
+          <span class="material-icons">cancel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code Modal -->
+  <div class="modal-backdrop" *ngIf="showTicketModal" (click)="closeTicketModal()">
+    <div class="ticket-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Billet Électronique Officiel</h3>
+        <button class="modal-close" (click)="closeTicketModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="boarding-pass">
+          <div class="pass-header">
+            <div class="brand">
+              <span class="material-icons">directions_bus</span>
+              <span>TransExpress Billetterie</span>
+            </div>
+            <div class="badge-valid">VALIDE</div>
+          </div>
+
+          <div class="pass-content">
+            <div class="pass-info">
+              <div class="p-row">
+                <span class="p-label">Passager :</span>
+                <span class="p-val">{{ selectedTicketReservation?.user?.name || 'Client' }}</span>
+              </div>
+              <div class="p-row">
+                <span class="p-label">Billet N° :</span>
+                <span class="p-val bold">{{ selectedTicketReservation?.ticket?.ticket_number }}</span>
+              </div>
+              <div class="p-row">
+                <span class="p-label">Trajet :</span>
+                <span class="p-val route">{{ selectedTicketReservation?.schedule?.route?.origin }} &rarr; {{ selectedTicketReservation?.schedule?.route?.destination }}</span>
+              </div>
+              <div class="p-row">
+                <span class="p-label">Départ :</span>
+                <span class="p-val">{{ selectedTicketReservation?.schedule?.departure_time | date:'dd/MM/yyyy à HH:mm' }}</span>
+              </div>
+              <div class="p-row">
+                <span class="p-label">Siège Attribué :</span>
+                <span class="p-val seat-badge">Siège N° {{ selectedTicketReservation?.seat_number }}</span>
+              </div>
+            </div>
+
+            <div class="pass-qr">
+              <img [src]="qrCodeDataUrl" alt="QR Code" class="qr-img" *ngIf="qrCodeDataUrl" />
+              <span class="qr-text">À scanner lors de la montée</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-print" (click)="printTicket()">
+          <span class="material-icons">print</span> Imprimer / Télécharger
+        </button>
+        <button class="btn-close" (click)="closeTicketModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

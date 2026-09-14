@@ -2,74 +2,105 @@
 @import 'material-icons/iconfont/material-icons.css';
 
 /* ==========================================================================
-   TransExpress — Warm & Earthy Design System
-   Unified olive-green palette + warm cream background + terracotta accents
+   TransExpress — Palette Naturelle & Élégante (Modern Flat UX)
+   Vert Olive + Beige Crème + Ivoire + Brun Chocolat + Doré Discret
    ========================================================================== */
 
 :root {
-  /* Brand primitives */
-  --primary: #556b2f;          /* army / olive green */
-  --primary-hover: #6b8a3f;
-  --primary-strong: #44571f;
-  --primary-light: #eef2e6;    /* very soft sage */
-  --primary-soft: #f6f8f2;
+  /* 1. Vert Olive — Navbar, sections clés, boutons principaux */
+  --primary: #5B7036;
+  --primary-hover: #4C5F2B;
+  --primary-strong: #3A4A1F;
+  --primary-light: #EBF0E3;
+  --primary-soft: #F6F9F2;
 
-  --accent: #e76f51;           /* terracotta */
-  --accent-light: #fcebe5;
+  /* 2. Doré Discret — Accents, icônes, tags, finitions premium */
+  --gold: #C5A059;
+  --gold-hover: #B89247;
+  --gold-strong: #99752D;
+  --gold-light: #FAF4E5;
+  --gold-soft: #FDFBF5;
 
-  /* Status colors — muted earth tones, fits the warm palette */
-  --success: #4c7d34;
-  --success-light: #e4efdb;
-  --warning: #a3761d;
-  --warning-light: #f8eed3;
-  --danger: #c2543e;
-  --danger-light: #f9e3dc;
-  --info: #4d6e94;
-  --info-light: #e4ebf3;
+  /* 3. Beige Crème — Arrière-plan principal */
+  --bg-main: #F7F4EC;
+  --bg-secondary: #EFE9DC;
+  --bg-tertiary: #E8E0CE;
 
-  /* Neutrals */
-  --bg-main: #f9f8f6;          /* warm cream */
-  --bg-secondary: #f4f3ef;
-  --card-bg: #ffffff;
-  --surface: #fbfaf8;
+  /* 4. Ivoire — Cartes, blocs, tables, fenêtres modales */
+  --card-bg: #FFFFFB;
+  --surface: #FAF7F0;
+  --surface-hover: #F4EFE4;
 
-  --text-primary: #2b302c;     /* dark forest */
-  --text-secondary: #6b736c;
-  --text-muted: #8c968f;
+  /* 5. Brun Chocolat — Titres, textes, lisibilité chaleureuse */
+  --text-primary: #342419;
+  --text-secondary: #635043;
+  --text-muted: #958477;
 
-  --border-color: #eceae4;
-  --border-strong: #dedbd2;
+  /* Bordures harmonisées */
+  --border-color: #E2DAC8;
+  --border-strong: #CFC2A8;
+  --border-gold: #DFB76C;
 
-  /* Effects */
-  --shadow-sm: 0 1px 2px rgba(43, 48, 44, 0.05);
-  --shadow-md: 0 4px 14px rgba(43, 48, 44, 0.06);
-  --shadow-lg: 0 14px 40px rgba(43, 48, 44, 0.12);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Statuts organiques */
+  --success: #4E7A42;          /* Vert Sauge */
+  --success-light: #EAF2E8;
+  --warning: #C5A059;          /* Doré ambré */
+  --warning-light: #FAF4E5;
+  --danger: #9E4732;           /* Terracotta élégant */
+  --danger-light: #F8EBE8;
+  --info: #48624E;             /* Olive forêt */
+  --info-light: #ECF2ED;
+
+  /* Effets & Ombres teintées chocolat doux (Flat Depth) */
+  --shadow-color: rgba(52, 36, 25, 0.06);
+  --shadow-sm: 0 2px 8px rgba(52, 36, 25, 0.05);
+  --shadow-md: 0 6px 16px var(--shadow-color);
+  --shadow-lg: 0 12px 28px rgba(52, 36, 25, 0.09);
+  --shadow-gold: 0 6px 20px rgba(197, 160, 89, 0.15);
+  --shadow-hard: none;
+  
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
+  
+  /* Typographie Haute Lisibilité UX */
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-accent: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-main);
   background-color: var(--bg-main);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(circle at 12% 40%, rgba(197, 160, 89, 0.05) 0%, transparent 32%),
+    radial-gradient(circle at 88% 25%, rgba(91, 112, 54, 0.05) 0%, transparent 30%);
+  background-attachment: fixed;
 }
 
-/* ---------- Scrollbar ---------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Barre de défilement ---------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: #d5d3cc; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #b9b6ae; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); border: 2px solid var(--bg-secondary); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ==========================================================================
-   Page scaffold
+   Structure de Page
    ========================================================================== */
 .page-shell { padding: 0; }
 
@@ -78,517 +109,825 @@ html, body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 .page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 2rem;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.2;
 }
 
 .page-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   margin-top: 0.25rem;
+  display: inline-block;
 }
 
 .page-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 /* ==========================================================================
-   Search field
+   Champ de Recherche Stylisé
    ========================================================================== */
 .search-field { position: relative; }
 .search-field .material-icons {
   position: absolute;
-  left: 14px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
-  font-size: 20px;
+  font-size: 22px;
   pointer-events: none;
 }
 .search-field input {
-  width: 280px;
-  padding: 0.65rem 1rem 0.65rem 2.7rem;
-  border: 1px solid var(--border-strong);
+  width: 320px;
+  padding: 0.75rem 1.2rem 0.75rem 3.2rem;
+  border: 2px solid var(--border-color);
   border-radius: var(--radius-full);
   background: var(--card-bg);
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-family: var(--font-main);
+  font-weight: 600;
   color: var(--text-primary);
   outline: none;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 0 var(--border-color);
 }
-.search-field input::placeholder { color: var(--text-muted); }
+.search-field input::placeholder { color: var(--text-muted); font-weight: 500; }
 .search-field input:focus {
-  border-color: var(--primary-hover);
+  border-color: var(--primary);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(107, 138, 63, 0.18);
+  box-shadow: 0 0 0 4px rgba(91, 112, 54, 0.15);
 }
 
 /* ==========================================================================
-   Buttons
+   Boutons (Design Flat Moderne & Épuré - UX Ergonomique)
    ========================================================================== */
-.btn-primary {
-  background: linear-gradient(135deg, #6b8a3f 0%, #556b2f 100%);
-  color: #fff;
-  padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-md);
-  border: none;
+.btn-primary, .btn-secondary, .btn-dark, .btn-cream, .btn-outline, .btn-outlineBrown, .btn-ghost, .btn-danger {
+  font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(85, 107, 47, 0.28);
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  border: 1px solid transparent;
+  user-select: none;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tailles */
+.btn-sm {
+  padding: 0.45rem 1.1rem;
+  font-size: 0.85rem;
+  border-width: 1px;
+}
+.btn-md {
+  padding: 0.65rem 1.4rem;
+  font-size: 0.92rem;
+}
+.btn-lg {
+  padding: 0.85rem 1.8rem;
+  font-size: 1.05rem;
+}
+
+/* 1. Vert Olive — Action Principale */
+.btn-primary {
+  background: var(--primary);
+  color: #FFFFFB;
+  border-color: var(--primary);
 }
 .btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(91, 112, 54, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(85, 107, 47, 0.36);
 }
-.btn-primary:active { transform: translateY(0); }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-primary:active,
+.btn-primary.btn-press {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:disabled { 
+  opacity: 0.55; 
+  cursor: not-allowed; 
+  transform: none; 
+  box-shadow: none; 
+}
 
+/* 2. Doré Discret — Action Secondaire / Premium */
 .btn-secondary {
-  background: var(--card-bg);
-  color: var(--text-primary);
-  padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-strong);
-  font-weight: 600;
-  font-size: 0.9rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: var(--gold);
+  color: #FFFFFB;
+  border-color: var(--gold);
 }
 .btn-secondary:hover {
-  border-color: var(--primary-hover);
-  color: var(--primary-hover);
-  background: var(--primary-soft);
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
+  transform: translateY(-1px);
+}
+.btn-secondary:active,
+.btn-secondary.btn-press {
+  transform: translateY(0);
+}
+
+/* 3. Brun Chocolat — Bouton Foncé */
+.btn-dark {
+  background: var(--text-primary);
+  color: #FFFFFB;
+  border-color: var(--text-primary);
+}
+.btn-dark:hover {
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+  box-shadow: 0 4px 12px rgba(52, 36, 25, 0.2);
+  transform: translateY(-1px);
+}
+.btn-dark:active,
+.btn-dark.btn-press {
+  transform: translateY(0);
+}
+
+/* 4. Ivoire & Crème — Bouton Neutre Doux */
+.btn-cream {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.btn-cream:hover {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.btn-cream:active,
+.btn-cream.btn-press {
+  transform: translateY(0);
+}
+
+/* 5. Contour Olive */
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  box-shadow: none;
+}
+.btn-outline:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+.btn-outline:active,
+.btn-outline.btn-press {
+  transform: translateY(0);
+}
+
+/* 6. Contour Doré */
+.btn-outlineBrown {
+  background: transparent;
+  color: var(--gold-strong);
+  border: 1.5px solid var(--gold);
+  box-shadow: none;
+}
+.btn-outlineBrown:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+}
+.btn-outlineBrown:active,
+.btn-outlineBrown.btn-press {
+  transform: translateY(0);
+}
+
+/* 7. Bouton Danger */
+.btn-danger {
+  background: var(--danger);
+  color: #FFFFFB;
+  border-color: var(--danger);
+}
+.btn-danger:hover {
+  background: #893B28;
+  box-shadow: 0 4px 12px rgba(158, 71, 50, 0.25);
+  transform: translateY(-1px);
+}
+.btn-danger:active {
+  transform: translateY(0);
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  border: none;
-  font-weight: 600;
-  font-size: 0.875rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-color: transparent;
+  box-shadow: none;
 }
 .btn-ghost:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.btn-ghost:active { transform: scale(0.98); }
 
-/* Icon buttons */
+/* Boutons icônes plats */
 .icon-btn {
   width: 38px;
   height: 38px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  background: transparent;
-  color: var(--text-muted);
+  background: var(--card-bg);
+  color: var(--text-primary);
   transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
 }
-.icon-btn .material-icons { font-size: 20px; }
-.icon-btn.edit:hover { background: var(--primary-light); color: var(--primary); }
-.icon-btn.delete:hover { background: var(--danger-light); color: var(--danger); }
-.icon-btn.view:hover { background: var(--info-light); color: var(--info); }
+.icon-btn .material-icons { font-size: 19px; }
+.icon-btn:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.icon-btn:active {
+  transform: translateY(0);
+}
+.icon-btn.edit { background: var(--gold-light); color: var(--gold-strong); border-color: #EBDAB4; }
+.icon-btn.delete { background: var(--danger-light); color: var(--danger); border-color: #ECD4CD; }
+.icon-btn.view { background: var(--primary-light); color: var(--primary); border-color: #D2DEBF; }
 
 /* ==========================================================================
-   Stat cards
+   Cartes de Statistiques (Ivoire & Modern Flat)
    ========================================================================== */
 .card-stat {
   background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  padding: 1.4rem 1.5rem;
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
 }
 .card-stat::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  top: -24px;
+  right: -24px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  opacity: 0.35;
+  z-index: 0;
 }
 .card-stat:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
 }
-.card-stat:hover::before { opacity: 1; }
 
 .stat-card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  flex-direction: row-reverse; 
+  position: relative;
+  z-index: 1;
 }
-.stat-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.stat-value {
-  font-size: 1.9rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  line-height: 1.1;
-}
+
 .stat-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: none;
 }
 .stat-icon .material-icons { font-size: 24px; }
-.stat-icon.primary { background: var(--primary-light); color: var(--primary); }
+.stat-icon.primary { background: var(--primary-light); color: var(--primary-strong); }
 .stat-icon.success { background: var(--success-light); color: var(--success); }
-.stat-icon.warning { background: var(--warning-light); color: var(--warning); }
-.stat-icon.danger  { background: var(--danger-light);  color: var(--danger); }
-.stat-icon.info    { background: var(--info-light);    color: var(--info); }
-.stat-icon.accent  { background: var(--accent-light);  color: var(--accent); }
-.stat-icon.neutral { background: var(--bg-secondary);  color: var(--text-secondary); }
+.stat-icon.warning { background: var(--gold-light); color: var(--gold-strong); }
+.stat-icon.danger  { background: var(--danger-light); color: var(--danger); }
+.stat-icon.info    { background: var(--info-light); color: var(--info); }
+.stat-icon.neutral { background: var(--bg-secondary); color: var(--text-secondary); }
 
-.stat-trend {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
+.stat-label {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
   font-weight: 700;
-  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: right;
+  margin-top: 10px;
 }
-.stat-trend.up { color: var(--success); }
-.stat-trend.down { color: var(--danger); }
+
+.stat-value {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-top: 1.25rem;
+}
 
 /* ==========================================================================
-   Badges
+   Badges de Statut (Teintes Terreuses & Organiques)
    ========================================================================== */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0.25rem 0.7rem;
+  gap: 6px;
+  padding: 0.35rem 0.95rem;
   border-radius: var(--radius-full);
-  font-size: 0.73rem;
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
   white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(52, 36, 25, 0.05);
 }
 .badge .dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
-.badge-success { background: var(--success-light); color: var(--success); }
-.badge-warning { background: var(--warning-light); color: var(--warning); }
-.badge-danger  { background: var(--danger-light);  color: var(--danger); }
-.badge-info    { background: var(--info-light);    color: var(--info); }
-.badge-primary { background: var(--primary-light); color: var(--primary); }
-.badge-neutral { background: var(--bg-secondary);  color: var(--text-secondary); }
+.badge-primary { background: var(--primary-light); color: var(--primary-strong); border: 1.5px solid #D2DEBF; }
+.badge-success { background: var(--success-light); color: #2E5325; border: 1.5px solid #CBE0C7; }
+.badge-warning { background: var(--gold-light); color: var(--gold-strong); border: 1.5px solid #EBDAB4; }
+.badge-danger  { background: var(--danger-light); color: var(--danger); border: 1.5px solid #ECCDC6; }
+.badge-info    { background: var(--info-light); color: var(--info); border: 1.5px solid #D1DFD3; }
+.badge-neutral { background: var(--bg-secondary); color: var(--text-secondary); border: 1.5px solid var(--border-color); }
 
 /* ==========================================================================
-   Tables
+   Tableaux Ivoire Élégants
    ========================================================================== */
 .table-container {
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  padding: 8px;
 }
 
 .custom-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 0.96rem;
 }
 
 .custom-table thead th {
-  background: var(--bg-secondary);
-  padding: 0.85rem 1.4rem;
+  background: transparent;
+  padding: 0.6rem 1.4rem;
   text-align: left;
-  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
+  letter-spacing: 0.04em;
+  border-bottom: none;
 }
 
+.custom-table tbody tr { 
+  background: var(--surface);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 0 var(--border-color);
+}
 .custom-table tbody td {
-  padding: 0.95rem 1.4rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1.1rem 1.4rem;
   color: var(--text-secondary);
   vertical-align: middle;
+  border-top: 1.5px solid var(--border-color);
+  border-bottom: 1.5px solid var(--border-color);
+}
+.custom-table tbody td:first-child {
+  border-left: 1.5px solid var(--border-color);
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+.custom-table tbody td:last-child {
+  border-right: 1.5px solid var(--border-color);
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
 }
 
-.custom-table tbody tr:last-child td { border-bottom: none; }
-.custom-table tbody tr { transition: background 0.12s ease; }
-.custom-table tbody tr:hover { background: var(--primary-soft); }
+.custom-table tbody tr:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(52, 36, 25, 0.07);
+  background: #FFFFFF;
+}
 
 .cell-primary {
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
   color: var(--text-primary);
 }
 .cell-secondary {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
-.cell-actions {
-  text-align: center;
-  white-space: nowrap;
-}
-.cell-actions .icon-btn + .icon-btn { margin-left: 4px; }
 
-/* ---------- Empty state ---------- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1.5rem;
-  color: var(--text-muted);
+/* Avatar Voyageur / Utilisateur */
+.avatar-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #788E4B, #5B7036);
+  color: #FFFFFB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(91, 112, 54, 0.25);
+  border: 2px solid var(--gold-light);
 }
-.empty-state .material-icons {
-  font-size: 42px;
-  color: #c9c7bf;
-  display: block;
-  margin-bottom: 0.75rem;
-}
-.empty-state p { margin: 0; font-size: 0.9rem; }
 
 /* ==========================================================================
-   Forms
+   Formulaires (Ivoire & Crème)
    ========================================================================== */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-.form-grid .full { grid-column: 1 / -1; }
-
-.form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-.form-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.01em;
-}
-.form-label .required { color: var(--danger); margin-left: 2px; }
-
 .form-input,
 .form-select,
 .form-textarea {
-  padding: 0.65rem 0.9rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: var(--card-bg);
-  font-size: 0.9rem;
+  padding: 0.75rem 1.15rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  font-size: 0.95rem;
+  font-family: var(--font-main);
+  font-weight: 600;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
 }
-.form-input::placeholder,
-.form-textarea::placeholder { color: var(--text-muted); }
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
-  border-color: var(--primary-hover);
-  box-shadow: 0 0 0 3px rgba(107, 138, 63, 0.18);
+  border-color: var(--primary);
+  background: #FFFFFF;
+  box-shadow: 0 3px 0 var(--primary-light);
+  transform: translateY(-1px);
 }
-.form-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b736c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.85rem center;
-  padding-right: 2.4rem;
-  cursor: pointer;
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group.full {
+  grid-column: 1 / -1;
+}
+.form-label {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+.form-label .required {
+  color: var(--danger);
 }
 
 /* ==========================================================================
-   Modal
+   SectionBadge & SectionTitle (Élégant & Doré)
    ========================================================================== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(43, 48, 44, 0.5);
-  backdrop-filter: blur(4px);
-  padding: 1rem;
-  animation: fadeIn 0.15s ease;
-}
-
-.modal-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-xl);
-  width: min(520px, 94vw);
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(43, 48, 44, 0.28);
-  animation: slideUp 0.2s ease;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.15rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-.modal-title {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--text-primary);
-  margin: 0;
-  display: flex;
+.section-badge-wrap {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  background: var(--card-bg);
+  color: var(--gold-strong);
+  border: 2px solid var(--border-gold);
+  padding: 0.35rem 1.15rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 3px 0 var(--gold-light);
+  margin-bottom: 0.6rem;
+  width: fit-content;
 }
-.modal-title .material-icons { color: var(--primary); }
-.modal-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  background: var(--bg-secondary);
+.section-badge-wrap .material-icons {
+  font-size: 18px;
+  color: var(--gold);
+}
+.section-tagline {
+  font-family: var(--font-accent);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--gold-strong);
+  line-height: 1;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.01em;
+}
+.section-desc {
+  font-family: var(--font-main);
+  font-size: 1.02rem;
   color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
+  font-weight: 600;
+  max-width: 680px;
+  margin: 0;
+  line-height: 1.5;
 }
-.modal-close:hover { background: var(--danger-light); color: var(--danger); }
-.modal-close .material-icons { font-size: 20px; }
-
-.modal-body { padding: 1.5rem; }
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-color);
-  background: var(--surface);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-}
-
-.modal-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-.modal-icon-wrap .material-icons { font-size: 28px; }
 
 /* ==========================================================================
-   Section cards (dashboard, reports)
+   Cartes Tournées & Placeholders Rayés
+   ========================================================================== */
+.rotate-card-left {
+  transform: rotate(-1.5deg);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.rotate-card-right {
+  transform: rotate(1.5deg);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.rotate-hover:hover {
+  transform: rotate(0deg) translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.placeholder-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--card-bg),
+    var(--card-bg) 14px,
+    var(--surface) 14px,
+    var(--surface) 28px
+  );
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-align: center;
+  padding: 1.75rem;
+  min-height: 140px;
+}
+.placeholder-stripes .material-icons {
+  font-size: 38px;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   Formes Décoratives Organiques (Vert Olive, Doré, Crème)
+   ========================================================================== */
+.deco-blob {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  filter: blur(34px);
+  opacity: 0.22;
+  animation: organicMorph 14s ease-in-out infinite alternate;
+}
+
+.deco-blob-olive {
+  background: radial-gradient(circle, #788E4B 0%, #5B7036 80%);
+}
+.deco-blob-gold {
+  background: radial-gradient(circle, #DFB76C 0%, #C5A059 80%);
+}
+.deco-blob-cream {
+  background: radial-gradient(circle, #FFFFFF 0%, #EFE9DC 80%);
+}
+
+.floating-bubble {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: gentleFloat 7s ease-in-out infinite alternate;
+}
+
+@keyframes organicMorph {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%;
+    transform: rotate(180deg) scale(1.06);
+  }
+  100% {
+    border-radius: 50% 60% 30% 60% / 30% 40% 60% 70%;
+    transform: rotate(360deg) scale(0.96);
+  }
+}
+
+@keyframes gentleFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   Scroll Reveal Animations
+   ========================================================================== */
+.reveal {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.reveal-up {
+  transform: translateY(28px);
+}
+.reveal.reveal-scale {
+  transform: scale(0.94) translateY(16px);
+}
+.reveal.reveal-left {
+  transform: translateX(-32px);
+}
+.reveal.reveal-right {
+  transform: translateX(32px);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1) translateX(0);
+}
+
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-150 { transition-delay: 150ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-250 { transition-delay: 250ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+.reveal-delay-400 { transition-delay: 400ms; }
+
+/* ==========================================================================
+   Section Cards (Ivoire & En-têtes Raffinés)
    ========================================================================== */
 .section-card {
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
-.section-card:hover { box-shadow: var(--shadow-md); }
+.section-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
 .section-card-header {
-  padding: 1.15rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1.25rem 1.75rem;
+  border-bottom: 2px solid var(--border-color);
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
+
+/* Variantes d'en-têtes de cartes */
+.section-card-header.header-olive {
+  background: var(--primary-light);
+  border-color: #D2DEBF;
+}
+.section-card-header.header-gold {
+  background: var(--gold-light);
+  border-color: #EBDAB4;
+}
+.section-card-header.header-cream {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
 .section-card-title {
-  font-weight: 700;
-  font-size: 1rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.25rem;
   color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-.section-card-title .material-icons { color: var(--primary); font-size: 20px; }
-.section-card-body { padding: 1.5rem; }
-
-/* ==========================================================================
-   Misc
-   ========================================================================== */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(236, 234, 228, 0.9);
-  box-shadow: var(--shadow-lg);
+.section-card-title .material-icons {
+  color: var(--primary);
+  font-size: 24px;
+}
+.section-card-body {
+  padding: 1.75rem;
 }
 
-.avatar-chip {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8aa868, #556b2f);
-  color: #fff;
-  display: inline-flex;
+/* Fenêtres Modales */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(52, 36, 25, 0.45);
+  backdrop-filter: blur(5px);
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(85, 107, 47, 0.25);
+  z-index: 999;
+  padding: 1rem;
 }
-
-.divider { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.modal-card {
+  background: var(--card-bg);
+  border-radius: 30px;
+  border: 3px solid var(--border-color);
+  box-shadow: 0 24px 60px rgba(52, 36, 25, 0.25);
+  width: min(540px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(14px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.modal-header {
+  padding: 1.35rem 1.75rem;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-title .material-icons {
+  color: var(--primary);
+  font-size: 26px;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+.modal-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.modal-body {
+  padding: 1.6rem 1.75rem;
+}
+.modal-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  background: var(--surface);
 }

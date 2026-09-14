@@ -1,0 +1,132 @@
+<div class="scan-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Validation des Billets &bull; Scanner QR Code</h1>
+      <p class="page-subtitle">Contrôlez les billets des passagers à la montée, vérifiez les sièges et autorisez l'embarquement.</p>
+    </div>
+    <a routerLink="/driver-trips" class="btn-back">
+      <span class="material-icons">arrow_back</span>
+      <span>Mes Trajets</span>
+    </a>
+  </div>
+
+  <div class="scan-grid">
+    <!-- Left: Scanner viewfinder & Code input -->
+    <div class="scanner-card">
+      <div class="scanner-viewfinder">
+        <div class="viewfinder-box">
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+          <div class="laser-beam"></div>
+          <span class="material-icons camera-icon">qr_code_scanner</span>
+        </div>
+        <p class="scan-hint">Placez le QR Code du billet face à la caméra ou entrez le numéro ci-dessous</p>
+      </div>
+
+      <div class="scan-input-box">
+        <label>Code du Billet / Référence QR</label>
+        <div class="input-action-row">
+          <input 
+            type="text" 
+            [(ngModel)]="ticketCode" 
+            placeholder="Ex: TKT-123456-1"
+            (keyup.enter)="onScanSubmit()"
+            class="code-input"
+            autofocus
+          />
+          <button class="btn-validate" [disabled]="isScanning || !ticketCode.trim()" (click)="onScanSubmit()">
+            <span class="material-icons">check_circle</span>
+            <span>Valider</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Test codes -->
+      <div class="quick-demo-codes">
+        <span class="demo-label">Tester avec un billet récent :</span>
+        <button class="pill-code" (click)="quickTest('TKT-')">Billets récents TKT-*</button>
+      </div>
+    </div>
+
+    <!-- Right: Validation Result Card -->
+    <div class="result-card" [class.success]="scanResult?.valid" [class.error]="scanResult && !scanResult.valid">
+      <!-- Waiting state -->
+      <div class="result-placeholder" *ngIf="!scanResult">
+        <span class="material-icons icon-idle">hourglass_empty</span>
+        <h3>En attente de scan...</h3>
+        <p>Scannez un QR code ou entrez un numéro de billet pour vérifier sa validité.</p>
+      </div>
+
+      <!-- Success result -->
+      <div class="result-content" *ngIf="scanResult?.valid">
+        <div class="status-banner valid">
+          <span class="material-icons">verified</span>
+          <span>BILLET VALIDE &bull; EMBARQUEMENT AUTORISÉ</span>
+        </div>
+
+        <div class="ticket-details-box">
+          <div class="detail-row">
+            <span class="d-label">Passager :</span>
+            <span class="d-val name">{{ scanResult.ticket?.reservation?.user?.name || 'Alice Client' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Siège Réservé :</span>
+            <span class="d-val seat-badge">SIÈGE N° {{ scanResult.ticket?.reservation?.seat_number }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Ligne :</span>
+            <span class="d-val">{{ scanResult.ticket?.reservation?.schedule?.route?.origin }} &rarr; {{ scanResult.ticket?.reservation?.schedule?.route?.destination }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">N° Billet :</span>
+            <span class="d-val bold">{{ scanResult.ticket?.ticket_number }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Statut Paiement :</span>
+            <span class="d-val text-emerald-600 font-bold">Payé (Mobile Money)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error result -->
+      <div class="result-content" *ngIf="scanResult && !scanResult.valid">
+        <div class="status-banner invalid">
+          <span class="material-icons">dangerous</span>
+          <span>ACCÈS REFUSÉ</span>
+        </div>
+        <p class="error-text">{{ scanResult.message || errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Scans Session History -->
+  <div class="history-card" *ngIf="recentScans.length > 0">
+    <h3>Historique de la session ({{ recentScans.length }} scans)</h3>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Heure</th>
+          <th>Passager</th>
+          <th>Siège</th>
+          <th>Trajet</th>
+          <th>Résultat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of recentScans">
+          <td>{{ s.time | date:'HH:mm:ss' }}</td>
+          <td><strong>{{ s.passenger }}</strong></td>
+          <td><span class="seat-badge-sm">N° {{ s.seat }}</span></td>
+          <td>{{ s.route }}</td>
+          <td>
+            <span class="badge" [class.badge-ok]="s.valid" [class.badge-ko]="!s.valid">
+              {{ s.valid ? 'Validé' : 'Refusé' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

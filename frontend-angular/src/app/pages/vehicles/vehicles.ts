@@ -35,7 +35,7 @@ export class VehiclesComponent implements OnInit {
     this.vehicleService.getVehicles().subscribe({
       next: (data) => {
         this.vehicles = data;
-        this.filteredVehicles = []; // Hide until search
+        this.applyFilter();
       },
       error: (err) => console.error(err)
     });
@@ -46,9 +46,9 @@ export class VehiclesComponent implements OnInit {
   }
 
   applyFilter(): void {
-    const term = this.searchTerm.toLowerCase();
-    if (term.trim() === '') {
-      this.filteredVehicles = [];
+    const term = this.searchTerm.toLowerCase().trim();
+    if (term === '') {
+      this.filteredVehicles = [...this.vehicles];
       return;
     }
     this.filteredVehicles = this.vehicles.filter(v => 

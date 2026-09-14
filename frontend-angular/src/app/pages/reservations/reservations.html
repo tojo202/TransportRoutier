@@ -1,198 +1,320 @@
-<div class="p-6 bg-gray-50/50 min-h-screen">
-  <div class="flex justify-between items-start mb-6">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900 mb-1">Réservations</h1>
-      <p class="text-gray-500">Gérez et suivez les réservations de vos clients.</p>
-    </div>
-    
-    <div class="flex gap-4">
-      <button mat-stroked-button class="bg-white">
-        <mat-icon>calendar_today</mat-icon> Ce mois
-        <mat-icon>arrow_drop_down</mat-icon>
-      </button>
-      <button mat-raised-button color="primary" (click)="openForm()">
-        <mat-icon>add</mat-icon> Ajouter
+<div class="page-shell">
+
+  <!-- ── Section Header avec Badge & Titre ludique ── -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8" revealOnScroll revealClass="reveal-up">
+    <app-section-badge
+      tagline="Gestion &amp; Logistique des Billets"
+      icon="confirmation_number"
+      title="Réservations Voyageurs"
+      description="Suivez en direct les passagers, les places attribuées et les paiements confirmés.">
+    </app-section-badge>
+
+    <div class="flex items-center gap-3">
+      <button class="btn-primary btn-md" (click)="openForm()">
+        <span class="material-icons">add_circle</span>
+        <span>Nouvelle Réservation</span>
       </button>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
-      <div class="absolute top-0 right-0 p-4 opacity-10">
-        <mat-icon class="scale-[3]">confirmation_number</mat-icon>
+  <!-- ── Cartes de Statistiques Chaleureuses & en Relief ── -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+
+    <!-- Total Réservations -->
+    <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="50">
+      <div class="stat-card-header">
+        <div class="stat-icon primary">
+          <span class="material-icons">confirmation_number</span>
+        </div>
+        <div class="stat-label">Total Réservations</div>
       </div>
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Réservations</div>
-      <div class="text-4xl font-bold text-gray-900 mb-2">1,248</div>
-      <div class="text-sm font-medium text-green-600 flex items-center">
-        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +12% vs mois dernier
+      <div class="stat-value">{{ totalCount }}</div>
+      <div class="badge badge-primary mt-2">
+        <span class="material-icons text-sm">trending_up</span> Activité en cours
       </div>
     </div>
 
-    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
-      <div class="absolute top-0 right-0 p-4 opacity-10">
-        <mat-icon class="scale-[3] text-green-500">check_circle</mat-icon>
+    <!-- Confirmées -->
+    <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="120">
+      <div class="stat-card-header">
+        <div class="stat-icon success">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <div class="stat-label">Confirmées</div>
       </div>
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Confirmées</div>
-      <div class="text-4xl font-bold text-gray-900 mb-2">982</div>
-      <div class="text-sm font-medium text-green-600 flex items-center">
-        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +5% vs mois dernier
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
-      <div class="absolute top-0 right-0 p-4 opacity-10">
-        <mat-icon class="scale-[3] text-amber-500">hourglass_empty</mat-icon>
-      </div>
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">En Attente</div>
-      <div class="text-4xl font-bold text-gray-900 mb-2">45</div>
-      <div class="text-sm font-medium text-gray-500 flex items-center">
-        Action requise
+      <div class="stat-value text-[#4E7A42]">{{ confirmedCount }}</div>
+      <div class="badge badge-success mt-2">
+        <span class="material-icons text-sm">done_all</span> Billets validés
       </div>
     </div>
 
-    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm relative overflow-hidden">
-      <div class="absolute top-0 right-0 p-4 opacity-10">
-        <mat-icon class="scale-[3] text-primary">account_balance_wallet</mat-icon>
+    <!-- En Attente -->
+    <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="190">
+      <div class="stat-card-header">
+        <div class="stat-icon warning">
+          <span class="material-icons">hourglass_empty</span>
+        </div>
+        <div class="stat-label">En Attente</div>
       </div>
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Revenu (Mois)</div>
-      <div class="text-4xl font-bold text-gray-900 mb-2 flex items-baseline gap-1">4.2M <span class="text-lg text-gray-500">Ar</span></div>
-      <div class="text-sm font-medium text-green-600 flex items-center">
-        <mat-icon class="scale-75 w-5 h-5">trending_up</mat-icon> +18% vs mois dernier
+      <div class="stat-value text-[#C5A059]">{{ pendingCount }}</div>
+      <div class="badge badge-warning mt-2">
+        <span class="material-icons text-sm">schedule</span> Paiement requis
       </div>
     </div>
+
+    <!-- Total Recettes -->
+    <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="260">
+      <div class="stat-card-header">
+        <div class="stat-icon info">
+          <span class="material-icons">account_balance_wallet</span>
+        </div>
+        <div class="stat-label">Volume Recettes</div>
+      </div>
+      <div class="stat-value text-[#5B7036]" style="font-size: 2.3rem;">
+        {{ totalRevenue | number }} <span class="text-sm font-bold text-gray-500">Ar</span>
+      </div>
+      <div class="badge badge-info mt-2">
+        <span class="material-icons text-sm">payments</span> Total cumulé
+      </div>
+    </div>
+
   </div>
 
-  <mat-card class="!rounded-xl border border-gray-100 !shadow-sm">
-    <div class="p-4 border-b flex flex-wrap justify-between items-center gap-4 bg-white rounded-t-xl">
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-medium text-gray-500">Filtres:</span>
-        <div class="flex bg-gray-100 rounded-lg p-1">
-          <button class="px-4 py-1.5 text-sm font-medium bg-white shadow-sm rounded-md text-gray-800 flex items-center gap-1">
-            Tous les statuts <mat-icon class="scale-75 w-4 h-4">close</mat-icon>
+  <!-- ── Section Principale : Filtres + Tableau Stylé ── -->
+  <div class="section-card mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="100">
+
+    <!-- En-tête raffiné avec filtres & champ de recherche -->
+    <div class="section-card-header header-olive flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="font-extrabold text-sm text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-icons text-primary text-base">filter_alt</span> Statut :
+        </span>
+        <div class="flex gap-2">
+          <button 
+            class="btn-sm" 
+            [ngClass]="statusFilter === 'all' ? 'btn-dark' : 'btn-cream'"
+            (click)="setStatusFilter('all')">
+            Tous ({{ totalCount }})
           </button>
-          <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">Confirmé</button>
-          <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">En attente</button>
+          <button 
+            class="btn-sm" 
+            [ngClass]="statusFilter === 'confirmed' ? 'btn-primary' : 'btn-cream'"
+            (click)="setStatusFilter('confirmed')">
+            <span class="material-icons text-xs">check</span> Confirmés
+          </button>
+          <button 
+            class="btn-sm" 
+            [ngClass]="statusFilter === 'pending' ? 'btn-secondary' : 'btn-cream'"
+            (click)="setStatusFilter('pending')">
+            <span class="material-icons text-xs">hourglass_top</span> En attente
+          </button>
         </div>
       </div>
-      
-      <div class="relative w-72">
-        <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</mat-icon>
-        <input type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="ID, Client, Trajet..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+
+      <!-- Recherche avec icône intégrée -->
+      <div class="search-field">
+        <span class="material-icons">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="applyFilter()" 
+          placeholder="Client, statut, ID réservation..."
+          class="form-input"
+          style="width: 290px;">
       </div>
     </div>
 
-    <div class="overflow-x-auto bg-white">
-      <table class="w-full text-left border-collapse">
+    <!-- Tableau Personnalisé -->
+    <div class="overflow-x-auto p-4 bg-[var(--card-bg)]">
+      <table class="custom-table">
         <thead>
-          <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-            <th class="p-4">ID</th>
-            <th class="p-4">Client</th>
-            <th class="p-4">Planning (Trajet)</th>
-            <th class="p-4">Sièges</th>
-            <th class="p-4">Total</th>
-            <th class="p-4">Statut</th>
-            <th class="p-4 text-center">Actions</th>
+          <tr>
+            <th>N° ID</th>
+            <th>Voyageur / Client</th>
+            <th>Planning &amp; Trajet</th>
+            <th>Siège</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th style="text-align: center;">Actions</th>
           </tr>
         </thead>
-        <tbody class="text-sm divide-y divide-gray-50">
-          <tr *ngFor="let r of filteredReservations | paginate: { itemsPerPage: 10, currentPage: p }" class="hover:bg-gray-50/50 transition-colors">
-            <td class="p-4 font-medium text-gray-600">#{{ r.id }}</td>
-            <td class="p-4">
+        <tbody>
+          <tr *ngFor="let r of filteredReservations | paginate: { itemsPerPage: 8, currentPage: p }">
+            <td>
+              <span class="badge badge-info font-mono">#{{ r.id }}</span>
+            </td>
+            <td>
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold text-xs">
-                  {{ (r.user?.name || 'C').substring(0, 2).toUpperCase() }}
+                <div class="avatar-chip">
+                  {{ (r.user?.name || 'C').substring(0, 1).toUpperCase() }}
                 </div>
-                <span class="font-medium text-gray-900">{{ r.user?.name || 'Alice Client' }}</span>
+                <div>
+                  <div class="cell-primary">{{ r.user?.name || 'Passager' }}</div>
+                  <span class="cell-secondary">{{ r.user?.phone || 'Client enregistré' }}</span>
+                </div>
               </div>
             </td>
-            <td class="p-4">
-              <div class="font-medium text-gray-900">
-                {{ r.schedule?.route?.origin || r.schedule?.route?.departure_city || 'Dakar' }} &rarr; {{ r.schedule?.route?.destination || r.schedule?.route?.arrival_city || 'Saint-Louis' }}
+            <td>
+              <div class="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                <span>{{ r.schedule?.route?.origin || r.schedule?.route?.departure_city || 'Départ' }}</span>
+                <span class="material-icons text-primary text-sm">east</span>
+                <span>{{ r.schedule?.route?.destination || r.schedule?.route?.arrival_city || 'Arrivée' }}</span>
               </div>
-              <div class="text-xs text-gray-500 mt-0.5">{{ r.schedule?.departure_time | date:'short' || '8/27/26, 8:06 PM' }}</div>
+              <div class="text-xs font-semibold text-gray-400 mt-1 flex items-center gap-1">
+                <span class="material-icons text-xs">event</span>
+                {{ (r.schedule?.departure_time | date:'dd MMM yyyy, HH:mm') || 'Horaire standard' }}
+              </div>
             </td>
-            <td class="p-4">
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                N° {{ r.seat_number || r.seats || '3' }}
+            <td>
+              <span class="badge badge-primary font-bold">
+                <span class="material-icons text-xs">event_seat</span>
+                Place {{ r.seat_number || r.seats || '1' }}
               </span>
             </td>
-            <td class="p-4 font-semibold text-green-700">{{ (r.total_amount || r.total_price || 7500) | number }} Ar</td>
-            <td class="p-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+            <td>
+              <span class="font-extrabold text-[var(--primary)] text-base" style="font-family: var(--font-heading);">
+                {{ (r.total_amount || r.total_price || 0) | number }} <span class="text-xs font-bold text-gray-500">Ar</span>
+              </span>
+            </td>
+
+            <td>
+              <span class="badge"
                 [ngClass]="{
-                  'bg-amber-100 text-amber-800': r.status === 'pending',
-                  'bg-green-100 text-green-700': r.status === 'confirmed' || !r.status,
-                  'bg-rose-100 text-rose-800': r.status === 'cancelled'
+                  'badge-success': r.status === 'confirmed' || !r.status,
+                  'badge-warning': r.status === 'pending',
+                  'badge-danger': r.status === 'cancelled'
                 }">
+                <span class="dot"></span>
                 {{ r.status === 'confirmed' || !r.status ? 'Confirmé' : (r.status === 'pending' ? 'En attente' : r.status) }}
               </span>
             </td>
-            <td class="p-4 text-center">
-              <button mat-icon-button class="text-gray-400 hover:text-primary scale-75" (click)="openForm(r)"><mat-icon>edit</mat-icon></button>
-              <button mat-icon-button class="text-gray-400 hover:text-red-500 scale-75" (click)="deleteReservation(r.id)"><mat-icon>delete</mat-icon></button>
+            <td style="text-align: center;">
+              <div class="flex items-center justify-center gap-2">
+                <button class="icon-btn edit" (click)="openForm(r)" title="Modifier la réservation">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="icon-btn delete" (click)="deleteReservation(r.id)" title="Supprimer la réservation">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
             </td>
           </tr>
+
+          <!-- État Vide avec pattern rayé -->
           <tr *ngIf="!filteredReservations.length">
-            <td colspan="7" class="p-8 text-center text-gray-500">Aucune réservation trouvée.</td>
+            <td colspan="7" class="p-8 text-center">
+              <div class="placeholder-stripes max-w-md mx-auto">
+                <span class="material-icons">confirmation_number</span>
+                <p class="text-base font-bold text-[#3B3835] mb-1">Aucune réservation trouvée</p>
+                <span class="text-xs text-gray-400 font-semibold">Essayez un autre mot-clé ou réinitialisez les filtres.</span>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
-    <div class="flex justify-center p-4 border-t mt-4">
-      <pagination-controls (pageChange)="p = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
-    </div>
 
-    </div>
-
-    <div class="p-4 border-t border-gray-100 bg-white rounded-b-xl flex justify-between items-center text-sm text-gray-500">
-      <span>Affichage de 1 à 5 sur 97 résultats</span>
-      <div class="flex gap-1">
-        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50"><mat-icon class="scale-75 w-5 h-5">chevron_left</mat-icon></button>
-        <button class="w-8 h-8 flex items-center justify-center border border-green-500 bg-green-50 text-green-700 rounded font-medium">1</button>
-        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50">2</button>
-        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50">3</button>
-        <span class="w-8 h-8 flex items-center justify-center text-gray-400">...</span>
-        <button class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded hover:bg-gray-50"><mat-icon class="scale-75 w-5 h-5">chevron_right</mat-icon></button>
+      <!-- Pagination Stylée -->
+      <div class="flex justify-center p-4 mt-2">
+        <pagination-controls 
+          (pageChange)="p = $event" 
+          previousLabel="Précédent" 
+          nextLabel="Suivant">
+        </pagination-controls>
       </div>
     </div>
-  </mat-card>
+  </div>
+
 </div>
 
-<!-- Modal Form -->
-<div *ngIf="showFormModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-[500px]">
-    <h2 class="text-xl font-bold mb-4">{{ editingId ? 'Modifier' : 'Ajouter' }} une réservation</h2>
-    <form (ngSubmit)="saveReservation()" class="flex flex-col gap-3">
-      
-      <input type="number" [(ngModel)]="form.user_id" name="user_id" placeholder="ID Client" class="border p-2 rounded" required>
-      
-      <select [(ngModel)]="form.schedule_id" name="schedule_id" class="border p-2 rounded" required>
-        <option value="">Sélectionnez un planning</option>
-        <option *ngFor="let s of schedules" [value]="s.id">
-          {{ s.route?.origin || s.route?.departure_city }} &rarr; {{ s.route?.destination || s.route?.arrival_city }} ({{ s.departure_time | date:'short' }})
-        </option>
-      </select>
-      
-      <div class="flex gap-2">
-        <div class="flex-1">
-          <label class="text-sm font-medium">N° de Siège</label>
-          <input type="number" [(ngModel)]="form.seat_number" name="seat_number" class="w-full border p-2 rounded" min="1" required>
+<!-- ── Modal Formulaire Chaleureux & Extra-Arrondi (Duolingo Style) ── -->
+<div *ngIf="showFormModal" class="modal-overlay" (click)="closeForm()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Header du Modal -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-icons">{{ editingId ? 'edit_note' : 'add_circle' }}</span>
+        {{ editingId ? 'Modifier la réservation' : 'Nouvelle Réservation' }}
+      </h2>
+      <button class="modal-close" (click)="closeForm()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Corps du Formulaire -->
+    <form (ngSubmit)="saveReservation()" class="modal-body">
+      <div class="form-grid">
+
+        <!-- ID Voyageur -->
+        <div class="form-group full">
+          <label class="form-label">Identifiant Voyageur / Client <span class="required">*</span></label>
+          <input 
+            type="number" 
+            [(ngModel)]="form.user_id" 
+            name="user_id" 
+            placeholder="Ex: 1042" 
+            class="form-input" 
+            required>
         </div>
-        <div class="flex-1">
-          <label class="text-sm font-medium">Prix Total (Ar)</label>
-          <input type="number" [(ngModel)]="form.total_amount" name="total_amount" class="w-full border p-2 rounded" required>
+
+        <!-- Trajet & Planning -->
+        <div class="form-group full">
+          <label class="form-label">Trajet &amp; Planning de départ <span class="required">*</span></label>
+          <select [(ngModel)]="form.schedule_id" name="schedule_id" class="form-select" required>
+            <option value="" disabled selected>Sélectionnez un planning...</option>
+            <option *ngFor="let s of schedules" [value]="s.id">
+              {{ s.route?.origin || s.route?.departure_city }} &rarr; {{ s.route?.destination || s.route?.arrival_city }} ({{ s.departure_time | date:'short' }})
+            </option>
+          </select>
         </div>
+
+        <!-- Numéro de Siège -->
+        <div class="form-group">
+          <label class="form-label">N° de Siège <span class="required">*</span></label>
+          <input 
+            type="number" 
+            [(ngModel)]="form.seat_number" 
+            name="seat_number" 
+            placeholder="Ex: 14" 
+            class="form-input" 
+            min="1" 
+            required>
+        </div>
+
+        <!-- Montant Total -->
+        <div class="form-group">
+          <label class="form-label">Prix Total (Ar) <span class="required">*</span></label>
+          <input 
+            type="number" 
+            [(ngModel)]="form.total_amount" 
+            name="total_amount" 
+            placeholder="Ex: 25000" 
+            class="form-input" 
+            required>
+        </div>
+
+        <!-- Statut de la réservation -->
+        <div class="form-group full">
+          <label class="form-label">Statut</label>
+          <select [(ngModel)]="form.status" name="status" class="form-select">
+            <option value="pending">En attente de paiement</option>
+            <option value="confirmed">Confirmé &amp; Payé</option>
+            <option value="cancelled">Annulé</option>
+          </select>
+        </div>
+
       </div>
-      
-      <select [(ngModel)]="form.status" name="status" class="border p-2 rounded">
-        <option value="pending">En attente</option>
-        <option value="confirmed">Confirmé</option>
-        <option value="cancelled">Annulé</option>
-      </select>
-      
-      <div class="flex justify-end gap-2 mt-4">
-        <button type="button" mat-stroked-button (click)="closeForm()">Annuler</button>
-        <button type="submit" mat-raised-button color="primary">Enregistrer</button>
+
+      <div class="modal-footer mt-6">
+        <button type="button" class="btn-cream btn-sm" (click)="closeForm()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary btn-md">
+          <span class="material-icons">save</span>
+          <span>Enregistrer</span>
+        </button>
       </div>
     </form>
+
   </div>
 </div>

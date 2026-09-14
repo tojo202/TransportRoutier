@@ -2,105 +2,262 @@
   <!-- Sidebar Navigation -->
   <aside class="sidebar">
     <!-- Logo Header -->
-    <div class="logo-container">
+    <a routerLink="/platform" class="logo-container" style="text-decoration: none;">
       <div class="logo-icon">
         <span class="material-icons">directions_bus</span>
       </div>
       <div class="logo-text">
         <div class="logo-title">TransExpress</div>
-        <div class="logo-subtitle">Gestion &amp; Logistique</div>
+        <div class="logo-subtitle">Plateforme Multi-Rôles</div>
       </div>
-    </div>
+    </a>
 
-    <!-- Navigation Menu -->
+    <!-- Navigation Menu (Dynamique selon le Rôle) -->
     <nav class="nav-menu">
-      <div class="nav-section-title">Vue Principale</div>
-      <ul class="nav-list">
-        <li>
-          <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
-            <span class="material-icons">dashboard</span>
-            <span>Tableau de bord</span>
-          </a>
-        </li>
-      </ul>
+      
+      <!-- ============================================== -->
+      <!-- 👑 MENU ADMIN                                  -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="authService.isAdmin()">
+        <div class="nav-section-title">Vue Principale</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+              <span class="material-icons">dashboard</span>
+              <span>Tableau de bord</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">public</span>
+              <span>Portail Voyageurs</span>
+            </a>
+          </li>
+        </ul>
 
-      <div class="nav-section-title">Flotte &amp; Personnel</div>
-      <ul class="nav-list">
-        <li>
-          <a routerLink="/agencies" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">business</span>
-            <span>Agences</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/vehicles" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">directions_bus</span>
-            <span>Véhicules</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/drivers" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">badge</span>
-            <span>Chauffeurs</span>
-          </a>
-        </li>
-      </ul>
+        <div class="nav-section-title">Flotte &amp; Réseau</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/agencies" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">apartment</span>
+              <span>Agences</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/vehicles" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">directions_bus</span>
+              <span>Véhicules</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/drivers" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">badge</span>
+              <span>Chauffeurs</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/routes" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">alt_route</span>
+              <span>Lignes &amp; Trajets</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">schedule</span>
+              <span>Horaires &amp; Départs</span>
+            </a>
+          </li>
+        </ul>
 
-      <div class="nav-section-title">Lignes &amp; Réservations</div>
-      <ul class="nav-list">
-        <li>
-          <a routerLink="/routes" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">alt_route</span>
-            <span>Lignes &amp; Trajets</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">schedule</span>
-            <span>Horaires</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">confirmation_number</span>
-            <span>Réservations</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">receipt_long</span>
-            <span>Billetterie</span>
-          </a>
-        </li>
-      </ul>
+        <div class="nav-section-title">Vente &amp; Finances</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">confirmation_number</span>
+              <span>Réservations</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">receipt_long</span>
+              <span>Billetterie</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">payments</span>
+              <span>Paiements</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">luggage</span>
+              <span>Bagages</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/reports" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">analytics</span>
+              <span>Rapports &amp; Stats</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">star</span>
+              <span>Avis &amp; Évaluations</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">chat</span>
+              <span>Chat Trajets</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
 
-      <div class="nav-section-title">Suivi &amp; Gestion</div>
-      <ul class="nav-list">
-        <li>
-          <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">payments</span>
-            <span>Paiements</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">luggage</span>
-            <span>Bagages</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/gps" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">my_location</span>
-            <span>Suivi GPS</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/reports" routerLinkActive="active-link" class="nav-item">
-            <span class="material-icons">analytics</span>
-            <span>Rapports &amp; Stats</span>
-          </a>
-        </li>
-      </ul>
+      <!-- ============================================== -->
+      <!-- 💼 MENU AGENT COMMERCIAL / GUICHET             -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="authService.isAgent()">
+        <div class="nav-section-title">Opérations Commerciales</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">confirmation_number</span>
+              <span>Réservations Guichet</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">receipt_long</span>
+              <span>Billetterie</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/driver-scan" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">qr_code_scanner</span>
+              <span>Validation QR Code</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">luggage</span>
+              <span>Enregistrement Bagages</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">payments</span>
+              <span>Encaissements</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">schedule</span>
+              <span>Plannings Départs</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">public</span>
+              <span>Plateforme Trajets</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
+      <!-- ============================================== -->
+      <!-- 🚗 MENU CHAUFFEUR / CONDUCTEUR                 -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="authService.isDriver()">
+        <div class="nav-section-title">Espace Chauffeur</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/driver-trips" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">directions_bus</span>
+              <span>Mes Trajets &amp; Missions</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/driver-scan" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">qr_code_scanner</span>
+              <span>Scanner Billets (QR)</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/publish-trip" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">add_circle</span>
+              <span>Publier un départ</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">chat</span>
+              <span>Chat Passagers</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">star</span>
+              <span>Mes Évaluations</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
+      <!-- ============================================== -->
+      <!-- 👤 MENU CLIENT / PASSAGER                      -->
+      <!-- ============================================== -->
+      <ng-container *ngIf="authService.isClient()">
+        <div class="nav-section-title">Espace Voyageur</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">search</span>
+              <span>Rechercher un Trajet</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/my-reservations" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">receipt_long</span>
+              <span>Mes Réservations &amp; QR</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">chat</span>
+              <span>Chat Conducteur</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">star</span>
+              <span>Évaluer un voyage</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
+      <!-- Public / Visiteur non connecté -->
+      <ng-container *ngIf="!authService.getCurrentUser()">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
+              <span class="material-icons">explore</span>
+              <span>Plateforme Trajets</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/login" class="nav-item">
+              <span class="material-icons">login</span>
+              <span>Connexion / Inscription</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
     </nav>
   </aside>
 
@@ -109,16 +266,16 @@
     <!-- Header Top Navbar -->
     <header class="top-header">
       <div class="header-left">
-        <div class="search-bar">
-          <span class="material-icons search-icon">search</span>
-          <input type="text" placeholder="Rechercher une réservation, véhicule..." class="search-input" />
-        </div>
+        <a routerLink="/platform" class="quick-brand-link">
+          <span class="material-icons text-amber-500">directions_bus</span>
+          <span class="brand-name">TransExpress</span>
+        </a>
       </div>
 
       <div class="header-right">
 
         <!-- ── Notifications ── -->
-        <div class="notif-wrapper" (clickOutside)="closeNotifications()">
+        <div class="notif-wrapper" *ngIf="authService.getCurrentUser()">
           <button class="notification-btn" (click)="toggleNotifications()" [class.active]="showNotifications" title="Notifications">
             <span class="material-icons">notifications</span>
             <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
@@ -160,39 +317,33 @@
         </div>
         <!-- ── /Notifications ── -->
 
-        <div class="header-divider"></div>
+        <div class="header-divider" *ngIf="authService.getCurrentUser()"></div>
 
-        <a routerLink="/profile" class="user-profile cursor-pointer hover:opacity-80 transition-opacity">
+        <!-- User Profile if logged in -->
+        <a *ngIf="authService.getCurrentUser()" routerLink="/profile" class="user-profile cursor-pointer hover:opacity-80 transition-opacity">
           <div class="user-avatar">
-            {{ (username ? username.charAt(0) : 'A') | uppercase }}
+            {{ (username ? username.charAt(0) : 'U') | uppercase }}
           </div>
           <div class="user-details">
-            <span class="user-name">{{ username || 'Administrateur' }}</span>
-            <span class="user-role">{{ role || 'ADMIN' }}</span>
+            <span class="user-name">{{ username }}</span>
+            <span class="user-role badge-role-{{ role }}">{{ role | uppercase }}</span>
           </div>
         </a>
 
-        <div class="header-divider"></div>
+        <!-- Login Button if visitor -->
+        <a *ngIf="!authService.getCurrentUser()" routerLink="/login" class="btn-header-login">
+          <span class="material-icons">login</span>
+          <span>Se connecter</span>
+        </a>
 
-        <button (click)="logout()" class="logout-btn" title="Se déconnecter">
+        <div class="header-divider" *ngIf="authService.getCurrentUser()"></div>
+
+        <button *ngIf="authService.getCurrentUser()" (click)="logout()" class="logout-btn" title="Se déconnecter">
           <span class="material-icons">logout</span>
           <span>Déconnexion</span>
         </button>
       </div>
     </header>
-
-    <!-- Breadcrumbs -->
-    <div class="breadcrumbs-container">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb-list">
-          <li *ngFor="let crumb of breadcrumbs; let last = last; let i = index" class="breadcrumb-item" [class.active]="last">
-            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
-            <span *ngIf="last">{{ crumb.label }}</span>
-            <span class="material-icons breadcrumb-separator" *ngIf="!last">chevron_right</span>
-          </li>
-        </ol>
-      </nav>
-    </div>
 
     <!-- Page Body -->
     <div class="page-content">

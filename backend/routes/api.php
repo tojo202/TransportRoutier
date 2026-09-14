@@ -12,11 +12,12 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\BaggageController;
-use App\Http\Controllers\Api\GpsLocationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,11 +42,21 @@ Route::apiResource('schedules', ScheduleController::class);
 
 Route::apiResource('reservations', ReservationController::class);
 Route::apiResource('tickets', TicketController::class);
+Route::post('/tickets/scan', [TicketController::class, 'scanQr']);
+
 Route::apiResource('payments', PaymentController::class);
 Route::apiResource('baggages', BaggageController::class);
 
-Route::apiResource('gps-locations', GpsLocationController::class)->only(['index', 'store']);
-Route::apiResource('notifications', NotificationController::class)->only(['index', 'update']);
+Route::apiResource('notifications', NotificationController::class)->only(['index', 'store', 'update']);
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+
+// Chat & Reviews
+Route::get('/messages', [ChatController::class, 'index']);
+Route::post('/messages', [ChatController::class, 'store']);
+
+Route::get('/reviews', [ReviewController::class, 'index']);
+Route::post('/reviews', [ReviewController::class, 'store']);
+Route::get('/drivers/{id}/stats', [ReviewController::class, 'driverStats']);
 
 Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
 Route::get('/reports', [ReportController::class, 'index']);

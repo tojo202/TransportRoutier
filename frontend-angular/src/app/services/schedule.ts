@@ -1,16 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Schedule {
   id?: number;
-  route_id: number;
-  vehicle_id: number;
-  driver_id: number;
+  route_id?: number;
+  vehicle_id?: number;
+  driver_id?: number;
   departure_time: string;
   arrival_time: string;
+  price?: number;
+  available_seats?: number;
+  occupied_seats?: number[];
   status: string;
+  route?: any;
+  vehicle?: any;
+  driver?: any;
+  reservations?: any[];
 }
 
 @Injectable({
@@ -21,15 +28,21 @@ export class ScheduleService {
 
   constructor(private http: HttpClient) { }
 
-  getSchedules(): Observable<Schedule[]> {
-    return this.http.get<Schedule[]>(this.apiUrl);
+  getSchedules(filters: any = {}): Observable<any> {
+    let params = new HttpParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params = params.set(key, filters[key]);
+      }
+    });
+    return this.http.get<any>(this.apiUrl, { params });
   }
 
   getSchedule(id: number): Observable<Schedule> {
     return this.http.get<Schedule>(`${this.apiUrl}/${id}`);
   }
 
-  createSchedule(schedule: Schedule): Observable<Schedule> {
+  createSchedule(schedule: any): Observable<Schedule> {
     return this.http.post<Schedule>(this.apiUrl, schedule);
   }
 

@@ -3,18 +3,21 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReservationService } from '../../services/reservation';
 import { ScheduleService } from '../../services/schedule';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { RevealOnScrollDirective } from '../../shared/directives/reveal-on-scroll.directive';
+import { SectionBadgeComponent } from '../../shared/components/section-badge/section-badge.component';
 
 @Component({
   selector: 'app-reservations',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, MatCardModule, MatInputModule, FormsModule, NgxPaginationModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    NgxPaginationModule,
+    RevealOnScrollDirective,
+    SectionBadgeComponent
+  ],
   providers: [DatePipe],
   templateUrl: './reservations.html',
   styleUrls: ['./reservations.css']
@@ -25,6 +28,26 @@ export class ReservationsComponent implements OnInit {
   filteredReservations: any[] = [];
   schedules: any[] = [];
   searchTerm = '';
+  statusFilter = 'all';
+
+  get totalCount(): number {
+    return this.reservations.length;
+  }
+  get confirmedCount(): number {
+    return this.reservations.filter(r => r.status === 'confirmed' || !r.status).length;
+  }
+  get pendingCount(): number {
+    return this.reservations.filter(r => r.status === 'pending').length;
+  }
+  get totalRevenue(): number {
+    return this.reservations.reduce((acc, r) => acc + Number(r.total_amount || r.total_price || 0), 0);
+  }
+
+  setStatusFilter(status: string): void {
+    this.statusFilter = status;
+    this.applyFilter();
+  }
+
 
   showFormModal = false;
   editingId: number | null = null;
@@ -49,10 +72,21 @@ export class ReservationsComponent implements OnInit {
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase();
-    this.filteredReservations = this.reservations.filter(r => 
-      r.user?.name.toLowerCase().includes(term) || r.status.toLowerCase().includes(term)
-    );
+    this.filteredReservations = this.reservations.filter(r => {
+      const matchesSearch = !term || 
+        (r.user?.name && r.user.name.toLowerCase().includes(term)) || 
+        (r.status && r.status.toLowerCase().includes(term)) ||
+        (r.id && r.id.toString().includes(term));
+      
+      const matchesStatus = this.statusFilter === 'all' || 
+        (this.statusFilter === 'confirmed' && (r.status === 'confirmed' || !r.status)) ||
+        (this.statusFilter === 'pending' && r.status === 'pending') ||
+        (this.statusFilter === 'cancelled' && r.status === 'cancelled');
+
+      return matchesSearch && matchesStatus;
+    });
   }
+
 
   openForm(reservation?: any): void {
     if (reservation) {

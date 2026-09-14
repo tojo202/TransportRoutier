@@ -1,0 +1,86 @@
+<div class="chat-page">
+  <div class="chat-container">
+    <!-- Left: Schedule Selector & Trip Info -->
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">Discussions Trajets</h3>
+        <p class="sidebar-subtitle">Échanges en direct conducteurs &amp; passagers</p>
+      </div>
+
+      <div class="schedules-list">
+        <div 
+          *ngFor="let s of allSchedules" 
+          class="schedule-chat-item" 
+          [class.active]="s.id === scheduleId"
+          (click)="switchSchedule(s.id!)"
+        >
+          <div class="chat-item-icon">
+            <span class="material-icons">directions_bus</span>
+          </div>
+          <div class="chat-item-info">
+            <span class="route-name">{{ s.route?.origin }} &rarr; {{ s.route?.destination }}</span>
+            <span class="trip-time">{{ s.departure_time | date:'dd/MM à HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Chat Room Area -->
+    <div class="chat-main">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="header-trip-info">
+          <div class="trip-title-row">
+            <h2>{{ schedule?.route?.origin }} &rarr; {{ schedule?.route?.destination }}</h2>
+            <span class="badge-active">En direct</span>
+          </div>
+          <div class="trip-meta-row">
+            <span><span class="material-icons text-sm">schedule</span> Départ : {{ schedule?.departure_time | date:'dd MMM yyyy à HH:mm' }}</span>
+            <span><span class="material-icons text-sm">person</span> Conducteur : <strong>{{ schedule?.driver?.name || 'Marc Chauffeur' }}</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Body -->
+      <div class="chat-body">
+        <div class="empty-chat" *ngIf="messages.length === 0 && !isLoading">
+          <span class="material-icons">forum</span>
+          <p>Aucun message pour ce trajet pour l'instant. Démarrez la discussion pour organiser l'embarquement !</p>
+        </div>
+
+        <div class="messages-list" *ngIf="messages.length > 0">
+          <div 
+            *ngFor="let m of messages" 
+            class="message-row"
+            [class.own]="m.user_id === authService.getCurrentUser()?.id"
+            [class.driver]="m.user?.role === 'driver'"
+          >
+            <div class="message-bubble">
+              <div class="bubble-header">
+                <span class="sender-name">{{ m.user?.name || 'Utilisateur' }}</span>
+                <span class="sender-role" *ngIf="m.user?.role === 'driver'">👑 Conducteur</span>
+                <span class="message-time">{{ m.created_at | date:'HH:mm' }}</span>
+              </div>
+              <p class="message-text">{{ m.message }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input Bar -->
+      <div class="chat-footer">
+        <div class="chat-input-wrapper">
+          <input 
+            type="text" 
+            [(ngModel)]="newMessage" 
+            placeholder="Écrivez votre message..." 
+            (keyup.enter)="sendMessage()"
+          />
+          <button class="btn-send" [disabled]="!newMessage.trim() || isSending" (click)="sendMessage()">
+            <span class="material-icons">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

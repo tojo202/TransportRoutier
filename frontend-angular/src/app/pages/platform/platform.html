@@ -1,0 +1,552 @@
+<div class="platform-container">
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="material-icons text-amber-400">verified</span>
+        <span>Plateforme Nationale de Transport &amp; Covoiturage</span>
+      </div>
+      <h1 class="hero-title">
+        Trouvez &amp; Réservez votre trajet en toute simplicité
+      </h1>
+      <p class="hero-subtitle">
+        Voyagez confortablement sur toutes les lignes interurbaines. Choisissez votre siège, payez par Mobile Money et recevez votre billet électronique avec QR Code immédiatement.
+      </p>
+
+      <!-- Fast Role Switcher / Demo Banner -->
+      <div class="hero-roles-bar" *ngIf="!authService.getCurrentUser()">
+        <span class="roles-label">Connexion rapide pour démo :</span>
+        <a routerLink="/login" class="role-pill admin">👑 Admin</a>
+        <a routerLink="/login" class="role-pill agent">💼 Agent</a>
+        <a routerLink="/login" class="role-pill driver">🚗 Chauffeur</a>
+        <a routerLink="/login" class="role-pill client">👤 Client</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search & Filter Card -->
+  <section class="search-section">
+    <div class="search-card">
+      <div class="search-fields">
+        <!-- Origin -->
+        <div class="search-field">
+          <label><span class="material-icons">trip_origin</span> Ville de Départ</label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              [(ngModel)]="searchOrigin" 
+              placeholder="Ex: Dakar"
+              list="origin-list"
+              (keyup.enter)="onSearch()"
+            />
+            <datalist id="origin-list">
+              <option *ngFor="let c of cities" [value]="c"></option>
+            </datalist>
+          </div>
+        </div>
+
+        <div class="search-swap-btn" (click)="searchOrigin && searchDestination ? (searchOrigin = [searchDestination, searchDestination = searchOrigin][0]) : null">
+          <span class="material-icons">swap_horiz</span>
+        </div>
+
+        <!-- Destination -->
+        <div class="search-field">
+          <label><span class="material-icons">location_on</span> Destination</label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              [(ngModel)]="searchDestination" 
+              placeholder="Ex: Saint-Louis"
+              list="dest-list"
+              (keyup.enter)="onSearch()"
+            />
+            <datalist id="dest-list">
+              <option *ngFor="let c of cities" [value]="c"></option>
+            </datalist>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="search-field">
+          <label><span class="material-icons">calendar_today</span> Date de Départ</label>
+          <div class="input-wrapper">
+            <input type="date" [(ngModel)]="searchDate" (change)="onSearch()" />
+          </div>
+        </div>
+
+        <!-- Submit Search Button -->
+        <div class="search-action">
+          <button class="btn-primary-search" (click)="onSearch()">
+            <span class="material-icons">search</span>
+            <span>Rechercher</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="selectedFilter === 'all'" (click)="setFilter('all')">
+          <span class="material-icons">dashboard</span> Tous les trajets
+        </button>
+        <button class="filter-tab" [class.active]="selectedFilter === 'today'" (click)="setFilter('today')">
+          <span class="material-icons">today</span> Départs aujourd'hui
+        </button>
+        <button class="filter-tab" [class.active]="selectedFilter === 'cheap'" (click)="setFilter('cheap')">
+          <span class="material-icons">savings</span> Économiques (&le; 5 000 F)
+        </button>
+        <button class="filter-tab" [class.active]="selectedFilter === 'vip'" (click)="setFilter('vip')">
+          <span class="material-icons">star</span> Confort VIP &amp; Grand Tourisme
+        </button>
+        <button *ngIf="searchOrigin || searchDestination || searchDate || selectedFilter !== 'all'" class="filter-reset" (click)="resetSearch()">
+          <span class="material-icons">restart_alt</span> Réinitialiser
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trip Results List Section -->
+  <section class="results-section">
+    <div class="results-header">
+      <div class="results-title-group">
+        <h2 class="results-title">Trajets disponibles</h2>
+        <span class="results-count">{{ filteredSchedules.length }} voyage(s) trouvé(s)</span>
+      </div>
+      <div class="page-indicator" *ngIf="totalPages > 1">
+        Page {{ currentPage }} sur {{ totalPages }}
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Chargement des meilleurs trajets...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && paginatedSchedules.length === 0">
+      <span class="material-icons empty-icon">directions_bus_filled</span>
+      <h3>Aucun trajet ne correspond à vos critères</h3>
+      <p>Essayez de modifier votre ville de destination ou la date recherchée.</p>
+      <button class="btn-reset-alt" (click)="resetSearch()">Voir tous les trajets</button>
+    </div>
+
+    <!-- Trip Cards Grid -->
+    <div class="trips-grid" *ngIf="!isLoading && paginatedSchedules.length > 0">
+      <div class="trip-card" *ngFor="let s of paginatedSchedules">
+        <!-- Top Agency & Status -->
+        <div class="trip-header">
+          <div class="agency-badge">
+            <span class="material-icons">apartment</span>
+            <span>{{ s.vehicle?.agency?.name || 'TransExpress National' }}</span>
+          </div>
+          <div class="seat-badge" [class.low]="(s.available_seats || 0) <= 5">
+            <span class="material-icons">event_seat</span>
+            <span>{{ s.available_seats || 0 }} places dispo</span>
+          </div>
+        </div>
+
+        <!-- Route & Time Timeline -->
+        <div class="trip-route-box">
+          <div class="time-col departure">
+            <span class="time">{{ s.departure_time | date:'HH:mm' }}</span>
+            <span class="city">{{ s.route?.origin || 'Départ' }}</span>
+            <span class="date">{{ s.departure_time | date:'dd MMM yyyy' }}</span>
+          </div>
+
+          <div class="duration-col">
+            <span class="duration-badge">{{ s.route?.estimated_duration_hours || 3 }}h estimées</span>
+            <div class="route-line">
+              <span class="dot start"></span>
+              <span class="line"></span>
+              <span class="material-icons bus-arrow">directions_bus</span>
+              <span class="line"></span>
+              <span class="dot end"></span>
+            </div>
+            <span class="distance">{{ s.route?.distance_km || 180 }} km</span>
+          </div>
+
+          <div class="time-col arrival">
+            <span class="time">{{ s.arrival_time | date:'HH:mm' }}</span>
+            <span class="city">{{ s.route?.destination || 'Arrivée' }}</span>
+            <span class="date">{{ s.arrival_time | date:'dd MMM yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Vehicle & Driver Details -->
+        <div class="trip-details">
+          <div class="driver-info">
+            <div class="driver-avatar">
+              <span class="material-icons">account_circle</span>
+            </div>
+            <div class="driver-meta">
+              <span class="driver-name">{{ s.driver?.name || 'Conducteur Professionnel' }}</span>
+              <div class="driver-rating">
+                <span class="material-icons star">star</span>
+                <span class="rating-value">{{ s.driver?.average_rating || 4.9 }}</span>
+                <span class="reviews-count">({{ s.driver?.reviews_count || 8 }} avis)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="vehicle-features">
+            <span class="feature-tag" title="Véhicule"><span class="material-icons">directions_car</span> {{ s.vehicle?.brand }} {{ s.vehicle?.model }}</span>
+            <span class="feature-tag"><span class="material-icons">ac_unit</span> Climatisé</span>
+            <span class="feature-tag"><span class="material-icons">wifi</span> Wifi</span>
+          </div>
+        </div>
+
+        <!-- Price & Action Footer -->
+        <div class="trip-footer">
+          <div class="price-box">
+            <span class="price-label">Prix par siège</span>
+            <span class="price-val">{{ s.price | number }} <small>FCFA</small></span>
+          </div>
+
+          <button class="btn-book" (click)="startBooking(s)">
+            <span>Choisir siège</span>
+            <span class="material-icons">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls Component -->
+    <div class="pagination-wrapper" *ngIf="totalPages > 1 && !isLoading">
+      <button class="page-btn prev" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+        <span class="material-icons">chevron_left</span>
+        <span>Précédent</span>
+      </button>
+
+      <div class="page-numbers">
+        <button 
+          *ngFor="let p of pages" 
+          class="num-btn" 
+          [class.active]="p === currentPage"
+          (click)="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+      </div>
+
+      <button class="page-btn next" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+        <span>Suivant</span>
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Platform Trust & Highlights Features -->
+  <section class="features-section">
+    <div class="feature-item">
+      <div class="feat-icon feat-icon-amber">
+        <span class="material-icons">qr_code_2</span>
+      </div>
+      <div class="feat-text">
+        <h4>Billet QR Code Instantané</h4>
+        <p>Générez et téléchargez votre billet avec QR code sécurisé dès validation du paiement.</p>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feat-icon feat-icon-emerald">
+        <span class="material-icons">account_balance_wallet</span>
+      </div>
+      <div class="feat-text">
+        <h4>Paiement Sécurisé</h4>
+        <p>Réglez directement via Wave, Orange Money ou Carte Bancaire sans frais cachés.</p>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feat-icon feat-icon-blue">
+        <span class="material-icons">chat</span>
+      </div>
+      <div class="feat-text">
+        <h4>Chat Conducteur &amp; Passagers</h4>
+        <p>Communiquez directement pour coordonner le point de rendez-vous et vos bagages.</p>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feat-icon feat-icon-purple">
+        <span class="material-icons">star_rate</span>
+      </div>
+      <div class="feat-text">
+        <h4>Avis &amp; Évaluations</h4>
+        <p>Consultez les notes des chauffeurs et évaluez vos trajets en toute transparence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================== -->
+  <!-- MODAL DE RÉSERVATION ET CHOIX DE SIÈGE         -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" *ngIf="showBookingModal" (click)="closeBooking()">
+    <div class="booking-modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <h3>Réservation de voyage</h3>
+          <p class="modal-subtitle">
+            {{ selectedSchedule?.route?.origin }} &rarr; {{ selectedSchedule?.route?.destination }} 
+            &bull; {{ selectedSchedule?.departure_time | date:'dd MMM yyyy à HH:mm' }}
+          </p>
+        </div>
+        <button class="modal-close-btn" (click)="closeBooking()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- Wizard Step Indicator -->
+      <div class="wizard-steps">
+        <div class="step-item" [class.active]="bookingStep === 1" [class.done]="bookingStep > 1">
+          <div class="step-circle">1</div>
+          <span>Choix du siège</span>
+        </div>
+        <div class="step-line" [class.active]="bookingStep > 1"></div>
+        <div class="step-item" [class.active]="bookingStep === 2" [class.done]="bookingStep > 2">
+          <div class="step-circle">2</div>
+          <span>Infos &amp; Paiement</span>
+        </div>
+        <div class="step-line" [class.active]="bookingStep > 2"></div>
+        <div class="step-item" [class.active]="bookingStep === 3">
+          <div class="step-circle">3</div>
+          <span>Billet QR Code</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: INTERACTIVE SEAT MAP -->
+      <div class="modal-body" *ngIf="bookingStep === 1">
+        <div class="seat-plan-wrapper">
+          <div class="seat-legend">
+            <div class="legend-item"><span class="seat-sample available"></span> Libre</div>
+            <div class="legend-item"><span class="seat-sample selected"></span> Sélectionné</div>
+            <div class="legend-item"><span class="seat-sample occupied"></span> Occupé</div>
+          </div>
+
+          <!-- Vehicle Layout Diagram -->
+          <div class="bus-container">
+            <div class="bus-front">
+              <span class="material-icons">airline_seat_recline_extra</span>
+              <span class="front-label">Cabine Conducteur ({{ selectedSchedule?.driver?.name }})</span>
+            </div>
+
+            <div class="bus-seats-grid">
+              <div class="bus-row" *ngFor="let row of seatRows">
+                <ng-container *ngFor="let item of row">
+                  <div *ngIf="item.isAisle" class="seat-aisle"></div>
+                  <button 
+                    *ngIf="!item.isAisle"
+                    class="seat-btn"
+                    [class.occupied]="item.isOccupied"
+                    [class.selected]="selectedSeat === item.seatNumber"
+                    [disabled]="item.isOccupied"
+                    (click)="selectSeat(item.seatNumber)"
+                  >
+                    <span class="material-icons seat-icon">chair</span>
+                    <span class="seat-num">{{ item.seatNumber }}</span>
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="bus-back">
+              <span>Arrière du car &bull; Soute à bagages</span>
+            </div>
+          </div>
+
+          <div class="selected-seat-summary" *ngIf="selectedSeat">
+            <div class="summary-text">
+              <span class="material-icons text-amber-500">check_circle</span>
+              <span>Siège sélectionné : <strong>N° {{ selectedSeat }}</strong></span>
+            </div>
+            <div class="summary-price">
+              Total : <strong>{{ selectedSchedule?.price | number }} FCFA</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="closeBooking()">Annuler</button>
+          <button class="btn-next" [disabled]="!selectedSeat" (click)="proceedToPassengerInfo()">
+            <span>Continuer vers le paiement</span>
+            <span class="material-icons">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: PASSENGER INFO & PAYMENT -->
+      <div class="modal-body" *ngIf="bookingStep === 2">
+        <div class="payment-step-grid">
+          <!-- Left: Passenger form -->
+          <div class="passenger-form">
+            <h4 class="section-heading"><span class="material-icons">person</span> Informations Voyageur</h4>
+            <div class="form-group">
+              <label>Nom complet *</label>
+              <input type="text" [(ngModel)]="passengerName" placeholder="Ex: Moussa Diop" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Téléphone *</label>
+                <input type="tel" [(ngModel)]="passengerPhone" placeholder="+221 77 000 00 00" />
+              </div>
+              <div class="form-group">
+                <label>Email (pour réception du billet) *</label>
+                <input type="email" [(ngModel)]="passengerEmail" placeholder="client@transport.com" />
+              </div>
+            </div>
+
+            <h4 class="section-heading mt-4"><span class="material-icons">payment</span> Mode de Paiement en Ligne</h4>
+            <div class="payment-methods">
+              <div class="pay-option" [class.selected]="paymentMethod === 'wave'" (click)="paymentMethod = 'wave'">
+                <input type="radio" name="pay" [checked]="paymentMethod === 'wave'" />
+                <span class="pay-name">🌊 Wave Money</span>
+              </div>
+              <div class="pay-option" [class.selected]="paymentMethod === 'orange_money'" (click)="paymentMethod = 'orange_money'">
+                <input type="radio" name="pay" [checked]="paymentMethod === 'orange_money'" />
+                <span class="pay-name">🍊 Orange Money</span>
+              </div>
+              <div class="pay-option" [class.selected]="paymentMethod === 'card'" (click)="paymentMethod = 'card'">
+                <input type="radio" name="pay" [checked]="paymentMethod === 'card'" />
+                <span class="pay-name">💳 Carte Bancaire</span>
+              </div>
+            </div>
+
+            <div class="form-group mt-3" *ngIf="paymentMethod === 'wave' || paymentMethod === 'orange_money'">
+              <label>Numéro de compte pour le prélèvement</label>
+              <input type="tel" [(ngModel)]="paymentPhone" [placeholder]="passengerPhone || '+221 77 123 45 67'" />
+            </div>
+          </div>
+
+          <!-- Right: Trip & Order Summary -->
+          <div class="order-summary-box">
+            <h4>Récapitulatif</h4>
+            <div class="summary-line">
+              <span>Trajet :</span>
+              <strong>{{ selectedSchedule?.route?.origin }} &rarr; {{ selectedSchedule?.route?.destination }}</strong>
+            </div>
+            <div class="summary-line">
+              <span>Date &amp; Heure :</span>
+              <span>{{ selectedSchedule?.departure_time | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="summary-line">
+              <span>Véhicule :</span>
+              <span>{{ selectedSchedule?.vehicle?.brand }} ({{ selectedSchedule?.vehicle?.plate_number }})</span>
+            </div>
+            <div class="summary-line">
+              <span>Siège attribué :</span>
+              <span class="badge-seat">Siège N° {{ selectedSeat }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-line total">
+              <span>Montant à régler :</span>
+              <span class="total-amount">{{ selectedSchedule?.price | number }} FCFA</span>
+            </div>
+            <p class="summary-note">
+              <span class="material-icons">mark_email_read</span>
+              Une notification avec votre billet et QR Code sera envoyée immédiatement par email et SMS.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="bookingStep = 1">Retour au siège</button>
+          <button class="btn-pay" [disabled]="isProcessingPayment || !passengerName" (click)="submitPaymentAndBooking()">
+            <span *ngIf="!isProcessingPayment" class="flex items-center gap-2">
+              <span class="material-icons">lock</span>
+              <span>Payer {{ selectedSchedule?.price | number }} FCFA</span>
+            </span>
+            <span *ngIf="isProcessingPayment">Traitement sécurisé en cours...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: TICKET & QR CODE CONFIRMATION -->
+      <div class="modal-body" *ngIf="bookingStep === 3">
+        <div class="ticket-success-container">
+          <div class="success-header">
+            <span class="material-icons success-icon">check_circle</span>
+            <h3>Réservation Confirmée avec Succès !</h3>
+            <p>Votre billet électronique a été généré et envoyé à votre adresse email.</p>
+          </div>
+
+          <!-- Printable Boarding Pass Card -->
+          <div class="boarding-pass" id="printable-ticket">
+            <div class="pass-header">
+              <div class="pass-brand">
+                <span class="material-icons">directions_bus</span>
+                <span>TransExpress &bull; Billet Électronique</span>
+              </div>
+              <div class="pass-status">VALIDE</div>
+            </div>
+
+            <div class="pass-body">
+              <div class="pass-left">
+                <div class="pass-row">
+                  <div class="pass-col">
+                    <span class="label">Passager</span>
+                    <span class="val">{{ confirmedReservation?.user?.name || passengerName }}</span>
+                  </div>
+                  <div class="pass-col">
+                    <span class="label">N° Billet</span>
+                    <span class="val bold">{{ confirmedReservation?.ticket?.ticket_number || 'TKT-2026' }}</span>
+                  </div>
+                </div>
+
+                <div class="pass-row">
+                  <div class="pass-col">
+                    <span class="label">Origine</span>
+                    <span class="val city">{{ selectedSchedule?.route?.origin }}</span>
+                  </div>
+                  <div class="pass-col arrow">
+                    <span class="material-icons">arrow_forward</span>
+                  </div>
+                  <div class="pass-col">
+                    <span class="label">Destination</span>
+                    <span class="val city">{{ selectedSchedule?.route?.destination }}</span>
+                  </div>
+                </div>
+
+                <div class="pass-row">
+                  <div class="pass-col">
+                    <span class="label">Départ</span>
+                    <span class="val">{{ selectedSchedule?.departure_time | date:'dd/MM/yyyy à HH:mm' }}</span>
+                  </div>
+                  <div class="pass-col">
+                    <span class="label">Siège</span>
+                    <span class="val seat-highlight">N° {{ confirmedReservation?.seat_number || selectedSeat }}</span>
+                  </div>
+                  <div class="pass-col">
+                    <span class="label">Montant Payé</span>
+                    <span class="val">{{ confirmedReservation?.total_amount || selectedSchedule?.price | number }} FCFA</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pass-right qr-box">
+                <img [src]="qrCodeUrl" alt="QR Code Billet" class="qr-image" *ngIf="qrCodeUrl" />
+                <span class="qr-caption">Présentez ce QR Code au conducteur à l'embarquement</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ticket-actions">
+            <button class="btn-print" (click)="printTicket()">
+              <span class="material-icons">print</span>
+              <span>Imprimer / Sauvegarder PDF</span>
+            </button>
+            <button class="btn-my-res" (click)="goToMyReservations()">
+              <span class="material-icons">history</span>
+              <span>Voir mes réservations</span>
+            </button>
+            <button class="btn-finish" (click)="closeBooking()">
+              <span>Fermer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

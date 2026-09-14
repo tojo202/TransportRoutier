@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
-    /** @use HasFactory<\Database\Factories\ScheduleFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -27,6 +26,8 @@ class Schedule extends Model
         'price' => 'decimal:2',
     ];
 
+    protected $appends = ['occupied_seats'];
+
     public function route()
     {
         return $this->belongsTo(Route::class);
@@ -45,5 +46,23 @@ class Schedule extends Model
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class)->with('user')->orderBy('created_at', 'asc');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function getOccupiedSeatsAttribute()
+    {
+        return $this->reservations()
+            ->whereIn('status', ['confirmed', 'paid', 'completed'])
+            ->pluck('seat_number')
+            ->toArray();
     }
 }

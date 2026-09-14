@@ -1,0 +1,126 @@
+<div class="reviews-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Avis &amp; Évaluations des Conducteurs</h1>
+      <p class="page-subtitle">Consultez les retours des voyageurs et notez vos trajets récents.</p>
+    </div>
+    <button class="btn-add-review" (click)="openReviewModal()">
+      <span class="material-icons">rate_review</span>
+      <span>Laisser un avis</span>
+    </button>
+  </div>
+
+  <!-- Filter by Driver -->
+  <div class="driver-filter-bar">
+    <div class="filter-group">
+      <label>Filtrer par conducteur :</label>
+      <select [(ngModel)]="selectedDriverId" (change)="onDriverFilterChange()">
+        <option [ngValue]="null">Tous les conducteurs</option>
+        <option *ngFor="let d of drivers" [value]="d.id">{{ d.name }} ({{ d.agency?.name || 'Agence' }})</option>
+      </select>
+    </div>
+
+    <!-- Stats if specific driver selected -->
+    <div class="driver-stats-badge" *ngIf="driverStats">
+      <span class="material-icons star">star</span>
+      <span class="rating-avg">{{ driverStats.average_rating }} / 5</span>
+      <span class="total-reviews">({{ driverStats.reviews_count }} avis au total)</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement des avis...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && reviews.length === 0">
+    <span class="material-icons empty-icon">star_border</span>
+    <h3>Aucun avis pour ce conducteur pour l'instant</h3>
+    <p>Soyez le premier à partager votre expérience de voyage !</p>
+    <button class="btn-cta" (click)="openReviewModal()">Rédiger le premier avis</button>
+  </div>
+
+  <!-- Reviews Grid -->
+  <div class="reviews-grid" *ngIf="!isLoading && reviews.length > 0">
+    <div class="review-card" *ngFor="let r of reviews">
+      <div class="review-top">
+        <div class="user-meta">
+          <div class="user-avatar">
+            <span class="material-icons">account_circle</span>
+          </div>
+          <div>
+            <span class="user-name">{{ r.user?.name || 'Voyageur' }}</span>
+            <span class="review-date">{{ r.created_at | date:'dd MMMM yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="stars-display">
+          <span class="material-icons star" *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= r.rating">
+            {{ s <= r.rating ? 'star' : 'star_border' }}
+          </span>
+        </div>
+      </div>
+
+      <p class="review-comment">"{{ r.comment || 'Très bon trajet, ponctuel et agréable.' }}"</p>
+
+      <div class="review-footer">
+        <span class="driver-tag">
+          <span class="material-icons">badge</span>
+          <span>Conducteur : <strong>{{ r.driver?.name || 'Marc Chauffeur' }}</strong></span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Review Modal -->
+  <div class="modal-backdrop" *ngIf="showReviewModal" (click)="closeReviewModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Évaluer votre voyage</h3>
+        <button class="btn-close" (click)="closeReviewModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Sélectionner le conducteur :</label>
+          <select [(ngModel)]="selectedDriverId" class="driver-select">
+            <option *ngFor="let d of drivers" [value]="d.id">{{ d.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group rating-selector">
+          <label>Votre note :</label>
+          <div class="stars-picker">
+            <span 
+              *ngFor="let s of [1,2,3,4,5]" 
+              class="material-icons pick-star" 
+              [class.active]="s <= (hoverRating || newRating)"
+              (mouseenter)="hoverRating = s"
+              (mouseleave)="hoverRating = 0"
+              (click)="setRating(s)"
+            >
+              star
+            </span>
+            <span class="rating-text">{{ newRating }} / 5 étoiles</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Votre commentaire d'expérience :</label>
+          <textarea [(ngModel)]="newComment" rows="4" placeholder="Ponctualité, confort du véhicule, conduite sécurisée..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeReviewModal()">Annuler</button>
+        <button class="btn-submit" [disabled]="isSubmitting || !selectedDriverId" (click)="submitReview()">
+          <span>{{ isSubmitting ? 'Publication...' : 'Publier mon avis' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

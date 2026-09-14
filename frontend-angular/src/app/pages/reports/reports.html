@@ -44,6 +44,79 @@
     </div>
   </mat-card>
 
+  <!-- ── Visualisation par Graphiques Analytiques ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 hide-on-print" *ngIf="statsData?.charts">
+
+    <div class="section-card">
+      <div class="section-card-header header-olive">
+        <h3 class="section-card-title"><span class="material-icons text-primary">insights</span> Évolution des Réservations</h3>
+      </div>
+      <div class="section-card-body chart-container bg-[var(--card-bg)] h-64 p-4">
+        <canvas *ngIf="resChartData.datasets.length"
+          baseChart
+          [data]="resChartData"
+          [options]="barChartOptions"
+          [type]="barChartType">
+        </canvas>
+        <div *ngIf="!resChartData.datasets.length" class="placeholder-stripes w-full h-full flex items-center justify-center">
+          <p class="text-sm font-bold text-gray-500">Aucune donnée disponible</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header header-gold">
+        <h3 class="section-card-title"><span class="material-icons text-[#C5A059]">payments</span> Recettes par Mois (Ar)</h3>
+      </div>
+      <div class="section-card-body chart-container bg-[var(--card-bg)] h-64 p-4">
+        <canvas *ngIf="revChartData.datasets.length"
+          baseChart
+          [data]="revChartData"
+          [options]="barChartOptions"
+          [type]="barChartType">
+        </canvas>
+        <div *ngIf="!revChartData.datasets.length" class="placeholder-stripes w-full h-full flex items-center justify-center">
+          <p class="text-sm font-bold text-gray-500">Aucune donnée disponible</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header header-olive">
+        <h3 class="section-card-title"><span class="material-icons text-primary">directions_bus</span> Taux d'Occupation Flotte</h3>
+      </div>
+      <div class="section-card-body chart-container chart-pie bg-[var(--card-bg)] h-64 p-4">
+        <canvas *ngIf="occChartData.datasets[0]?.data?.length"
+          baseChart
+          [data]="occChartData"
+          [options]="pieChartOptions"
+          [type]="pieChartType">
+        </canvas>
+        <div *ngIf="!occChartData.datasets[0]?.data?.length" class="placeholder-stripes w-full h-full flex items-center justify-center">
+          <p class="text-sm font-bold text-gray-500">Aucune donnée disponible</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header header-gold">
+        <h3 class="section-card-title"><span class="material-icons text-[#C5A059]">alt_route</span> Répartition des Trajets</h3>
+      </div>
+      <div class="section-card-body chart-container chart-pie bg-[var(--card-bg)] h-64 p-4">
+        <canvas *ngIf="routeChartData.datasets[0]?.data?.length"
+          baseChart
+          [data]="routeChartData"
+          [options]="pieChartOptions"
+          [type]="pieChartType">
+        </canvas>
+        <div *ngIf="!routeChartData.datasets[0]?.data?.length" class="placeholder-stripes w-full h-full flex items-center justify-center">
+          <p class="text-sm font-bold text-gray-500">Aucune donnée disponible</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <mat-card class="flex-1 overflow-hidden flex flex-col">
     <div class="p-4 bg-gray-50 border-b font-bold flex justify-between">
       <span>Aperçu du Rapport : {{ reportType | uppercase }}</span>

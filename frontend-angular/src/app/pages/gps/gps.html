@@ -1,36 +1,48 @@
-<div class="p-6 h-[calc(100vh-64px)] flex flex-col">
-  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-    <h1 class="text-2xl font-bold text-gray-800">Suivi GPS</h1>
+<div class="page-shell h-[calc(100vh-100px)] flex flex-col">
+
+  <!-- ── Header Section ── -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4" revealOnScroll revealClass="reveal-up">
+    <app-section-badge
+      tagline="Flotte &amp; Géolocalisation"
+      icon="my_location"
+      title="Suivi GPS en Temps Réel"
+      description="Visualisez vos véhicules en circulation, leur vitesse et leurs trajets.">
+    </app-section-badge>
     
-    <div class="flex flex-wrap gap-3 items-center">
-      <mat-form-field appearance="outline" class="w-40 mb-[-1.25em]">
-        <mat-label>Agence</mat-label>
-        <mat-select [(ngModel)]="filterAgency" (selectionChange)="applyFilters()">
-          <mat-option value="">Toutes</mat-option>
-          <mat-option *ngFor="let ag of agencies" [value]="ag">{{ ag }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div class="flex flex-wrap gap-2.5 items-center">
+      <!-- Filtre Agence -->
+      <select 
+        [(ngModel)]="filterAgency" 
+        (change)="applyFilters()" 
+        class="form-select text-xs font-bold" 
+        style="width: 150px; padding: 0.5rem 0.9rem; border-radius: 9999px;">
+        <option value="">Toutes les agences</option>
+        <option *ngFor="let ag of agencies" [value]="ag">{{ ag }}</option>
+      </select>
 
-      <mat-form-field appearance="outline" class="w-40 mb-[-1.25em]">
-        <mat-label>Statut</mat-label>
-        <mat-select [(ngModel)]="filterStatus" (selectionChange)="applyFilters()">
-          <mat-option value="">Tous</mat-option>
-          <mat-option value="in_transit">En trajet</mat-option>
-          <mat-option value="available">Disponible</mat-option>
-          <mat-option value="maintenance">Maintenance</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <!-- Filtre Statut -->
+      <select 
+        [(ngModel)]="filterStatus" 
+        (change)="applyFilters()" 
+        class="form-select text-xs font-bold" 
+        style="width: 140px; padding: 0.5rem 0.9rem; border-radius: 9999px;">
+        <option value="">Tous les statuts</option>
+        <option value="in_transit">En trajet</option>
+        <option value="available">Disponible</option>
+        <option value="maintenance">Maintenance</option>
+      </select>
 
-      <button mat-icon-button color="primary" (click)="loadLocations()" matTooltip="Actualiser">
-        <mat-icon>refresh</mat-icon>
+      <!-- Boutons d'action 3D -->
+      <button class="icon-btn" (click)="loadLocations()" title="Actualiser les positions">
+        <span class="material-icons">refresh</span>
       </button>
 
-      <button mat-icon-button color="accent" (click)="recenterMap()" matTooltip="Recentrer">
-        <mat-icon>my_location</mat-icon>
+      <button class="icon-btn" style="background: #FFE082; border-color: #D97706; box-shadow: 0 4px 0 #D97706;" (click)="recenterMap()" title="Recentrer la carte">
+        <span class="material-icons text-amber-900">my_location</span>
       </button>
 
-      <button mat-icon-button color="primary" (click)="toggleFullScreen()" matTooltip="Plein écran">
-        <mat-icon>fullscreen</mat-icon>
+      <button class="icon-btn" style="background: #E7F3F7; border-color: #38BDF8; box-shadow: 0 4px 0 #0284C7;" (click)="toggleFullScreen()" title="Plein écran">
+        <span class="material-icons text-sky-800">fullscreen</span>
       </button>
     </div>
   </div>
@@ -39,74 +51,113 @@
     <mat-spinner></mat-spinner>
   </div>
   
-  <div *ngIf="error" class="bg-red-100 text-red-700 p-4 rounded mb-4">
-    {{ error }}
+  <div *ngIf="error" class="bg-[var(--danger-light)] text-[var(--danger)] border-2 border-[var(--danger)] p-4 rounded-2xl mb-4 font-bold flex items-center gap-2">
+    <span class="material-icons">error_outline</span> {{ error }}
   </div>
 
   <!-- Map Container and Right Panel -->
-  <div class="flex-1 flex gap-4 overflow-hidden" [class.hidden]="isLoading && !locations.length">
-    <mat-card id="map-container" class="flex-1 relative overflow-hidden">
+  <div class="flex-1 flex gap-5 overflow-hidden" [class.hidden]="isLoading && !locations.length" revealOnScroll revealClass="reveal-scale">
+    <!-- Map Card -->
+    <div id="map-container" class="section-card flex-1 relative overflow-hidden" style="border-radius: 28px;">
       <div id="map" class="w-full h-full absolute inset-0 z-0"></div>
-    </mat-card>
+    </div>
 
     <!-- Side Info Panel -->
-    <mat-card class="w-80 flex flex-col overflow-hidden hidden md:flex">
-      <div class="p-4 border-b bg-gray-50 flex items-center justify-between">
-        <h3 class="font-bold text-gray-800 m-0">Véhicules Actifs</h3>
-        <span class="bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">{{ filteredLocations.length }}</span>
+    <div class="section-card w-88 flex flex-col overflow-hidden hidden md:flex" style="width: 340px; border-radius: 28px;">
+      <div class="section-card-header header-olive py-3 px-4 flex items-center justify-between">
+        <h3 class="section-card-title text-base">
+          <span class="material-icons text-primary">directions_bus</span>
+          Véhicules Actifs
+        </h3>
+        <span class="badge badge-primary font-bold">
+          {{ filteredLocations.length }} en ligne
+        </span>
       </div>
-      <div class="flex-1 overflow-y-auto p-4">
-        <div *ngIf="!filteredLocations.length" class="text-sm text-gray-500 text-center py-4">Aucun véhicule actif</div>
-        <ul class="space-y-3">
-          <li *ngFor="let loc of filteredLocations" class="border border-gray-100 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-            <div class="flex justify-between items-center mb-1">
-              <span class="font-bold text-gray-800">{{ loc.vehicle?.plate_number }}</span>
-              <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" 
-                [ngClass]="{'bg-green-100 text-green-700': loc.vehicle?.status === 'in_transit', 'bg-gray-100 text-gray-600': loc.vehicle?.status !== 'in_transit'}">
-                {{ loc.vehicle?.status === 'in_transit' ? 'En trajet' : loc.vehicle?.status }}
+
+      <div class="flex-1 overflow-y-auto p-4 bg-[var(--card-bg)]">
+        <div *ngIf="!filteredLocations.length" class="placeholder-stripes">
+          <span class="material-icons text-2xl">location_off</span>
+          <p class="text-xs font-bold text-gray-500">Aucun véhicule actif actuellement</p>
+        </div>
+
+        <ul class="space-y-3" *ngIf="filteredLocations.length">
+          <li *ngFor="let loc of filteredLocations" 
+              class="border-2 border-[var(--border-color)] bg-[var(--card-bg)] rounded-2xl p-3.5 hover:shadow-md transition-all">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="font-extrabold text-sm text-[var(--text-primary)] font-mono tracking-wide bg-[var(--surface)] px-2 py-0.5 rounded-lg border border-[var(--border-color)]">
+                {{ loc.vehicle?.plate_number }}
+              </span>
+              <span class="badge"
+                [ngClass]="loc.vehicle?.status === 'in_transit' ? 'badge-info' : 'badge-success'">
+                <span class="dot"></span>
+                {{ loc.vehicle?.status === 'in_transit' ? 'En trajet' : (loc.vehicle?.status || 'Disponible') }}
               </span>
             </div>
-            <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
-              <span><mat-icon class="scale-50 w-4 h-4 inline-block align-bottom">store</mat-icon> {{ loc.vehicle?.agency?.name }}</span>
-              <span class="font-medium text-blue-600">{{ loc.speed || 0 }} km/h</span>
+
+            <div class="flex justify-between items-center text-xs text-gray-500 mb-2 font-semibold">
+              <span class="flex items-center gap-1">
+                <span class="material-icons text-xs text-primary">store</span>
+                {{ loc.vehicle?.agency?.name || 'Agence centrale' }}
+              </span>
+              <span class="badge badge-success text-xs py-0.5">
+                {{ loc.speed || 0 }} km/h
+              </span>
             </div>
-            <button mat-stroked-button color="primary" class="w-full !text-xs !py-0 !h-8" (click)="viewHistory(loc.vehicle_id)">
-              <mat-icon class="scale-75">history</mat-icon> Historique
+
+            <button class="btn-cream btn-sm w-full" (click)="viewHistory(loc.vehicle_id)">
+              <span class="material-icons text-sm">history</span>
+              <span>Voir l'Historique</span>
             </button>
           </li>
         </ul>
       </div>
-    </mat-card>
+    </div>
   </div>
 
-  <!-- History Modal (Simple implementation instead of separate Dialog component for ease) -->
-  <div *ngIf="showHistoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-h-[80vh] flex flex-col">
-      <div class="flex justify-between items-center p-4 border-b">
-        <h2 class="text-lg font-bold">Historique du véhicule {{ selectedVehicleHistory[0]?.vehicle?.plate_number }}</h2>
-        <button mat-icon-button (click)="closeHistory()"><mat-icon>close</mat-icon></button>
+
+  <!-- History Modal -->
+  <div *ngIf="showHistoryModal" class="modal-overlay" (click)="closeHistory()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons text-primary">route</span>
+          Historique : {{ selectedVehicleHistory[0]?.vehicle?.plate_number || 'Véhicule' }}
+        </h2>
+        <button class="modal-close" (click)="closeHistory()">
+          <span class="material-icons">close</span>
+        </button>
       </div>
-      <div class="p-4 overflow-y-auto flex-1">
-        <div *ngIf="!selectedVehicleHistory.length" class="text-center py-4 text-gray-500">
-          Aucun historique trouvé
+
+      <div class="p-5 overflow-y-auto max-h-[60vh]">
+        <div *ngIf="!selectedVehicleHistory.length" class="placeholder-stripes">
+          <span class="material-icons">history_toggle_off</span>
+          <p class="text-sm font-bold text-gray-500">Aucun historique de position trouvé</p>
         </div>
-        <table class="w-full text-left" *ngIf="selectedVehicleHistory.length">
-          <thead class="bg-gray-50">
+
+        <table class="custom-table" *ngIf="selectedVehicleHistory.length">
+          <thead>
             <tr>
-              <th class="p-2">Date/Heure</th>
-              <th class="p-2">Vitesse</th>
-              <th class="p-2">Coordonnées</th>
+              <th>Date &amp; Heure</th>
+              <th>Vitesse</th>
+              <th>Coordonnées GPS</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let h of selectedVehicleHistory" class="border-t">
-              <td class="p-2">{{ h.recorded_at | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-              <td class="p-2">{{ h.speed || 0 }} km/h</td>
-              <td class="p-2 text-xs text-gray-600">{{ h.latitude }}, {{ h.longitude }}</td>
+            <tr *ngFor="let h of selectedVehicleHistory">
+              <td class="font-bold text-xs">{{ h.recorded_at | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td>
+                <span class="badge badge-info">{{ h.speed || 0 }} km/h</span>
+              </td>
+              <td class="text-xs text-gray-500 font-mono">{{ h.latitude | number:'1.4-4' }}, {{ h.longitude | number:'1.4-4' }}</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <div class="modal-footer">
+        <button class="btn-dark btn-sm" (click)="closeHistory()">Fermer</button>
+      </div>
     </div>
   </div>
+
 </div>

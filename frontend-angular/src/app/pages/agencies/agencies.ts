@@ -32,17 +32,16 @@ export class AgenciesComponent implements OnInit {
     this.agencyService.getAgencies().subscribe({
       next: (data) => {
         this.agencies = data;
-        // Don't display data automatically; wait for search
-        this.filteredAgencies = [];
+        this.applyFilter();
       },
       error: (err) => console.error(err)
     });
   }
 
   applyFilter(): void {
-    const term = this.searchTerm.toLowerCase();
-    if (term.trim() === '') {
-      this.filteredAgencies = [];
+    const term = this.searchTerm.toLowerCase().trim();
+    if (term === '') {
+      this.filteredAgencies = [...this.agencies];
       return;
     }
     this.filteredAgencies = this.agencies.filter(a => 

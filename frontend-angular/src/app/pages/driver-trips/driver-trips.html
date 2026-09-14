@@ -1,0 +1,146 @@
+<div class="driver-trips-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mes Missions &amp; Trajets Chauffeur</h1>
+      <p class="page-subtitle">Consultez vos départs programmés, la liste des passagers et validez les billets par QR Code.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/publish-trip" class="btn-publish">
+        <span class="material-icons">add_circle</span>
+        <span>Publier un trajet</span>
+      </a>
+      <a routerLink="/driver-scan" class="btn-scan">
+        <span class="material-icons">qr_code_scanner</span>
+        <span>Scanner Billets</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement de vos trajets...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && trips.length === 0">
+    <span class="material-icons empty-icon">directions_bus</span>
+    <h3>Aucun trajet assigné pour le moment</h3>
+    <p>Vous pouvez publier un nouveau trajet ou attendre l'assignation par votre agence.</p>
+    <a routerLink="/publish-trip" class="btn-cta">Publier un départ</a>
+  </div>
+
+  <!-- Trips Grid -->
+  <div class="trips-grid" *ngIf="!isLoading && trips.length > 0">
+    <div class="trip-card" *ngFor="let t of trips">
+      <div class="card-top">
+        <div class="vehicle-tag">
+          <span class="material-icons">directions_car</span>
+          <span>{{ t.vehicle?.brand }} {{ t.vehicle?.model }} ({{ t.vehicle?.plate_number }})</span>
+        </div>
+        <div class="status-pill" [class.scheduled]="t.status === 'scheduled'" [class.in_progress]="t.status === 'in_progress'" [class.completed]="t.status === 'completed'">
+          {{ t.status === 'in_progress' ? 'En cours de route' : (t.status === 'completed' ? 'Terminé' : 'Programmé') }}
+        </div>
+      </div>
+
+      <div class="route-box">
+        <div class="cities">
+          <span class="origin">{{ t.route?.origin }}</span>
+          <span class="material-icons">arrow_forward</span>
+          <span class="destination">{{ t.route?.destination }}</span>
+        </div>
+        <div class="time">
+          <span class="material-icons">schedule</span>
+          <span>Départ : {{ t.departure_time | date:'EEEE dd/MM/yyyy à HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-label">Passagers inscrits</span>
+          <span class="stat-val highlight">{{ t.reservations ? t.reservations.length : (t.vehicle ? t.vehicle.capacity - (t.available_seats || 0) : 0) }} / {{ t.vehicle?.capacity || 19 }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tarif siège</span>
+          <span class="stat-val">{{ t.price | number }} FCFA</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Agence</span>
+          <span class="stat-val">{{ t.vehicle?.agency?.name || 'Agence Centrale' }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-passengers" (click)="viewPassengers(t)">
+          <span class="material-icons">people</span>
+          <span>Passagers</span>
+        </button>
+
+        <button class="btn-scan-trip" (click)="goToScan(t.id)">
+          <span class="material-icons">qr_code_scanner</span>
+          <span>Check-in QR</span>
+        </button>
+
+        <button class="btn-chat" (click)="goToChat(t.id)">
+          <span class="material-icons">chat</span>
+          <span>Chat</span>
+        </button>
+
+        <!-- Status modifier -->
+        <button *ngIf="t.status === 'scheduled'" class="btn-start" (click)="updateTripStatus(t, 'in_progress')" title="Démarrer le trajet">
+          <span class="material-icons">play_arrow</span>
+        </button>
+        <button *ngIf="t.status === 'in_progress'" class="btn-finish" (click)="updateTripStatus(t, 'completed')" title="Terminer le voyage">
+          <span class="material-icons">check</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Passengers Modal -->
+  <div class="modal-backdrop" *ngIf="showPassengersModal" (click)="closePassengersModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Passagers &bull; {{ selectedTrip?.route?.origin }} &rarr; {{ selectedTrip?.route?.destination }}</h3>
+        <button class="btn-close" (click)="closePassengersModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="!selectedTrip?.reservations || selectedTrip?.reservations?.length === 0" class="empty-passengers">
+          <span class="material-icons">person_off</span>
+          <p>Aucun passager enregistré pour ce départ pour le moment.</p>
+        </div>
+
+        <table class="passengers-table" *ngIf="selectedTrip?.reservations && (selectedTrip?.reservations?.length || 0) > 0">
+          <thead>
+            <tr>
+              <th>Siège</th>
+              <th>Passager</th>
+              <th>N° Billet</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of selectedTrip?.reservations">
+              <td><span class="seat-pill">N° {{ r.seat_number }}</span></td>
+              <td><strong>{{ r.user?.name || 'Passager' }}</strong></td>
+              <td><code>{{ r.ticket?.ticket_number || 'TKT-' + r.id }}</code></td>
+              <td>
+                <span class="badge" [class.badge-paid]="r.status === 'confirmed'">{{ r.status }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="goToScan(selectedTrip?.id)">
+          <span class="material-icons">qr_code_scanner</span> Scanner les billets
+        </button>
+        <button class="btn-secondary" (click)="closePassengersModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

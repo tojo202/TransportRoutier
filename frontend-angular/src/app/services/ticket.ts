@@ -18,4 +18,8 @@ export class TicketService {
   getTicket(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
+
+  scanQr(code: string, markUsed: boolean = true): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/scan`, { code, mark_used: markUsed });
+  }
 }

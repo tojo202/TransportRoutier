@@ -1,0 +1,86 @@
+<div class="publish-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Publier un Nouveau Trajet / Covoiturage</h1>
+      <p class="page-subtitle">Ouvrez les réservations pour votre véhicule et fixez le prix du siège.</p>
+    </div>
+  </div>
+
+  <div class="publish-card">
+    <form (ngSubmit)="onSubmit()">
+      <!-- Route Section -->
+      <div class="form-section">
+        <h3 class="section-title"><span class="material-icons">alt_route</span> Itinéraire &amp; Villes</h3>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Ville de Départ *</label>
+            <input type="text" [(ngModel)]="origin" name="origin" placeholder="Ex: Dakar" list="cities-list" required />
+          </div>
+
+          <div class="form-group">
+            <label>Ville d'Arrivée (Destination) *</label>
+            <input type="text" [(ngModel)]="destination" name="destination" placeholder="Ex: Saint-Louis" list="cities-list" required />
+          </div>
+        </div>
+
+        <datalist id="cities-list">
+          <option *ngFor="let c of cities" [value]="c"></option>
+        </datalist>
+      </div>
+
+      <!-- Schedule Section -->
+      <div class="form-section">
+        <h3 class="section-title"><span class="material-icons">schedule</span> Date &amp; Horaires</h3>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Date de Départ *</label>
+            <input type="date" [(ngModel)]="departureDate" name="departureDate" required />
+          </div>
+
+          <div class="form-group">
+            <label>Heure de Départ *</label>
+            <input type="time" [(ngModel)]="departureTime" name="departureTime" required />
+          </div>
+
+          <div class="form-group">
+            <label>Durée estimée (heures)</label>
+            <input type="number" [(ngModel)]="estimatedDuration" name="estimatedDuration" min="1" max="24" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle & Pricing Section -->
+      <div class="form-section">
+        <h3 class="section-title"><span class="material-icons">directions_bus</span> Véhicule &amp; Tarification</h3>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Véhicule Assigné *</label>
+            <select [(ngModel)]="vehicleId" name="vehicleId" (change)="onVehicleChange()">
+              <option *ngFor="let v of vehicles" [value]="v.id">
+                {{ v.brand }} {{ v.model }} ({{ v.plate_number }}) - {{ v.capacity }} places
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Places Disponibles *</label>
+            <input type="number" [(ngModel)]="availableSeats" name="availableSeats" min="1" required />
+          </div>
+
+          <div class="form-group">
+            <label>Prix par Siège (FCFA) *</label>
+            <input type="number" [(ngModel)]="price" name="price" step="500" min="500" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" routerLink="/driver-trips" class="btn-cancel">Annuler</button>
+        <button type="submit" class="btn-submit" [disabled]="isSaving">
+          <span class="material-icons">publish</span>
+          <span>{{ isSaving ? 'Publication en cours...' : 'Publier le départ' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

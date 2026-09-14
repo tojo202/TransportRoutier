@@ -35,7 +35,7 @@ export class DriversComponent implements OnInit {
     this.driverService.getDrivers().subscribe({
       next: (data) => {
         this.drivers = data;
-        this.filteredDrivers = []; // Do not display until search
+        this.applyFilter();
       },
       error: (err) => console.error(err)
     });
@@ -46,9 +46,9 @@ export class DriversComponent implements OnInit {
   }
 
   applyFilter(): void {
-    const term = this.searchTerm.toLowerCase();
-    if (term.trim() === '') {
-      this.filteredDrivers = [];
+    const term = this.searchTerm.toLowerCase().trim();
+    if (term === '') {
+      this.filteredDrivers = [...this.drivers];
       return;
     }
     this.filteredDrivers = this.drivers.filter(d => {
