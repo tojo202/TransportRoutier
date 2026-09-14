@@ -12,6 +12,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TicketConfirmationMail;
 
 class ReservationController extends Controller
 {
@@ -65,7 +67,27 @@ class ReservationController extends Controller
         }
 
         $user = $request->user();
-        $userId = $request->user_id ?: ($user ? $user->id : 1);
+        $userId = $request->user_id;
+
+        // Contexte invité : création / récupération automatique d'un compte client
+        $createdAccount = null;
+        if (!$userId && $user) {
+            $userId = $user->id;
+        } elseif (!$userId && $request->filled('passenger_email')) {
+            $client = User::firstOrCreate(
+                ['email' => $request->passenger_email],
+                [
+                    'name' => $request->passenger_name ?? 'Client',
+                    'password' => \Illuminate\Support\Facades\Hash::make('client@' . \Illuminate\Support\Str::random(6)),
+                    'role' => 'client',
+                ]
+            );
+            $userId = $client->id;
+            if ($client->wasRecentlyCreated) {
+                $createdAccount = $client;
+            }
+        }
+        $userId = $userId ?: 1;
 
         // Create reservation
         $reservation = Reservation::create([
@@ -110,13 +132,12 @@ class ReservationController extends Controller
             'status' => 'success',
         ]);
 
-        // Send simulated Email and in-app Notification
         $clientUser = User::find($userId);
-        $clientEmail = $clientUser ? $clientUser->email : 'client@transport.com';
-        $clientName = $clientUser ? $clientUser->name : 'Client';
+        $clientEmail = $clientUser ? $clientUser->email : ($request->passenger_email ?? 'client@transport.com');
+        $clientName = $clientUser ? $clientUser->name : ($request->passenger_name ?? 'Client');
 
         $routeName = $schedule->route ? ($schedule->route->origin . ' → ' . $schedule->route->destination) : 'votre trajet';
-        
+
         // In-app Notification
         Notification::create([
             'user_id' => $userId,
@@ -126,17 +147,71 @@ class ReservationController extends Controller
             'is_read' => false
         ]);
 
-        // Email simulation log
+        // Send Email with elegant HTML template + inline QR Code
+        $qrDataUrl = $this->buildQrDataUrl($qrCodePayload);
+
+        try {
+            Mail::to($clientEmail)->send(new TicketConfirmationMail([
+                'title' => 'Réservation confirmée — Billet ' . $ticketNumber,
+                'ticket_number' => $ticketNumber,
+                'passenger_name' => $clientName,
+                'origin' => $schedule->route->origin ?? 'Départ',
+                'destination' => $schedule->route->destination ?? 'Arrivée',
+                'departure_time' => $schedule->departure_time?->format('d/m/Y à H:i') ?? '',
+                'arrival_time' => $schedule->arrival_time?->format('d/m/Y à H:i') ?? '',
+                'duration_hours' => $schedule->route->estimated_duration_hours ?? '',
+                'seat' => $request->seat_number,
+                'vehicle' => ($schedule->vehicle->brand ?? '') . ' ' . ($schedule->vehicle->model ?? '') . ' — ' . ($schedule->vehicle->plate_number ?? ''),
+                'total_amount' => $request->total_amount,
+                'transaction_reference' => $payment->transaction_reference,
+                'qr_code' => $qrDataUrl,
+                'app_url' => config('app.url'),
+            ]));
+        } catch (\Throwable $e) {
+            // Ne bloque jamais la réservation si l'email échoue (mailer = log en dev)
+            Log::warning('Ticket mail sending failed: ' . $e->getMessage());
+        }
+
         Log::info("EMAIL NOTIFICATION SENT to {$clientEmail} [Subject: Confirmation de votre billet {$ticketNumber}] - Trajet: {$routeName}, Siège: {$request->seat_number}, Montant: {$request->total_amount} FCFA");
 
-        return response()->json($reservation->load([
+        $responseData = $reservation->load([
             'user',
             'schedule.route',
             'schedule.vehicle',
             'schedule.driver',
             'ticket',
             'payment'
-        ]), 201);
+        ])->toArray();
+
+        // Compte client créé contextuellement : on renvoie token + user pour connexion auto
+        if ($createdAccount) {
+            $responseData['account_created'] = true;
+            $responseData['user'] = $createdAccount->only(['id', 'name', 'email', 'role']);
+            $responseData['auth_token'] = $createdAccount->createToken('auth_token')->plainTextToken;
+        }
+
+        return response()->json($responseData, 201);
+    }
+
+    /**
+     * Génère une data-URI PNG (QR Code) pour les emails / billet.
+     */
+    protected function buildQrDataUrl($payload): string
+    {
+        try {
+            $qr = new \Endroid\QrCode\QrCode(
+                (string) $payload,
+                size: 260,
+                margin: 8
+            );
+            $writer = new \Endroid\QrCode\Writer\PngWriter();
+            $result = $writer->write($qr);
+
+            return 'data:image/png;base64,' . base64_encode($result->getString());
+        } catch (\Throwable $e) {
+            Log::warning('QR generation failed: ' . $e->getMessage());
+            return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260"></svg>';
+        }
     }
 
     public function show(Reservation $reservation)

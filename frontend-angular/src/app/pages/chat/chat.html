@@ -58,7 +58,7 @@
             <div class="message-bubble">
               <div class="bubble-header">
                 <span class="sender-name">{{ m.user?.name || 'Utilisateur' }}</span>
-                <span class="sender-role" *ngIf="m.user?.role === 'driver'">👑 Conducteur</span>
+                <span class="sender-role" *ngIf="m.user?.role === 'driver'"><span class="material-icons" style="font-size:14px;">workspace_premium</span>&nbsp;Conducteur</span>
                 <span class="message-time">{{ m.created_at | date:'HH:mm' }}</span>
               </div>
               <p class="message-text">{{ m.message }}</p>

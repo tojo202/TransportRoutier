@@ -4,8 +4,16 @@ import { LayoutComponent } from './components/layout/layout';
 
 export const routes: Routes = [
   {
+    path: 'home',
+    loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then(m => m.Login)
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./pages/register/register').then(m => m.RegisterComponent)
   },
   {
     path: '',
@@ -88,8 +96,8 @@ export const routes: Routes = [
         path: 'profile',
         loadComponent: () => import('./pages/profile/profile').then(m => m.Profile)
       },
-      { path: '', redirectTo: 'platform', pathMatch: 'full' }
+      { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: '/platform' }
+  { path: '**', redirectTo: '/home' }
 ];

@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Schedules } from './schedules';
+import { DriverService } from '../../services/driver';
+import { RouteService } from '../../services/route';
+import { ScheduleService } from '../../services/schedule';
+import { VehicleService } from '../../services/vehicle';
+import { SchedulesComponent } from './schedules';
 
-describe('Schedules', () => {
-  let component: Schedules;
-  let fixture: ComponentFixture<Schedules>;
+describe('Horaires', () => {
+  let component: SchedulesComponent;
+  let fixture: ComponentFixture<SchedulesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Schedules],
+      imports: [SchedulesComponent],
+      providers: [
+        { provide: ScheduleService, useValue: {} },
+        { provide: RouteService, useValue: {} },
+        { provide: VehicleService, useValue: {} },
+        { provide: DriverService, useValue: {} },
+      ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Schedules);
+    fixture = TestBed.createComponent(SchedulesComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

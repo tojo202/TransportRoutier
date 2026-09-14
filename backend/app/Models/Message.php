@@ -12,12 +12,18 @@ class Message extends Model
     protected $fillable = [
         'schedule_id',
         'user_id',
+        'receiver_id',
         'message',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
     }
 
     public function schedule()

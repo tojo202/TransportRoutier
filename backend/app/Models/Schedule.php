@@ -13,6 +13,8 @@ class Schedule extends Model
         'route_id',
         'vehicle_id',
         'driver_id',
+        'agency_id',
+        'published_by',
         'departure_time',
         'arrival_time',
         'price',
@@ -41,6 +43,11 @@ class Schedule extends Model
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class);
     }
 
     public function reservations()

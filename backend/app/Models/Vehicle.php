@@ -23,16 +23,6 @@ class Vehicle extends Model
         return $this->belongsTo(Agency::class);
     }
 
-    public function latestGpsLocation()
-    {
-        return $this->hasOne(GpsLocation::class)->latest('recorded_at');
-    }
-
-    public function gpsLocations()
-    {
-        return $this->hasMany(GpsLocation::class);
-    }
-
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

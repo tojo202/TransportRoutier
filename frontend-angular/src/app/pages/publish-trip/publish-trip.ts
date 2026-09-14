@@ -94,7 +94,7 @@ export class PublishTripComponent implements OnInit {
     this.scheduleService.createSchedule(payload).subscribe({
       next: () => {
         this.isSaving = false;
-        alert('🎉 Trajet publié avec succès !');
+        alert('Trajet publié avec succès !');
         if (this.authService.isDriver()) {
           this.router.navigate(['/driver-trips']);
         } else {

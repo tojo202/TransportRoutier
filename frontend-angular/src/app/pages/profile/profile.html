@@ -15,7 +15,8 @@
     <p class="text-[var(--text-secondary)] text-sm mb-4">{{ user?.email || 'email@example.com' }}</p>
     
     <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[var(--primary-light)] text-[var(--primary-hover)] uppercase tracking-wider">
-      🛡️ {{ user?.role || 'client' }}
+      <span class="material-icons" style="font-size:13px; margin-right:4px;">shield</span>
+      {{ user?.role || 'client' }}
     </div>
 
     <div class="mt-6 pt-6 border-t border-[var(--border-color)] text-left space-y-3 text-sm">

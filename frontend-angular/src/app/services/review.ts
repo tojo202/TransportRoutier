@@ -29,11 +29,12 @@ export class ReviewService {
 
   constructor(private http: HttpClient) {}
 
-  getReviews(driverId?: number, scheduleId?: number): Observable<any> {
+  getReviews(driverId?: number, scheduleId?: number, perPage?: number): Observable<any> {
     let url = this.apiUrl;
     const params: string[] = [];
     if (driverId) params.push(`driver_id=${driverId}`);
     if (scheduleId) params.push(`schedule_id=${scheduleId}`);
+    if (perPage) params.push(`per_page=${perPage}`);
     if (params.length > 0) {
       url += '?' + params.join('&');
     }

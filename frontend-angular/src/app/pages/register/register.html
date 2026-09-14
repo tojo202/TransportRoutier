@@ -1,0 +1,97 @@
+<div class="min-h-screen flex items-center justify-center bg-[var(--bg-main)] p-4">
+  <div class="w-full max-w-md p-8 rounded-2xl relative overflow-hidden bg-white shadow-xl border border-[#e2e8f0]">
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-[var(--primary-light)] rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-[var(--info-light)] rounded-full blur-3xl opacity-50"></div>
+
+    <div class="relative z-10">
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#edf3e6] text-[#788e4b] mb-3">
+          <span class="material-icons text-2xl">person_add</span>
+        </div>
+        <h1 class="text-2xl font-extrabold text-[#0f172a] mb-1">Créer un compte</h1>
+        <p class="text-sm text-[#64748b]">Rejoignez TransExpress en 30 secondes</p>
+      </div>
+
+      <div *ngIf="success" class="mb-4 bg-[#ecfdf5] border border-[#6ee7b7] text-[#047857] px-4 py-3 rounded-xl flex items-start gap-2 text-sm font-semibold">
+        <span class="material-icons text-emerald-600" style="font-size:18px; margin-top:1px;">check_circle</span>
+        <span>Compte créé avec succès ! Redirection vers votre espace...</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit(form)" #form="ngForm" class="space-y-4" novalidate>
+        <div>
+          <label class="block text-xs font-bold text-[#475569] uppercase mb-1.5">Nom complet</label>
+          <div class="relative">
+            <span class="material-icons field-icon">person</span>
+            <input type="text" name="name" [(ngModel)]="model.name" #name="ngModel" required minlength="2"
+                   class="form-input" placeholder="Ex: Moussa Diop" />
+          </div>
+          <span class="field-error" *ngIf="name.touched && name.errors?.['required']">Veuillez indiquer votre nom complet.</span>
+          <span class="field-error" *ngIf="name.touched && name.errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#475569] uppercase mb-1.5">Email</label>
+          <div class="relative">
+            <span class="material-icons field-icon">mail</span>
+            <input type="email" name="email" [(ngModel)]="model.email" #email="ngModel" required
+                   class="form-input" placeholder="nom@transport.com" />
+          </div>
+          <span class="field-error" *ngIf="email.touched && email.errors?.['required']">Veuillez indiquer votre email.</span>
+          <span class="field-error" *ngIf="email.touched && email.errors?.['email']">Adresse email invalide.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#475569] uppercase mb-1.5">Mot de passe</label>
+          <div class="relative">
+            <span class="material-icons field-icon">lock</span>
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="model.password" #password="ngModel" required minlength="6"
+                   class="form-input" placeholder="6 caractères minimum" />
+            <button type="button" class="field-visibility" (click)="showPassword = !showPassword" [attr.title]="showPassword ? 'Masquer' : 'Afficher'">
+              <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="password.touched && password.errors?.['required']">Veuillez choisir un mot de passe.</span>
+          <span class="field-error" *ngIf="password.touched && password.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#475569] uppercase mb-1.5">Confirmation</label>
+          <div class="relative">
+            <span class="material-icons field-icon">lock_outline</span>
+            <input [type]="showConfirm ? 'text' : 'password'" name="password_confirmation" [(ngModel)]="model.password_confirmation" #confirm="ngModel" required
+                   class="form-input" placeholder="Confirmez votre mot de passe" />
+            <button type="button" class="field-visibility" (click)="showConfirm = !showConfirm" [attr.title]="showConfirm ? 'Masquer' : 'Afficher'">
+              <span class="material-icons">{{ showConfirm ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="confirm.touched && confirm.errors?.['required']">Veuillez confirmer votre mot de passe.</span>
+        </div>
+
+        <div *ngIf="error" class="bg-[#fee2e2] text-[#ef4444] px-4 py-2.5 rounded-xl text-xs font-semibold border border-[#fca5a5] flex items-start gap-2">
+          <span class="material-icons" style="font-size:16px; margin-top:1px;">error</span>
+          <span>{{ error }}</span>
+        </div>
+
+        <button type="submit" [disabled]="isLoading || success"
+                class="w-full bg-[#788e4b] hover:bg-[#677b3e] text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 disabled:opacity-60">
+          <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+          <span *ngIf="!isLoading" class="material-icons" style="font-size:18px;">person_add</span>
+          <span>{{ isLoading ? 'Création du compte...' : 'Créer mon compte' }}</span>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-5 border-t border-[#f1f5f9] space-y-3">
+        <p class="text-sm text-[#64748b] text-center">
+          Déjà membre ?
+          <a routerLink="/login" class="font-bold text-[#788e4b] hover:underline">Se connecter</a>
+        </p>
+        <div class="text-center">
+          <a routerLink="/platform" class="text-xs font-bold text-[#788e4b] hover:underline inline-flex items-center gap-1">
+            <span class="material-icons text-sm">arrow_back</span>
+            <span>Accéder au portail public de réservation</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

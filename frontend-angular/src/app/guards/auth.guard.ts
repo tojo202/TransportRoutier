@@ -12,7 +12,8 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   // Allow platform / public browsing
-  if (state.url === '/' || state.url === '/platform' || state.url.startsWith('/platform')) {
+  if (state.url === '/' || state.url === '/home' || state.url.startsWith('/home') ||
+      state.url === '/platform' || state.url.startsWith('/platform')) {
     return true;
   }
 

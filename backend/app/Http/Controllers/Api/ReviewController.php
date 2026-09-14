@@ -53,7 +53,7 @@ class ReviewController extends Controller
         if ($driver && $driver->user_id) {
             Notification::create([
                 'user_id' => $driver->user_id,
-                'title' => 'Nouvel avis reçu ⭐ ' . $request->rating . '/5',
+                'title' => 'Nouvel avis reçu ' . $request->rating . '/5',
                 'message' => ($user ? $user->name : 'Un voyageur') . ' a laissé un avis : "' . substr($request->comment ?? '', 0, 50) . '"',
                 'type' => 'success',
                 'is_read' => false

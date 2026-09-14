@@ -37,17 +37,16 @@
   background: linear-gradient(135deg, #788E4B, #5B7036);
   width: 48px;
   height: 48px;
-  border-radius: 18px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 0 var(--primary-strong, #3A4A1F);
   border: 2px solid var(--border-gold, #DFB76C);
-  transform: rotate(-2deg);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(52, 36, 25, 0.18);
 }
 .logo-icon:hover {
-  transform: rotate(3deg) scale(1.04);
+  transform: scale(1.04);
 }
 
 .logo-icon .material-icons {
@@ -116,21 +115,20 @@
   font-size: 0.95rem;
   font-weight: 700;
   border: 2px solid transparent;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.15s ease;
 }
 
 .nav-item:hover {
   background: var(--primary-light, #EBF0E3);
   color: var(--primary, #5B7036);
-  transform: translateX(4px);
+  transform: translateX(3px);
 }
 
 .nav-item.active-link {
   background: var(--primary, #5B7036);
   color: #FFFFFB !important;
   font-weight: 800;
-  border-color: var(--primary-strong, #3A4A1F);
-  box-shadow: 0 4px 0 var(--primary-strong, #3A4A1F);
+  box-shadow: 0 1px 3px rgba(52, 36, 25, 0.2);
 }
 
 .nav-item .material-icons {
@@ -217,7 +215,7 @@
 .notification-btn {
   background: var(--surface, #FAF7F0);
   border: 2px solid var(--border-color, #E2DAC8);
-  box-shadow: 0 3px 0 var(--border-strong, #CFC2A8);
+  box-shadow: 0 1px 2px rgba(52, 36, 25, 0.08);
   width: 42px;
   height: 42px;
   border-radius: var(--radius-full, 9999px);
@@ -238,8 +236,8 @@
 }
 
 .notification-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--border-strong, #CFC2A8);
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .notification-badge {
@@ -273,7 +271,7 @@
   border-radius: 22px;
   box-shadow: 0 16px 36px rgba(52, 36, 25, 0.14);
   z-index: 200;
-  animation: slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: slideUp 0.2s ease;
   overflow: hidden;
 }
 
@@ -354,7 +352,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 0 rgba(52, 36, 25, 0.05);
+  box-shadow: 0 1px 2px rgba(52, 36, 25, 0.05);
 }
 .notif-icon .material-icons { font-size: 20px; }
 
@@ -442,7 +440,7 @@
   font-weight: 800;
   font-size: 1.1rem;
   border: 2px solid var(--border-gold, #DFB76C);
-  box-shadow: 0 3px 0 var(--primary-strong, #3A4A1F);
+  box-shadow: 0 1px 3px rgba(52, 36, 25, 0.15);
 }
 
 .user-details {
@@ -474,7 +472,7 @@
   padding: 0.5rem 1.05rem;
   background: var(--card-bg, #FFFFFB);
   border: 2px solid var(--border-color, #E2DAC8);
-  box-shadow: 0 3px 0 var(--border-strong, #CFC2A8);
+  box-shadow: 0 1px 2px rgba(52, 36, 25, 0.06);
   color: var(--text-secondary, #635043);
   border-radius: var(--radius-full, 9999px);
   font-family: var(--font-heading, sans-serif);
@@ -491,8 +489,8 @@
 }
 
 .logout-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--border-strong, #CFC2A8);
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 /* Fil d'Ariane (Breadcrumbs) */
@@ -548,3 +546,48 @@
   position: relative;
   z-index: 1;
 }
+
+/* ====================================================================
+   Éléments manquants ajoutés (flat SaaS)
+   ==================================================================== */
+.quick-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--primary, #5B7036);
+  font-family: var(--font-heading, sans-serif);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.quick-brand-link .material-icons { font-size: 26px; }
+
+.brand-name { color: var(--text-primary, #342419); }
+
+.btn-header-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.5rem 1.1rem;
+  background: var(--primary, #5B7036);
+  color: #FFFFFB;
+  border: none;
+  border-radius: 9999px;
+  font-family: var(--font-heading, sans-serif);
+  font-weight: 800;
+  font-size: 0.88rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  box-shadow: 0 1px 3px rgba(52, 36, 25, 0.18);
+}
+
+.btn-header-login:hover {
+  background: var(--primary-hover, #4C5F2B);
+}
+
+.badge-role-admin   { color: #9E4732 !important; }
+.badge-role-agent   { color: #2563EB !important; }
+.badge-role-driver  { color: #B45309 !important; }
+.badge-role-client  { color: #3F6212 !important; }

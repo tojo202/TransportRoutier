@@ -18,8 +18,9 @@ class ScheduleController extends Controller
             'vehicle.agency',
             'driver.agency',
             'driver.reviews',
+            'agency',
             'reservations.user'
-        ]);
+        ])->where('status', '!=', 'cancelled');
 
         if ($request->filled('origin')) {
             $query->whereHas('route', function ($q) use ($request) {
@@ -39,23 +40,58 @@ class ScheduleController extends Controller
             $query->whereDate('departure_time', $request->date);
         }
 
+        if ($request->filled('date_from')) {
+            $query->whereDate('departure_time', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('departure_time', '<=', $request->date_to);
+        }
+
         if ($request->filled('driver_id')) {
             $query->where('driver_id', $request->driver_id);
+        }
+
+        if ($request->filled('agency_id')) {
+            $query->where('agency_id', $request->agency_id);
         }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
         }
 
+        // Nombre de places disponibles minimal (ex: passagers)
+        if ($request->filled('seats')) {
+            $query->where('available_seats', '>=', $request->seats);
+        }
+
+        if ($request->filled('published_by')) {
+            $query->where('published_by', $request->published_by);
+        }
+
+        // Par défaut, seuls les départs à venir et programmés sont proposés au public
+        if (!$request->boolean('include_past')) {
+            $query->where(function ($q) {
+                $q->where('departure_time', '>=', now()->subMinutes(30))
+                    ->orWhere('status', 'in_transit');
+            });
+        }
+
         $query->orderBy('departure_time', 'asc');
 
+        // Pagination Laravel activée dès qu'une page est demandée
         if ($request->has('page') || $request->boolean('paginate')) {
-            $perPage = $request->get('per_page', 6);
-            return response()->json($query->paginate($perPage));
+            $perPage = $request->get('per_page', 8);
+            $page = $request->get('page', 1);
+            return response()->json($query->paginate($perPage, ['*'], 'page', $page));
         }
 
         return response()->json($query->get());
@@ -105,6 +141,25 @@ class ScheduleController extends Controller
         $capacity = $vehicle ? $vehicle->capacity : 19;
         $availableSeats = $request->available_seats ?? $capacity;
 
+        // Publicateur : conducteur connecté, sinon agence / admin
+        $publishedBy = 'admin';
+        $agencyId = $request->agency_id;
+        if ($vehicle && !$agencyId) {
+            $agencyId = $vehicle->agency_id;
+        }
+        $user = $request->user();
+        if ($user && $user->role === 'driver') {
+            $publishedBy = 'driver';
+            if ($driverId) {
+                $driverModel = Driver::find($driverId);
+                if ($driverModel && $driverModel->agency_id && !$agencyId) {
+                    $agencyId = $driverModel->agency_id;
+                }
+            }
+        } elseif ($request->filled('agency_id') || ($vehicle && $vehicle->agency_id)) {
+            $publishedBy = 'agency';
+        }
+
         $departureTime = \Carbon\Carbon::parse($request->departure_time);
         $arrivalTime = $request->filled('arrival_time')
             ? \Carbon\Carbon::parse($request->arrival_time)
@@ -114,6 +169,8 @@ class ScheduleController extends Controller
             'route_id' => $routeId,
             'vehicle_id' => $vehicleId,
             'driver_id' => $driverId,
+            'agency_id' => $agencyId,
+            'published_by' => $publishedBy,
             'departure_time' => $departureTime,
             'arrival_time' => $arrivalTime,
             'price' => $request->price,
@@ -121,7 +178,7 @@ class ScheduleController extends Controller
             'status' => $request->status ?? 'scheduled',
         ]);
 
-        return response()->json($schedule->load(['route', 'vehicle', 'driver']), 201);
+        return response()->json($schedule->load(['route', 'vehicle', 'driver', 'agency']), 201);
     }
 
     public function show(Schedule $schedule)
@@ -131,6 +188,7 @@ class ScheduleController extends Controller
             'vehicle.agency',
             'driver.agency',
             'driver.reviews.user',
+            'agency',
             'reservations.user',
             'reservations.ticket'
         ]));
@@ -139,7 +197,7 @@ class ScheduleController extends Controller
     public function update(Request $request, Schedule $schedule)
     {
         $schedule->update($request->all());
-        return response()->json($schedule->load(['route', 'vehicle', 'driver']));
+        return response()->json($schedule->load(['route', 'vehicle', 'driver', 'agency']));
     }
 
     public function destroy(Schedule $schedule)

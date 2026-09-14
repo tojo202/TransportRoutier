@@ -1,17 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Baggages } from './baggages';
+import { BaggageService } from '../../services/baggage';
+import { BaggagesComponent } from './baggages';
 
-describe('Baggages', () => {
-  let component: Baggages;
-  let fixture: ComponentFixture<Baggages>;
+describe('Bagages', () => {
+  let component: BaggagesComponent;
+  let fixture: ComponentFixture<BaggagesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Baggages],
+      imports: [BaggagesComponent],
+      providers: [{ provide: BaggageService, useValue: {} }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Baggages);
+    fixture = TestBed.createComponent(BaggagesComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

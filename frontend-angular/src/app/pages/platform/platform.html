@@ -14,12 +14,12 @@
       </p>
 
       <!-- Fast Role Switcher / Demo Banner -->
-      <div class="hero-roles-bar" *ngIf="!authService.getCurrentUser()">
+      <div class="hero-roles-bar" *ngIf="(authService.currentUser$ | async) === null">
         <span class="roles-label">Connexion rapide pour démo :</span>
-        <a routerLink="/login" class="role-pill admin">👑 Admin</a>
-        <a routerLink="/login" class="role-pill agent">💼 Agent</a>
-        <a routerLink="/login" class="role-pill driver">🚗 Chauffeur</a>
-        <a routerLink="/login" class="role-pill client">👤 Client</a>
+        <a routerLink="/login" class="role-pill admin"><span class="material-icons">shield</span> Admin</a>
+        <a routerLink="/login" class="role-pill agent"><span class="material-icons">badge</span> Agent</a>
+        <a routerLink="/login" class="role-pill driver"><span class="material-icons">directions_car</span> Chauffeur</a>
+        <a routerLink="/login" class="role-pill client"><span class="material-icons">person</span> Client</a>
       </div>
     </div>
   </header>
@@ -109,7 +109,7 @@
     <div class="results-header">
       <div class="results-title-group">
         <h2 class="results-title">Trajets disponibles</h2>
-        <span class="results-count">{{ filteredSchedules.length }} voyage(s) trouvé(s)</span>
+        <span class="results-count">{{ totalItems }} voyage(s) trouvé(s)</span>
       </div>
       <div class="page-indicator" *ngIf="totalPages > 1">
         Page {{ currentPage }} sur {{ totalPages }}
@@ -378,6 +378,35 @@
 
       <!-- STEP 2: PASSENGER INFO & PAYMENT -->
       <div class="modal-body" *ngIf="bookingStep === 2">
+        <!-- Connexion contextuelle pour les invités -->
+        <div class="guest-auth-box" *ngIf="isGuest">
+          <div class="guest-auth-tabs">
+            <button class="guest-tab" [class.active]="authMode === 'create'" (click)="authMode='create'">
+              <span class="material-icons">person_add</span> Créer mon compte
+            </button>
+            <button class="guest-tab" [class.active]="authMode === 'login'" (click)="authMode='login'">
+              <span class="material-icons">login</span> J'ai déjà un compte
+            </button>
+          </div>
+          <p class="guest-hint">
+            Votre compte client sera créé automatiquement avec votre email à l'issue du paiement.
+          </p>
+          <div class="guest-login-form" *ngIf="authMode === 'login'">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" [(ngModel)]="loginEmail" placeholder="client@transport.com" />
+            </div>
+            <div class="form-group">
+              <label>Mot de passe</label>
+              <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••" />
+            </div>
+            <button class="btn-ghost-xs" [disabled]="isAuthProcessing" (click)="doAuth('login')">
+              <span class="material-icons">login</span> {{ isAuthProcessing ? 'Connexion...' : 'Se connecter' }}
+            </button>
+            <span class="auth-error" *ngIf="authError">{{ authError }}</span>
+          </div>
+        </div>
+
         <div class="payment-step-grid">
           <!-- Left: Passenger form -->
           <div class="passenger-form">
@@ -401,15 +430,15 @@
             <div class="payment-methods">
               <div class="pay-option" [class.selected]="paymentMethod === 'wave'" (click)="paymentMethod = 'wave'">
                 <input type="radio" name="pay" [checked]="paymentMethod === 'wave'" />
-                <span class="pay-name">🌊 Wave Money</span>
+                <span class="pay-name"><span class="material-icons pay-ic">water</span> Wave Money</span>
               </div>
               <div class="pay-option" [class.selected]="paymentMethod === 'orange_money'" (click)="paymentMethod = 'orange_money'">
                 <input type="radio" name="pay" [checked]="paymentMethod === 'orange_money'" />
-                <span class="pay-name">🍊 Orange Money</span>
+                <span class="pay-name"><span class="material-icons pay-ic">flaky</span> Orange Money</span>
               </div>
               <div class="pay-option" [class.selected]="paymentMethod === 'card'" (click)="paymentMethod = 'card'">
                 <input type="radio" name="pay" [checked]="paymentMethod === 'card'" />
-                <span class="pay-name">💳 Carte Bancaire</span>
+                <span class="pay-name"><span class="material-icons pay-ic">credit_card</span> Carte Bancaire</span>
               </div>
             </div>
 

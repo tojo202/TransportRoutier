@@ -138,7 +138,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($route) {
                 return [
-                    'name' => $route->departure_city . ' - ' . $route->arrival_city,
+                    'name' => $route->origin . ' → ' . $route->destination,
                     'count' => $route->schedules_count
                 ];
             });

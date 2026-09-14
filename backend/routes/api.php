@@ -44,6 +44,10 @@ Route::apiResource('reservations', ReservationController::class);
 Route::apiResource('tickets', TicketController::class);
 Route::post('/tickets/scan', [TicketController::class, 'scanQr']);
 
+// Paiements (ressource + simulation Mobile Money)
+Route::get('/payments/methods', [PaymentController::class, 'methods']);
+Route::post('/payments/mobile-money', [PaymentController::class, 'mobileMoney']);
+Route::post('/payments/{payment}/confirm', [PaymentController::class, 'confirm']);
 Route::apiResource('payments', PaymentController::class);
 Route::apiResource('baggages', BaggageController::class);
 

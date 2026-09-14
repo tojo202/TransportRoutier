@@ -31,7 +31,7 @@ export class DriverTripsComponent implements OnInit {
     this.isLoading = true;
     const user = this.authService.getCurrentUser();
     const driverId = user?.driver?.id;
-    const filters: any = {};
+    const filters: any = { include_past: 1 };
     if (driverId) {
       filters.driver_id = driverId;
     }

@@ -69,7 +69,6 @@ export class LayoutComponent implements OnInit {
         'tickets': 'Billetterie',
         'payments': 'Paiements',
         'baggages': 'Bagages',
-        'gps': 'Suivi GPS',
         'reports': 'Rapports & Stats'
       };
 

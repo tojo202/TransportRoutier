@@ -6,45 +6,61 @@ import { ScheduleService, Schedule } from '../../services/schedule';
 import { ReservationService } from '../../services/reservation';
 import { AuthService } from '../../services/auth';
 import { QrCodeService } from '../../services/qrcode.service';
+import { ReviewService } from '../../services/review';
 
 @Component({
-  selector: 'app-platform',
+  selector: 'app-home',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './platform.html',
-  styleUrl: './platform.css'
+  templateUrl: './home.html',
+  styleUrl: './home.css'
 })
-export class PlatformComponent implements OnInit {
-  // Search parameters
+export class HomeComponent implements OnInit {
+  // Recherche
   searchOrigin: string = '';
   searchDestination: string = '';
   searchDate: string = '';
-  selectedFilter: string = 'all';
+  passengers: number = 1;
 
-  // Schedule data & pagination (serveur Laravel)
+  // Résultats & pagination serveur
   schedules: Schedule[] = [];
-  filteredSchedules: Schedule[] = [];
-  paginatedSchedules: Schedule[] = [];
   isLoading: boolean = false;
+  hasSearched: boolean = false;
 
   currentPage: number = 1;
-  pageSize: number = 4;
+  pageSize: number = 6;
   totalPages: number = 1;
   totalItems: number = 0;
   pages: number[] = [];
 
-  // Booking Modal
+  // Filtres dynamiques
+  priceFilter: string = 'all'; // all | le10000 | le5000 | le2000
+  sortBy: string = 'departure'; // departure | price_asc | price_desc
+
+  // Compteur stats
+  stats = { agencies: 0, vehicles: 0, drivers: 0, cities: 7 };
+
+  // Avis clients (section publique)
+  reviews: any[] = [];
+  reviewLoading: boolean = false;
+
+  cities: string[] = ['Dakar', 'Saint-Louis', 'Thiès', 'Touba', 'Kaolack', 'Ziguinchor', 'Mbour', 'Tambacounda'];
+  popularTrips: { origin: string; destination: string }[] = [
+    { origin: 'Dakar', destination: 'Saint-Louis' },
+    { origin: 'Dakar', destination: 'Thiès' },
+    { origin: 'Dakar', destination: 'Touba' },
+    { origin: 'Dakar', destination: 'Ziguinchor' }
+  ];
+
+  // Modal réservation
   showBookingModal: boolean = false;
   selectedSchedule: Schedule | null = null;
-  bookingStep: number = 1; // 1: Seat selection, 2: Passenger info & payment, 3: Ticket QR confirmation
-
-  // Seat Selection
+  bookingStep: number = 1;
   selectedSeat: number | null = null;
   vehicleCapacity: number = 19;
   occupiedSeats: number[] = [];
   seatRows: any[] = [];
 
-  // Passenger & Payment Info
   passengerName: string = '';
   passengerPhone: string = '';
   passengerEmail: string = '';
@@ -52,25 +68,22 @@ export class PlatformComponent implements OnInit {
   paymentPhone: string = '';
   isProcessingPayment: boolean = false;
   paymentSuccess: boolean = false;
-
-  // Generated Ticket Result
   confirmedReservation: any = null;
   qrCodeUrl: string = '';
 
-  // Connexion contextuelle (invités)
+  // Connexion contextuelle
   authMode: 'create' | 'login' = 'create';
   loginEmail: string = '';
   loginPassword: string = '';
   isAuthProcessing: boolean = false;
   authError: string = '';
 
-  cities: string[] = ['Dakar', 'Saint-Louis', 'Thiès', 'Touba', 'Kaolack', 'Ziguinchor', 'Mbour'];
-
   constructor(
     private scheduleService: ScheduleService,
     private reservationService: ReservationService,
     public authService: AuthService,
     private qrCodeService: QrCodeService,
+    private reviewService: ReviewService,
     private router: Router
   ) {}
 
@@ -81,46 +94,71 @@ export class PlatformComponent implements OnInit {
       this.passengerEmail = user.email;
     }
     this.loadSchedules();
+    this.loadReviews();
   }
 
-  get isGuest(): boolean {
-    return !this.authService.getCurrentUser();
+  loadReviews(): void {
+    this.reviewLoading = true;
+    this.reviewService.getReviews(undefined, undefined, 4).subscribe({
+      next: (res: any) => {
+        this.reviews = Array.isArray(res) ? res : (res.data || []);
+        this.reviewLoading = false;
+      },
+      error: () => {
+        this.reviews = [];
+        this.reviewLoading = false;
+      }
+    });
+  }
+
+  scrollTo(id: string): void {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  applyPopular(origin: string, destination: string): void {
+    this.searchOrigin = origin;
+    this.searchDestination = destination;
+    this.searchDate = '';
+    this.passengers = 1;
+    this.onSearch();
   }
 
   loadSchedules(): void {
     this.isLoading = true;
     const filters: any = {
       page: this.currentPage,
-      per_page: this.pageSize
+      per_page: this.pageSize,
+      seats: this.passengers || 1
     };
-
     if (this.searchOrigin) filters.origin = this.searchOrigin;
     if (this.searchDestination) filters.destination = this.searchDestination;
     if (this.searchDate) filters.date = this.searchDate;
-    if (this.selectedFilter === 'cheap') filters.max_price = 5000;
-    if (this.selectedFilter === 'vip') filters.min_price = 7000;
-    if (this.selectedFilter === 'today') {
-      filters.date = new Date().toISOString().split('T')[0];
-    }
+
+    if (this.priceFilter === 'le10000') filters.max_price = 10000;
+    if (this.priceFilter === 'le5000') filters.max_price = 5000;
+    if (this.priceFilter === 'le2000') filters.max_price = 2000;
 
     this.scheduleService.getSchedules(filters).subscribe({
       next: (data: any) => {
         this.schedules = Array.isArray(data) ? data : (data.data || []);
         this.totalItems = data.total ?? this.schedules.length;
-        this.totalPages = data.last_page || 1;
+        this.totalPages = data.last_page || Math.ceil(this.totalItems / this.pageSize) || 1;
         this.currentPage = data.current_page || 1;
         this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-        this.applyFilter();
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading schedules', err);
+        this.schedules = [];
+        this.totalItems = 0;
+        this.totalPages = 1;
         this.isLoading = false;
       }
     });
   }
 
   onSearch(): void {
+    this.hasSearched = true;
     this.currentPage = 1;
     this.loadSchedules();
   }
@@ -129,41 +167,34 @@ export class PlatformComponent implements OnInit {
     this.searchOrigin = '';
     this.searchDestination = '';
     this.searchDate = '';
-    this.selectedFilter = 'all';
+    this.passengers = 1;
+    this.priceFilter = 'all';
+    this.sortBy = 'departure';
+    this.hasSearched = false;
     this.currentPage = 1;
     this.loadSchedules();
   }
 
-  setFilter(filter: string): void {
-    this.selectedFilter = filter;
+  onFilterChange(): void {
     this.currentPage = 1;
     this.loadSchedules();
-  }
-
-  applyFilter(): void {
-    // La pagination et les filtres sont gérés côté serveur (Laravel paginate).
-    this.filteredSchedules = [...this.schedules];
-    this.updatePaginatedList();
-  }
-
-  updatePaginatedList(): void {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedSchedules = this.filteredSchedules.slice(startIndex, endIndex);
-    if (this.paginatedSchedules.length === 0 && this.currentPage > 1) {
-      this.currentPage = 1;
-      this.updatePaginatedList();
-    }
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.loadSchedules();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  // --- Booking Flow ---
+  getSortedSchedules(): Schedule[] {
+    if (this.sortBy === 'price_asc') return [...this.schedules].sort((a, b) => (a.price || 0) - (b.price || 0));
+    if (this.sortBy === 'price_desc') return [...this.schedules].sort((a, b) => (b.price || 0) - (a.price || 0));
+    return this.schedules;
+  }
+
+  // --- Réservation ---
   startBooking(schedule: Schedule): void {
     this.selectedSchedule = schedule;
     this.vehicleCapacity = schedule.vehicle?.capacity || 19;
@@ -171,7 +202,6 @@ export class PlatformComponent implements OnInit {
     this.selectedSeat = null;
     this.bookingStep = 1;
     this.paymentSuccess = false;
-    this.authError = '';
     this.generateSeatLayout();
     this.showBookingModal = true;
   }
@@ -180,20 +210,17 @@ export class PlatformComponent implements OnInit {
     this.showBookingModal = false;
     this.selectedSchedule = null;
     this.bookingStep = 1;
+    this.authError = '';
   }
 
   generateSeatLayout(): void {
     const total = this.vehicleCapacity;
     this.seatRows = [];
-
-    // Create standard 4-across rows (2 seats - aisle - 2 seats)
     let currentSeat = 1;
     while (currentSeat <= total) {
       const row = [];
       for (let i = 0; i < 4 && currentSeat <= total; i++) {
-        if (i === 2) {
-          row.push({ isAisle: true });
-        }
+        if (i === 2) row.push({ isAisle: true });
         row.push({
           seatNumber: currentSeat,
           isOccupied: this.occupiedSeats.includes(currentSeat),
@@ -217,6 +244,10 @@ export class PlatformComponent implements OnInit {
   }
 
   // Connexion / création de compte contextuelle
+  get isGuest(): boolean {
+    return !this.authService.getCurrentUser();
+  }
+
   doAuth(action: 'login' | 'register'): void {
     this.isAuthProcessing = true;
     this.authError = '';
@@ -274,7 +305,6 @@ export class PlatformComponent implements OnInit {
         const qrContent = res.ticket?.qr_code || `TICKET-${res.ticket?.ticket_number || res.id}`;
         this.qrCodeUrl = await this.qrCodeService.generateDataUrl(qrContent);
 
-        // Refresh schedules
         this.loadSchedules();
       },
       error: (err) => {
@@ -291,5 +321,13 @@ export class PlatformComponent implements OnInit {
   goToMyReservations(): void {
     this.closeBooking();
     this.router.navigate(['/my-reservations']);
+  }
+
+  loginUrl(): string {
+    return '/login';
+  }
+
+  scrollToSearch(): void {
+    document.getElementById('search-section')?.scrollIntoView({ behavior: 'smooth' });
   }
 }

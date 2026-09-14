@@ -109,7 +109,7 @@ export class ReviewsComponent implements OnInit {
         this.isSubmitting = false;
         this.newComment = '';
         this.showReviewModal = false;
-        alert('⭐ Merci ! Votre avis a été publié avec succès.');
+        alert('Merci ! Votre avis a été publié avec succès.');
         this.loadReviews();
       },
       error: (err) => {

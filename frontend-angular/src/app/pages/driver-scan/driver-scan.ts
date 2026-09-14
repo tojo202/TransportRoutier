@@ -57,7 +57,7 @@ export class DriverScanComponent implements OnInit {
       },
       error: (err) => {
         this.isScanning = false;
-        this.errorMessage = err.error?.message || '❌ Billet invalide ou introuvable.';
+        this.errorMessage = err.error?.message || 'Billet invalide ou introuvable.';
         this.scanResult = { valid: false, message: this.errorMessage };
         this.recentScans.unshift({
           code: this.ticketCode,

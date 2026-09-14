@@ -1,13 +1,16 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { Driver } from './driver';
+import { DriverService } from './driver';
 
-describe('Driver', () => {
-  let service: Driver;
+describe('DriverService', () => {
+  let service: DriverService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Driver);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    service = TestBed.inject(DriverService);
   });
 
   it('should be created', () => {

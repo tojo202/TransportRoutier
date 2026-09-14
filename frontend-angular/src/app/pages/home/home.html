@@ -1,0 +1,569 @@
+<div class="home-page">
+
+  <!-- ============ NAVBAR PUBLIQUE ============ -->
+  <nav class="public-nav">
+    <a routerLink="/home" class="nav-brand">
+      <span class="nav-logo"><span class="material-icons">directions_bus</span></span>
+      <span class="nav-brand-text">Trans<span class="accent">Express</span></span>
+    </a>
+    <div class="nav-links">
+      <a (click)="scrollToSearch()" class="nav-link">Rechercher un trajet</a>
+      <a (click)="scrollTo('how')" class="nav-link hidden-sm">Comment ça marche</a>
+      <a (click)="scrollTo('avis')" class="nav-link hidden-sm">Avis clients</a>
+    </div>
+    <div class="nav-actions">
+      <ng-container *ngIf="authService.currentUser$ | async as user">
+        <a routerLink="/platform" class="btn-nav btn-solid">
+          <span class="material-icons">log-in</span> Mon espace ({{ (user.name || '').split(' ')[0] }})
+        </a>
+      </ng-container>
+      <ng-template #guestActions>
+        <a routerLink="/login" class="btn-nav btn-ghost">Connexion</a>
+        <a routerLink="/register" class="btn-nav btn-solid">Inscription</a>
+      </ng-template>
+    </div>
+  </nav>
+
+  <!-- ============ HERO + RECHERCHE ============ -->
+  <section class="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="material-icons">verified</span>
+        <span>Plateforme Nationale de Transport &amp; Covoiturage</span>
+      </div>
+      <h1 class="hero-title">Voyagez malin. Réservez en <span class="accent">30 secondes</span>.</h1>
+      <p class="hero-subtitle">
+        Trouvez votre trajet, choisissez votre siège, payez par Wave / Orange Money / Carte
+        et recevez votre billet électronique avec QR Code — immédiatement.
+      </p>
+
+      <!-- Barre de recherche -->
+      <div class="search-card" id="search-section">
+        <div class="search-fields">
+          <div class="search-field">
+            <label><span class="material-icons">trip_origin</span> Départ</label>
+            <input
+              type="text"
+              [(ngModel)]="searchOrigin"
+              placeholder="Ex: Dakar"
+              list="home-origin-list"
+              (keyup.enter)="onSearch()"
+            />
+            <datalist id="home-origin-list">
+              <option *ngFor="let c of cities" [value]="c"></option>
+            </datalist>
+          </div>
+          <button class="swap-btn" (click)="searchOrigin && searchDestination ? (searchOrigin=[searchDestination, searchDestination=searchOrigin][0]) : null">
+            <span class="material-icons">swap_horiz</span>
+          </button>
+          <div class="search-field">
+            <label><span class="material-icons">location_on</span> Destination</label>
+            <input
+              type="text"
+              [(ngModel)]="searchDestination"
+              placeholder="Ex: Saint-Louis"
+              list="home-dest-list"
+              (keyup.enter)="onSearch()"
+            />
+            <datalist id="home-dest-list">
+              <option *ngFor="let c of cities" [value]="c"></option>
+            </datalist>
+          </div>
+          <div class="search-field">
+            <label><span class="material-icons">calendar_today</span> Date</label>
+            <input type="date" [(ngModel)]="searchDate" (change)="onSearch()" />
+          </div>
+          <div class="search-field search-field-narrow">
+            <label><span class="material-icons">groups</span> Passagers</label>
+            <input type="number" min="1" max="6" [(ngModel)]="passengers" (change)="onSearch()" />
+          </div>
+          <button class="search-btn" (click)="onSearch()">
+            <span class="material-icons">search</span>
+            <span>Rechercher</span>
+          </button>
+        </div>
+
+        <!-- Destinations populaires + reset -->
+        <div class="search-hints" *ngIf="(!searchOrigin && !searchDestination) || hasSearched">
+          <span class="hint-label">Populaires :</span>
+          <button class="hint-chip" *ngFor="let t of popularTrips" (click)="applyPopular(t.origin, t.destination)">
+            {{ t.origin }} → {{ t.destination }}
+          </button>
+          <button class="hint-chip reset" *ngIf="hasSearched" (click)="resetSearch()">
+            <span class="material-icons">restart_alt</span> Réinitialiser
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats rapides -->
+      <div class="hero-stats">
+        <div class="stat"><strong>{{ stats.cities }}</strong><span>villes desservies</span></div>
+        <div class="stat"><strong>4</strong><span>lignes principales</span></div>
+        <div class="stat"><strong>100%</strong><span>billetterie électronique</span></div>
+        <div class="stat"><strong>7j/7</strong><span>départs quotidiens</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RÉSULTATS ============ -->
+  <section class="results" id="results">
+    <div class="results-head">
+      <div>
+        <h2 *ngIf="!hasSearched || (!searchOrigin && !searchDestination && !searchDate)">Prochains départs disponibles</h2>
+        <h2 *ngIf="hasSearched">Résultats de votre recherche</h2>
+        <p class="results-count">
+          <ng-container *ngIf="!isLoading">{{ totalItems }} voyage(s) trouvé(s)</ng-container>
+        </p>
+      </div>
+
+      <!-- Filtres dynamiques -->
+      <div class="results-tools">
+        <select class="tool-select" [(ngModel)]="priceFilter" (change)="onFilterChange()">
+          <option value="all">Tous les prix</option>
+          <option value="le10000">≤ 10 000 F</option>
+          <option value="le5000">≤ 5 000 F</option>
+          <option value="le2000">≤ 2 000 F</option>
+        </select>
+        <select class="tool-select" [(ngModel)]="sortBy" (change)="onFilterChange()">
+          <option value="departure">Tri : départ le plus proche</option>
+          <option value="price_asc">Tri : prix croissant</option>
+          <option value="price_desc">Tri : prix décroissant</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Recherche des meilleurs trajets...</p>
+    </div>
+
+    <!-- Empty -->
+    <div class="empty-state" *ngIf="!isLoading && schedules.length === 0">
+      <span class="material-icons empty-icon">search_off</span>
+      <h3>Aucun trajet ne correspond à vos critères</h3>
+      <p>Essayez une autre destination ou élargissez la date recherchée.</p>
+      <button class="btn-reset" (click)="resetSearch()">Voir tous les trajets</button>
+    </div>
+
+    <!-- Cards -->
+    <div class="trips-grid" *ngIf="!isLoading && schedules.length > 0">
+      <div class="trip-card" *ngFor="let s of getSortedSchedules()">
+        <div class="trip-header">
+          <div class="agency-badge">
+            <span class="material-icons">apartment</span>
+            <span>{{ s.vehicle?.agency?.name || 'TransExpress National' }}</span>
+          </div>
+          <div class="seat-badge" [class.low]="(s.available_seats || 0) <= 5">
+            <span class="material-icons">event_seat</span>
+            <span>{{ s.available_seats || 0 }} places</span>
+          </div>
+        </div>
+
+        <div class="trip-route-box">
+          <div class="time-col">
+            <span class="time">{{ s.departure_time | date:'HH:mm' }}</span>
+            <span class="city">{{ s.route?.origin || 'Départ' }}</span>
+            <span class="date">{{ s.departure_time | date:'dd MMM' }}</span>
+          </div>
+          <div class="duration-col">
+            <span class="duration-badge">{{ s.route?.estimated_duration_hours || 3 }}h</span>
+            <div class="route-line">
+              <span class="dot start"></span><span class="line"></span>
+              <span class="material-icons bus-arrow">directions_bus</span>
+              <span class="line"></span><span class="dot end"></span>
+            </div>
+            <span class="distance">{{ s.route?.distance_km || 180 }} km</span>
+          </div>
+          <div class="time-col">
+            <span class="time">{{ s.arrival_time | date:'HH:mm' }}</span>
+            <span class="city">{{ s.route?.destination || 'Arrivée' }}</span>
+            <span class="date">{{ s.arrival_time | date:'dd MMM' }}</span>
+          </div>
+        </div>
+
+        <div class="trip-details">
+          <div class="driver-info">
+            <div class="driver-avatar"><span class="material-icons">account_circle</span></div>
+            <div class="driver-meta">
+              <span class="driver-name">{{ s.driver?.name || 'Conducteur pro' }}</span>
+              <div class="driver-rating">
+                <span class="material-icons star">star</span>
+                <span class="rating-value">{{ s.driver?.average_rating || 4.9 }}</span>
+                <span class="reviews-count">({{ s.driver?.reviews_count || 8 }})</span>
+              </div>
+            </div>
+          </div>
+          <div class="vehicle-features">
+            <span class="feature-tag"><span class="material-icons">directions_car</span> {{ s.vehicle?.brand }} {{ s.vehicle?.model }}</span>
+            <span class="feature-tag"><span class="material-icons">ac_unit</span> Climatisé</span>
+            <span class="feature-tag"><span class="material-icons">check_circle</span> Confirmation immédiate</span>
+          </div>
+        </div>
+
+        <div class="trip-footer">
+          <div class="price-box">
+            <span class="price-label">Prix par siège</span>
+            <span class="price-val">{{ s.price | number }} <small>FCFA</small></span>
+          </div>
+          <button class="btn-book" (click)="startBooking(s)">
+            <span>Choisir mon siège</span>
+            <span class="material-icons">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination serveur -->
+    <div class="pagination-wrapper" *ngIf="!isLoading && totalPages > 1">
+      <button class="page-btn prev" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+        <span class="material-icons">chevron_left</span> Précédent
+      </button>
+      <div class="page-numbers">
+        <button *ngFor="let p of pages" class="num-btn" [class.active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
+      </div>
+      <button class="page-btn next" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+        Suivant <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ COMMENT ÇA MARCHE ============ -->
+  <section class="how-section" id="how">
+    <h2 class="section-title">Comment ça marche ?</h2>
+    <p class="section-sub">4 étapes simples, 100% en ligne</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon amber"><span class="material-icons">search</span></div>
+        <h4>1. Recherchez</h4>
+        <p>Indiquez votre départ, destination et date. Les trajets disponibles s'affichent instantanément.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon emerald"><span class="material-icons">event_seat</span></div>
+        <h4>2. Choisissez votre siège</h4>
+        <p>Visualisez le plan du car en temps réel et sélectionnez votre place préférée.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon blue"><span class="material-icons">account_balance_wallet</span></div>
+        <h4>3. Payez en ligne</h4>
+        <p>Réglez via Wave, Orange Money ou Carte Bancaire en toute sécurité.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon purple"><span class="material-icons">qr_code_2</span></div>
+        <h4>4. Montez à bord</h4>
+        <p>Présentez votre billet QR Code au conducteur. Simple, rapide, sans papier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="features-section">
+    <div class="feature-item">
+      <div class="feat-icon amber"><span class="material-icons">qr_code_2</span></div>
+      <div><h4>Billet QR Code instantané</h4><p>Billet électronique sécurisé généré dès le paiement, envoyé par email.</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feat-icon emerald"><span class="material-icons">chat</span></div>
+      <div><h4>Chat avec le conducteur</h4><p>Coordonnez le point de rendez-vous et vos bagages en temps réel.</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feat-icon blue"><span class="material-icons">star_rate</span></div>
+      <div><h4>Avis vérifiés</h4><p>Notez vos trajets et consultez les notes des conducteurs en toute transparence.</p></div>
+    </div>
+    <div class="feature-item">
+      <div class="feat-icon purple"><span class="material-icons">support_agent</span></div>
+      <div><h4>Agences &amp; guichets</h4><p>Achat en ligne ou au guichet : le même billet, la même garantie.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ AVIS CLIENTS ============ -->
+  <section class="reviews-section" id="avis">
+    <h2 class="section-title">Avis clients</h2>
+    <p class="section-sub">Ce que nos voyageurs disent de nous</p>
+
+    <div class="loading-state" *ngIf="reviewLoading">
+      <div class="spinner"></div>
+      <p>Chargement des avis...</p>
+    </div>
+
+    <div class="review-grid" *ngIf="!reviewLoading && reviews.length > 0">
+      <div class="review-card" *ngFor="let r of reviews">
+        <div class="review-stars">
+          <span class="material-icons star-filled" *ngFor="let s of [].constructor(r.rating); let i = index">star</span>
+          <span class="material-icons star-empty" *ngFor="let s of [].constructor(5 - (r.rating || 0)); let i = index">star_border</span>
+        </div>
+        <p class="review-comment">“{{ r.comment || 'Excellent voyage, conducteur au top !' }}”</p>
+        <div class="review-meta">
+          <div class="review-avatar"><span class="material-icons">person</span></div>
+          <div class="review-author">
+            <span class="review-name">{{ r.user?.name || 'Voyageur TransExpress' }}</span>
+            <span class="review-driver">{{ r.driver?.name ? 'Trajet avec ' + r.driver.name : 'Voyage vérifié' }} &bull; {{ r.created_at | date:'dd MMM yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state reviews-empty" *ngIf="!reviewLoading && reviews.length === 0">
+      <span class="material-icons empty-icon">star</span>
+      <h3>Aucun avis pour le moment</h3>
+      <p>Les premiers avis de nos voyageurs apparaîtront ici très bientôt.</p>
+    </div>
+
+    <div class="cta-actions reviews-cta">
+      <a [routerLink]="(authService.currentUser$ | async) ? '/reviews' : '/register'" class="btn-cta primary">
+        <span class="material-icons">rating</span> Laissez votre avis
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2>Prêt à voyager ?</h2>
+      <p>Créez un compte en 30 secondes pour retrouver vos billets et gérer vos trajets.</p>
+      <div class="cta-actions">
+        <a routerLink="/register" class="btn-cta primary">
+          <span class="material-icons">person_add</span> Créer un compte
+        </a>
+        <a (click)="scrollToSearch()" class="btn-cta ghost">
+          <span class="material-icons">search</span> Continuer en tant qu'invité
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="public-footer">
+    <div>
+      <span class="nav-logo small"><span class="material-icons">directions_bus</span></span>
+      <strong>TransExpress</strong> — Plateforme de Transport &amp; Covoiturage
+    </div>
+    <div class="footer-links">
+      <a routerLink="/login">Connexion</a>
+      <a routerLink="/register">Inscription</a>
+      <a routerLink="/platform">Portail voyageurs</a>
+      <a (click)="scrollTo('avis')" class="footer-avis-link">Avis</a>
+    </div>
+  </footer>
+
+  <!-- ============================================== -->
+  <!-- MODAL RÉSERVATION : SIÈGES → PAIEMENT → BILLET  -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" *ngIf="showBookingModal" (click)="closeBooking()">
+    <div class="booking-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <h3>Réservation de voyage</h3>
+          <p class="modal-subtitle">
+            {{ selectedSchedule?.route?.origin }} &rarr; {{ selectedSchedule?.route?.destination }}
+            &bull; {{ selectedSchedule?.departure_time | date:'dd MMM yyyy à HH:mm' }}
+          </p>
+        </div>
+        <button class="modal-close-btn" (click)="closeBooking()"><span class="material-icons">close</span></button>
+      </div>
+
+      <div class="wizard-steps">
+        <div class="step-item" [class.active]="bookingStep === 1" [class.done]="bookingStep > 1">
+          <div class="step-circle">1</div><span>Choix du siège</span>
+        </div>
+        <div class="step-line" [class.active]="bookingStep > 1"></div>
+        <div class="step-item" [class.active]="bookingStep === 2" [class.done]="bookingStep > 2">
+          <div class="step-circle">2</div><span>Infos &amp; Paiement</span>
+        </div>
+        <div class="step-line" [class.active]="bookingStep > 2"></div>
+        <div class="step-item" [class.active]="bookingStep === 3">
+          <div class="step-circle">3</div><span>Billet QR Code</span>
+        </div>
+      </div>
+
+      <!-- STEP 1 : PLAN DE SIÈGES -->
+      <div class="modal-body" *ngIf="bookingStep === 1">
+        <div class="seat-plan-wrapper">
+          <div class="seat-legend">
+            <span class="legend-item"><i class="seat-sample available"></i> Libre</span>
+            <span class="legend-item"><i class="seat-sample selected"></i> Sélectionné</span>
+            <span class="legend-item"><i class="seat-sample occupied"></i> Occupé</span>
+          </div>
+          <div class="bus-container">
+            <div class="bus-front">
+              <span class="material-icons">airline_seat_recline_extra</span>
+              <span>Conducteur : {{ selectedSchedule?.driver?.name }}</span>
+            </div>
+            <div class="bus-seats-grid">
+              <div class="bus-row" *ngFor="let row of seatRows">
+                <ng-container *ngFor="let item of row">
+                  <div *ngIf="item.isAisle" class="seat-aisle"></div>
+                  <button *ngIf="!item.isAisle"
+                          class="seat-btn"
+                          [class.occupied]="item.isOccupied"
+                          [class.selected]="selectedSeat === item.seatNumber"
+                          [disabled]="item.isOccupied"
+                          (click)="selectSeat(item.seatNumber)">
+                    <span class="material-icons seat-icon">chair</span>
+                    <span class="seat-num">{{ item.seatNumber }}</span>
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+            <div class="bus-back"><span>Arrière du car &bull; Soute à bagages</span></div>
+          </div>
+          <div class="selected-seat-summary" *ngIf="selectedSeat">
+            <span class="material-icons">check_circle</span>
+            <span>Siège <strong>N° {{ selectedSeat }}</strong></span>
+            <span class="summary-price">Total : <strong>{{ selectedSchedule?.price | number }} FCFA</strong></span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="closeBooking()">Annuler</button>
+          <button class="btn-next" [disabled]="!selectedSeat" (click)="proceedToPassengerInfo()">
+            Continuer vers le paiement <span class="material-icons">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 : INFOS + PAIEMENT -->
+      <div class="modal-body" *ngIf="bookingStep === 2">
+        <!-- Connexion contextuelle pour les invités -->
+        <div class="guest-auth-box" *ngIf="isGuest">
+          <div class="guest-auth-tabs">
+            <button class="guest-tab" [class.active]="authMode === 'create'" (click)="authMode='create'">
+              <span class="material-icons">person_add</span> Créer mon compte
+            </button>
+            <button class="guest-tab" [class.active]="authMode === 'login'" (click)="authMode='login'">
+              <span class="material-icons">login</span> J'ai déjà un compte
+            </button>
+          </div>
+          <p class="guest-hint">
+            Votre compte sera créé automatiquement avec votre email après le paiement pour retrouver vos billets.
+          </p>
+          <div class="guest-login-form" *ngIf="authMode === 'login'">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" [(ngModel)]="loginEmail" placeholder="client@transport.com" />
+            </div>
+            <div class="form-group">
+              <label>Mot de passe</label>
+              <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••" />
+            </div>
+            <button class="btn-ghost-xs" [disabled]="isAuthProcessing" (click)="doAuth('login')">
+              <span class="material-icons">login</span> {{ isAuthProcessing ? 'Connexion...' : 'Se connecter' }}
+            </button>
+            <span class="auth-error" *ngIf="authError">{{ authError }}</span>
+          </div>
+        </div>
+
+        <div class="payment-step-grid">
+          <div class="passenger-form">
+            <h4 class="section-heading"><span class="material-icons">person</span> Informations voyageur</h4>
+            <div class="form-group">
+              <label>Nom complet *</label>
+              <input type="text" [(ngModel)]="passengerName" placeholder="Ex: Moussa Diop" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Téléphone *</label>
+                <input type="tel" [(ngModel)]="passengerPhone" placeholder="+221 77 000 00 00" />
+              </div>
+              <div class="form-group">
+                <label>Email (billet) *</label>
+                <input type="email" [(ngModel)]="passengerEmail" placeholder="client@transport.com" />
+              </div>
+            </div>
+
+            <h4 class="section-heading mt-4"><span class="material-icons">payment</span> Mode de paiement</h4>
+            <div class="payment-methods">
+              <div class="pay-option" [class.selected]="paymentMethod === 'wave'" (click)="paymentMethod='wave'">
+                <input type="radio" name="pay" [checked]="paymentMethod==='wave'" />
+                <span class="material-icons pay-ic">water</span>
+                <span>Wave Money</span>
+              </div>
+              <div class="pay-option" [class.selected]="paymentMethod === 'orange_money'" (click)="paymentMethod='orange_money'">
+                <input type="radio" name="pay" [checked]="paymentMethod==='orange_money'" />
+                <span class="material-icons pay-ic">flaky</span>
+                <span>Orange Money</span>
+              </div>
+              <div class="pay-option" [class.selected]="paymentMethod === 'card'" (click)="paymentMethod='card'">
+                <input type="radio" name="pay" [checked]="paymentMethod==='card'" />
+                <span class="material-icons pay-ic">credit_card</span>
+                <span>Carte Bancaire</span>
+              </div>
+            </div>
+            <div class="form-group mt-3" *ngIf="paymentMethod === 'wave' || paymentMethod === 'orange_money'">
+              <label>Numéro de compte Mobile Money</label>
+              <input type="tel" [(ngModel)]="paymentPhone" [placeholder]="passengerPhone || '+221 77 123 45 67'" />
+            </div>
+          </div>
+
+          <div class="order-summary-box">
+            <h4>Récapitulatif</h4>
+            <div class="summary-line"><span>Trajet :</span><strong>{{ selectedSchedule?.route?.origin }} &rarr; {{ selectedSchedule?.route?.destination }}</strong></div>
+            <div class="summary-line"><span>Départ :</span><span>{{ selectedSchedule?.departure_time | date:'dd/MM/yyyy HH:mm' }}</span></div>
+            <div class="summary-line"><span>Véhicule :</span><span>{{ selectedSchedule?.vehicle?.brand }} {{ selectedSchedule?.vehicle?.plate_number }}</span></div>
+            <div class="summary-line"><span>Siège :</span><span class="badge-seat">N° {{ selectedSeat }}</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-line total"><span>Montant :</span><span class="total-amount">{{ selectedSchedule?.price | number }} FCFA</span></div>
+            <p class="summary-note"><span class="material-icons">mark_email_read</span> Votre billet avec QR Code sera envoyé par email immédiatement.</p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="bookingStep = 1">Retour aux sièges</button>
+          <button class="btn-pay" [disabled]="isProcessingPayment || !passengerName" (click)="submitPaymentAndBooking()">
+            <span *ngIf="!isProcessingPayment" class="flex-items"><span class="material-icons">lock</span> Payer {{ selectedSchedule?.price | number }} FCFA</span>
+            <span *ngIf="isProcessingPayment">Traitement sécurisé en cours...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3 : BILLET QR -->
+      <div class="modal-body" *ngIf="bookingStep === 3">
+        <div class="ticket-success-container">
+          <div class="success-header">
+            <span class="material-icons success-icon">check_circle</span>
+            <h3>Réservation confirmée !</h3>
+            <p>Votre billet électronique a été généré et envoyé à votre email.</p>
+            <p class="acct-note" *ngIf="confirmedReservation?.account_created">
+              <span class="material-icons" style="font-size: 15px; vertical-align: -2px;">celebration</span>&nbsp;Votre compte client a été créé automatiquement et vous êtes maintenant connecté.
+            </p>
+          </div>
+
+          <div class="boarding-pass">
+            <div class="pass-header">
+              <div class="pass-brand"><span class="material-icons">directions_bus</span><span>TransExpress &bull; Billet électronique</span></div>
+              <div class="pass-status">VALIDE</div>
+            </div>
+            <div class="pass-body">
+              <div class="pass-left">
+                <div class="pass-row">
+                  <div class="pass-col"><span class="label">Passager</span><span class="val">{{ confirmedReservation?.user?.name || passengerName }}</span></div>
+                  <div class="pass-col"><span class="label">N° billet</span><span class="val bold">{{ confirmedReservation?.ticket?.ticket_number }}</span></div>
+                </div>
+                <div class="pass-row">
+                  <div class="pass-col"><span class="label">Origine</span><span class="val city">{{ selectedSchedule?.route?.origin }}</span></div>
+                  <div class="pass-col arrow"><span class="material-icons">arrow_forward</span></div>
+                  <div class="pass-col"><span class="label">Destination</span><span class="val city">{{ selectedSchedule?.route?.destination }}</span></div>
+                </div>
+                <div class="pass-row">
+                  <div class="pass-col"><span class="label">Départ</span><span class="val">{{ selectedSchedule?.departure_time | date:'dd/MM/yyyy à HH:mm' }}</span></div>
+                  <div class="pass-col"><span class="label">Siège</span><span class="val seat-highlight">N° {{ confirmedReservation?.seat_number }}</span></div>
+                  <div class="pass-col"><span class="label">Montant</span><span class="val">{{ confirmedReservation?.total_amount | number }} FCFA</span></div>
+                </div>
+              </div>
+              <div class="pass-right qr-box">
+                <img [src]="qrCodeUrl" alt="QR Code billet" class="qr-image" *ngIf="qrCodeUrl" />
+                <span class="qr-caption">Présentez ce QR Code au conducteur</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ticket-actions">
+            <button class="btn-print" (click)="printTicket()"><span class="material-icons">print</span> Imprimer / PDF</button>
+            <button class="btn-my-res" (click)="goToMyReservations()"><span class="material-icons">history</span> Mes réservations</button>
+            <button class="btn-finish" (click)="closeBooking()">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
