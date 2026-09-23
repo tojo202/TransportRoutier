@@ -3,7 +3,7 @@
   <!-- ── En-tête avec SectionBadge ── -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8" revealOnScroll revealClass="reveal-up">
     <app-section-badge
-      tagline="Supervision &amp; Performance Globale"
+      tagline="Supervision & Performance Globale"
       icon="speed"
       title="Tableau de Bord TransExpress"
       description="Indicateurs clés en direct, réservations, recettes et statut de la flotte.">
@@ -33,125 +33,26 @@
     </div>
   </div>
 
-  <!-- ── Chargement ── -->
-  <div *ngIf="isLoading" class="flex justify-center items-center h-64">
-    <mat-spinner></mat-spinner>
+  <!-- ── Chargement Skeleton ── -->
+  <div *ngIf="isLoading" class="mb-8">
+    <app-skeleton-loader variant="stat-card" [count]="6"></app-skeleton-loader>
+    <app-skeleton-loader variant="stat-card" [count]="3" class="mt-4"></app-skeleton-loader>
+    <app-skeleton-loader variant="card" class="mt-4"></app-skeleton-loader>
+    <app-skeleton-loader variant="list-item" [count]="5" class="mt-4"></app-skeleton-loader>
   </div>
 
   <!-- ── Erreur ── -->
-  <div *ngIf="error" class="section-card" style="padding:1rem 1.5rem; border-left: 5px solid var(--danger); background: var(--danger-light); color: var(--danger); margin-bottom:1.5rem;">
+  <div *ngIf="error" class="section-card mb-6" style="padding:1rem 1.5rem; border-left: 5px solid var(--danger); background: var(--danger-light); color: var(--danger);">
     <span class="material-icons" style="vertical-align:middle; margin-right:8px">error_outline</span>{{ error }}
   </div>
 
   <ng-container *ngIf="!isLoading && !error && stats">
 
-    <!-- ── Cartes stats avec effet de relief & rotation douce ── -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-8">
+    <!-- ── Indicateurs Principaux ── -->
+    <app-stat-cards [cards]="mainStatCards" [grouped]="false" class="mb-8"></app-stat-cards>
 
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="50">
-        <div class="stat-card-header">
-          <div class="stat-icon primary">
-            <span class="material-icons">receipt</span>
-          </div>
-          <p class="stat-label">Réservations</p>
-        </div>
-        <div class="stat-value">{{ stats.total_reservations }}</div>
-      </div>
-
-
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="100">
-        <div class="stat-card-header">
-          <div class="stat-icon success">
-            <span class="material-icons">confirmation_number</span>
-          </div>
-          <p class="stat-label">Billets Vendus</p>
-        </div>
-        <div class="stat-value">{{ stats.tickets_sold }}</div>
-      </div>
-
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="150">
-        <div class="stat-card-header">
-          <div class="stat-icon warning">
-            <span class="material-icons">directions_car</span>
-          </div>
-          <p class="stat-label">Véhicules Dispo</p>
-        </div>
-        <div class="stat-value">{{ stats.total_vehicles - stats.vehicles_in_transit }}</div>
-      </div>
-
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="200">
-        <div class="stat-card-header">
-          <div class="stat-icon accent">
-            <span class="material-icons">local_shipping</span>
-          </div>
-          <p class="stat-label">En Trajet</p>
-        </div>
-        <div class="stat-value">{{ stats.vehicles_in_transit }}</div>
-      </div>
-
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="250">
-        <div class="stat-card-header">
-          <div class="stat-icon info">
-            <span class="material-icons">badge</span>
-          </div>
-          <p class="stat-label">Chauffeurs</p>
-        </div>
-        <div class="stat-value">{{ stats.total_drivers }}</div>
-      </div>
-
-      <div class="card-stat rotate-hover" revealOnScroll revealClass="reveal-scale" [revealDelay]="300">
-        <div class="stat-card-header">
-          <div class="stat-icon neutral">
-            <span class="material-icons">luggage</span>
-          </div>
-          <p class="stat-label">Bagages</p>
-        </div>
-        <div class="stat-value">{{ stats.total_baggage }}</div>
-      </div>
-
-    </div>
-
-    <!-- ── CA en Cartes Épurées Flat ── -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="150">
-      <!-- CA du Jour -->
-      <div class="card-stat" style="background: var(--text-primary); border: 1px solid #20150E; color:#FFFFFB;">
-        <div class="stat-card-header">
-          <div class="stat-icon" style="background: rgba(197, 160, 89, 0.25); color: var(--gold);">
-            <span class="material-icons">today</span>
-          </div>
-          <p class="stat-label" style="color: rgba(255, 255, 251, 0.75);">CA du Jour</p>
-        </div>
-        <div class="stat-value text-[#DFB76C]" style="font-size: 2.1rem;">
-          {{ stats.today_revenue | number }} <span class="text-sm font-bold text-gray-300">Ar</span>
-        </div>
-      </div>
-
-      <!-- CA du Mois -->
-      <div class="card-stat" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-        <div class="stat-card-header">
-          <div class="stat-icon" style="background: var(--gold-light); color: var(--gold-strong);">
-            <span class="material-icons">calendar_month</span>
-          </div>
-          <p class="stat-label" style="color: var(--text-secondary);">CA du Mois</p>
-        </div>
-        <div class="stat-value text-[#5B7036]" style="font-size: 2.1rem;">
-          {{ stats.month_revenue | number }} <span class="text-sm font-bold text-gray-500">Ar</span>
-        </div>
-      </div>
-
-      <!-- CA Annuel -->
-      <div class="card-stat" style="background: var(--primary); border: 1px solid var(--primary-strong); color:#FFFFFB;">
-        <div class="stat-card-header">
-          <div class="stat-icon" style="background: rgba(255, 255, 251, 0.2); color:#FFFFFB;">
-            <span class="material-icons">bar_chart</span>
-          </div>
-          <p class="stat-label" style="color: rgba(255, 255, 251, 0.85);">CA Annuel</p>
-        </div>
-        <div class="stat-value" style="font-size: 2.1rem; color: #FFFFFB;">
-          {{ stats.year_revenue | number }} <span class="text-sm font-bold text-white/80">Ar</span>
-        </div>
-      </div>
-    </div>
+    <!-- ── Chiffre d'Affaires ── -->
+    <app-stat-cards [cards]="revenueStatCards" [grouped]="false" class="mb-8"></app-stat-cards>
 
     <!-- ── Actions rapides ── -->
     <div class="section-card mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="180">
@@ -163,7 +64,7 @@
           <span class="material-icons text-base">public</span> Portail Trajets
         </button>
         <button class="btn-secondary btn-sm" (click)="viewAll('reports')">
-          <span class="material-icons text-base">analytics</span> Rapports &amp; Stats
+          <span class="material-icons text-base">analytics</span> Rapports & Stats
         </button>
         <button class="btn-dark btn-sm" (click)="viewAll('tickets')">
           <span class="material-icons text-base">confirmation_number</span> Billetterie
@@ -177,6 +78,12 @@
       </div>
     </div>
 
+    <!-- ── Flottes & Chauffeurs ── -->
+    <app-stat-cards [groups]="fleetStatGroups" [grouped]="true" class="mb-8"></app-stat-cards>
+
+    <!-- ── Réservations & Finances ── -->
+    <app-stat-cards [groups]="salesStatGroups" [grouped]="true" class="mb-8"></app-stat-cards>
+
     <!-- ── Réservations récentes ── -->
     <div class="section-card mb-8" revealOnScroll revealClass="reveal-up" [revealDelay]="150">
       <div class="section-card-header header-olive">
@@ -187,10 +94,7 @@
       </div>
 
       <div *ngIf="!stats.recent_reservations?.length" class="p-8">
-        <div class="placeholder-stripes max-w-sm mx-auto">
-          <span class="material-icons">event_busy</span>
-          <p class="text-sm font-bold text-gray-500">Aucune réservation récente</p>
-        </div>
+        <app-empty-state variant="reservations" [compact]="true"></app-empty-state>
       </div>
 
       <ul class="divide-y divide-[var(--border-color)] bg-[var(--card-bg)]" *ngIf="stats.recent_reservations?.length">
@@ -219,8 +123,6 @@
         </li>
       </ul>
     </div>
-
-
 
   </ng-container>
 </div>

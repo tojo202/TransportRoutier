@@ -72,6 +72,10 @@ export class AuthService {
     return this.currentUserSubject.value?.role || 'client';
   }
 
+  currentUserSync(): User | null {
+    return this.currentUserSubject.value;
+  }
+
   isAdmin(): boolean {
     return this.getRole() === 'admin';
   }

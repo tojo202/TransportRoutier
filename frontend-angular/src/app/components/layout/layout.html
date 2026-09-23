@@ -1,264 +1,115 @@
-<div class="layout-wrapper">
+<div class="layout-wrapper" [class.sidebar-collapsed]="sidebarCollapsed()">
   <!-- Sidebar Navigation -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
     <!-- Logo Header -->
     <a routerLink="/platform" class="logo-container" style="text-decoration: none;">
       <div class="logo-icon">
         <span class="material-icons">directions_bus</span>
       </div>
-      <div class="logo-text">
+      <div class="logo-text" [class.hidden]="sidebarCollapsed()">
         <div class="logo-title">TransExpress</div>
         <div class="logo-subtitle">Plateforme Multi-Rôles</div>
       </div>
+      <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar" title="Réduire/Agrandir la barre latérale">
+        <span class="material-icons">{{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}</span>
+      </button>
     </a>
 
     <!-- Navigation Menu (Dynamique selon le Rôle) -->
-    <nav class="nav-menu">
+    <nav class="nav-menu" [class.collapsed]="sidebarCollapsed()">
       
-      <!-- ============================================== -->
-      <!-- MENU ADMIN                                     -->
-      <!-- ============================================== -->
-      <ng-container *ngIf="authService.isAdmin()">
-        <div class="nav-section-title">Vue Principale</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
-              <span class="material-icons">dashboard</span>
-              <span>Tableau de bord</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">public</span>
-              <span>Portail Voyageurs</span>
-            </a>
-          </li>
-        </ul>
+      @for (section of navSections(); track section.id) {
+        <div class="nav-section" revealOnScroll revealClass="reveal-up" [revealDelay]="50">
+          <!-- Section Header -->
+          <button 
+            class="nav-section-header" 
+            (click)="toggleSection(section.id)"
+            [class.collapsed]="!isSectionExpanded(section.id)"
+            type="button">
+            <span class="material-icons section-icon">{{ section.icon }}</span>
+            <span class="section-title" *ngIf="!sidebarCollapsed()">{{ section.title }}</span>
+            <span class="section-badge" *ngIf="section.notificationCount && section.notificationCount > 0 && !sidebarCollapsed()">{{ section.notificationCount }}</span>
+            <span class="section-new-badge" *ngIf="section.hasNew && !sidebarCollapsed()">New</span>
+            <span class="material-icons section-chevron" [class.rotated]="isSectionExpanded(section.id)">
+              chevron_right
+            </span>
+          </button>
 
-        <div class="nav-section-title">Flotte &amp; Réseau</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/agencies" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">apartment</span>
-              <span>Agences</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/vehicles" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">directions_bus</span>
-              <span>Véhicules</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/drivers" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">badge</span>
-              <span>Chauffeurs</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/routes" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">alt_route</span>
-              <span>Lignes &amp; Trajets</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">schedule</span>
-              <span>Horaires &amp; Départs</span>
-            </a>
-          </li>
-        </ul>
+          <!-- Section Items -->
+          <div class="nav-section-content" [class.collapsed]="!isSectionExpanded(section.id)" [class.hidden]="sidebarCollapsed()">
+            <ul class="nav-list">
+              @for (item of section.items; track item.route) {
+                <li>
+                  <a 
+                    [routerLink]="item.route" 
+                    routerLinkActive="active-link" 
+                    [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+                    class="nav-item"
+                    [class.has-badge]="!!item.badge || (item.notificationCount && item.notificationCount > 0)"
+                    [class.new-item]="item.isNew">
+                    
+                    <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    
+                    <span class="nav-label" *ngIf="!sidebarCollapsed()">{{ item.label }}</span>
+                    
+                    <!-- Notification count on item -->
+                    <span class="nav-item-badge" *ngIf="item.notificationCount && item.notificationCount > 0 && !sidebarCollapsed()">
+                      {{ item.notificationCount }}
+                    </span>
+                    
+                    <!-- Custom badge -->
+                    <span class="nav-custom-badge" [class]="item.badgeColor" *ngIf="item.badge && !sidebarCollapsed()">
+                      {{ item.badge }}
+                    </span>
+                    
+                    <!-- New indicator -->
+                    <span class="nav-new-dot" *ngIf="item.isNew && !sidebarCollapsed()"></span>
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
 
-        <div class="nav-section-title">Vente &amp; Finances</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">confirmation_number</span>
-              <span>Réservations</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">receipt_long</span>
-              <span>Billetterie</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">payments</span>
-              <span>Paiements</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">luggage</span>
-              <span>Bagages</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/reports" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">analytics</span>
-              <span>Rapports &amp; Stats</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">star</span>
-              <span>Avis &amp; Évaluations</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">chat</span>
-              <span>Chat Trajets</span>
-            </a>
-          </li>
-        </ul>
-      </ng-container>
-
-      <!-- ============================================== -->
-      <!-- MENU AGENT COMMERCIAL / GUICHET             -->
-      <!-- ============================================== -->
-      <ng-container *ngIf="authService.isAgent()">
-        <div class="nav-section-title">Opérations Commerciales</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/reservations" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">confirmation_number</span>
-              <span>Réservations Guichet</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/tickets" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">receipt_long</span>
-              <span>Billetterie</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/driver-scan" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">qr_code_scanner</span>
-              <span>Validation QR Code</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/baggages" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">luggage</span>
-              <span>Enregistrement Bagages</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/payments" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">payments</span>
-              <span>Encaissements</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/schedules" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">schedule</span>
-              <span>Plannings Départs</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">public</span>
-              <span>Plateforme Trajets</span>
-            </a>
-          </li>
-        </ul>
-      </ng-container>
-
-      <!-- ============================================== -->
-      <!-- MENU CHAUFFEUR / CONDUCTEUR                 -->
-      <!-- ============================================== -->
-      <ng-container *ngIf="authService.isDriver()">
-        <div class="nav-section-title">Espace Chauffeur</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/driver-trips" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">directions_bus</span>
-              <span>Mes Trajets &amp; Missions</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/driver-scan" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">qr_code_scanner</span>
-              <span>Scanner Billets (QR)</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/publish-trip" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">add_circle</span>
-              <span>Publier un départ</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">chat</span>
-              <span>Chat Passagers</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">star</span>
-              <span>Mes Évaluations</span>
-            </a>
-          </li>
-        </ul>
-      </ng-container>
-
-      <!-- ============================================== -->
-      <!-- MENU CLIENT / PASSAGER                      -->
-      <!-- ============================================== -->
-      <ng-container *ngIf="authService.isClient()">
-        <div class="nav-section-title">Espace Voyageur</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">search</span>
-              <span>Rechercher un Trajet</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/my-reservations" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">receipt_long</span>
-              <span>Mes Réservations &amp; QR</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/chat" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">chat</span>
-              <span>Chat Conducteur</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/reviews" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">star</span>
-              <span>Évaluer un voyage</span>
-            </a>
-          </li>
-        </ul>
-      </ng-container>
-
-      <!-- Public / Visiteur non connecté -->
-      <ng-container *ngIf="(authService.currentUser$ | async) === null">
-        <div class="nav-section-title">Navigation</div>
-        <ul class="nav-list">
-          <li>
-            <a routerLink="/platform" routerLinkActive="active-link" class="nav-item">
-              <span class="material-icons">explore</span>
-              <span>Plateforme Trajets</span>
-            </a>
-          </li>
-          <li>
-            <a routerLink="/login" class="nav-item">
-              <span class="material-icons">login</span>
-              <span>Connexion / Inscription</span>
-            </a>
-          </li>
-        </ul>
-      </ng-container>
+      <!-- Collapsed sidebar tooltips -->
+      <div class="sidebar-tooltips" *ngIf="sidebarCollapsed()">
+        @for (section of navSections(); track section.id) {
+          @if (isSectionExpanded(section.id)) {
+            <div class="tooltip-group">
+              @for (item of section.items; track item.route) {
+                <a 
+                  [routerLink]="item.route" 
+                  routerLinkActive="active-link" 
+                  class="tooltip-item"
+                  [title]="item.label">
+                  <span class="material-icons">{{ item.icon }}</span>
+                  <span class="tooltip-badge" *ngIf="item.notificationCount && item.notificationCount > 0">{{ item.notificationCount }}</span>
+                </a>
+              }
+            </div>
+          }
+        }
+      </div>
 
     </nav>
+
+    <!-- User Status Bar (bottom of sidebar) -->
+    <div class="sidebar-footer" *ngIf="!sidebarCollapsed() && authService.currentUserSync()">
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          {{ (username ? username.charAt(0) : 'U') | uppercase }}
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ username }}</span>
+          <span class="user-role badge-role-{{ role }}">{{ role | uppercase }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Se déconnecter">
+        <span class="material-icons">logout</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
   </aside>
 
   <!-- Main Content Wrapper -->
@@ -266,19 +117,97 @@
     <!-- Header Top Navbar -->
     <header class="top-header">
       <div class="header-left">
+        <button class="sidebar-toggle-mobile" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+          <span class="material-icons">menu</span>
+        </button>
         <a routerLink="/platform" class="quick-brand-link">
           <span class="material-icons text-amber-500">directions_bus</span>
           <span class="brand-name">TransExpress</span>
         </a>
       </div>
 
-      <div class="header-right">
+      <div class="header-center">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs-container" *ngIf="breadcrumbs.length > 1" aria-label="Fil d'Ariane">
+          <ol class="breadcrumb-list">
+            @for (crumb of breadcrumbs; track crumb.url; let last = $last) {
+              <li class="breadcrumb-item" [class.active]="last">
+                <a [routerLink]="crumb.url" *ngIf="!last">{{ crumb.label }}</a>
+                <span *ngIf="last">{{ crumb.label }}</span>
+                <span class="breadcrumb-separator" *ngIf="!last">
+                  <span class="material-icons">chevron_right</span>
+                </span>
+              </li>
+            }
+          </ol>
+        </nav>
+      </div>
 
-        <!-- ── Notifications ── -->
-        <div class="notif-wrapper" *ngIf="authService.currentUser$ | async">
+      <div class="header-right">
+        <!-- Quick Actions Button -->
+        <div class="quick-actions-wrapper" *ngIf="authService.currentUserSync()">
+          <button 
+            class="quick-actions-btn" 
+            (click)="toggleQuickActions()" 
+            [class.active]="showQuickActions"
+            title="Actions rapides (Maj+Espace)">
+            <span class="material-icons">bolt</span>
+            <span class="quick-actions-badge" *ngIf="showQuickActions"></span>
+          </button>
+
+          <!-- Quick Actions Dropdown -->
+          <div class="quick-actions-dropdown" *ngIf="showQuickActions" (click)="$event.stopPropagation()">
+            <div class="quick-actions-header">
+              <span class="material-icons">bolt</span>
+              <span>Actions Rapides</span>
+            </div>
+            <div class="quick-actions-grid">
+              @if (authService.isAdmin() || authService.isAgent()) {
+                <button class="quick-action-item" (click)="executeQuickAction('new-reservation')" type="button">
+                  <span class="material-icons">add_circle</span>
+                  <span>Nouvelle Réservation</span>
+                  <kbd>⌘N</kbd>
+                </button>
+                <button class="quick-action-item" (click)="executeQuickAction('new-schedule')" type="button">
+                  <span class="material-icons">schedule</span>
+                  <span>Publier un Départ</span>
+                </button>
+              }
+              @if (authService.isAdmin()) {
+                <button class="quick-action-item" (click)="executeQuickAction('new-vehicle')" type="button">
+                  <span class="material-icons">directions_bus</span>
+                  <span>Ajouter Véhicule</span>
+                </button>
+                <button class="quick-action-item" (click)="executeQuickAction('new-driver')" type="button">
+                  <span class="material-icons">badge</span>
+                  <span>Ajouter Chauffeur</span>
+                </button>
+                <button class="quick-action-item" (click)="executeQuickAction('reports')" type="button">
+                  <span class="material-icons">analytics</span>
+                  <span>Voir Rapports</span>
+                </button>
+              }
+              @if (authService.isDriver() || authService.isAgent()) {
+                <button class="quick-action-item" (click)="executeQuickAction('scan')" type="button">
+                  <span class="material-icons">qr_code_scanner</span>
+                  <span>Scanner QR Code</span>
+                  <kbd>⌘S</kbd>
+                </button>
+              }
+              <button class="quick-action-item" (click)="router.navigateByUrl('/profile')" type="button">
+                <span class="material-icons">person</span>
+                <span>Mon Profil</span>
+                <kbd>⌘P</kbd>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="notif-wrapper" *ngIf="authService.currentUserSync()">
           <button class="notification-btn" (click)="toggleNotifications()" [class.active]="showNotifications" title="Notifications">
             <span class="material-icons">notifications</span>
-            <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+            <span class="notification-badge" *ngIf="unreadCountValue > 0">{{ unreadCountValue }}</span>
           </button>
 
           <!-- Dropdown Panel -->
@@ -287,18 +216,15 @@
               <span class="notif-title">
                 <span class="material-icons">notifications</span>
                 Notifications
-                <span class="notif-count" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+                <span class="notif-count" *ngIf="unreadCountValue > 0">{{ unreadCountValue }}</span>
               </span>
-              <button class="notif-mark-all" (click)="markAllRead()" *ngIf="unreadCount > 0">
+              <button class="notif-mark-all" (click)="markAllRead()" *ngIf="unreadCountValue > 0">
                 Tout lire
               </button>
             </div>
 
             <ul class="notif-list">
-              <li *ngFor="let n of notifications"
-                  class="notif-item"
-                  [class.unread]="!n.read"
-                  (click)="markRead(n.id)">
+              <li *ngFor="let n of notifications" class="notif-item" [class.unread]="!n.read" (click)="markRead(n.id)">
                 <span class="notif-icon notif-icon-{{ n.iconColor }}">
                   <span class="material-icons">{{ n.icon }}</span>
                 </span>
@@ -315,39 +241,38 @@
             </div>
           </div>
         </div>
-        <!-- ── /Notifications ── -->
 
-        <div class="header-divider" *ngIf="authService.currentUser$ | async"></div>
-
-        <!-- User Profile if logged in -->
-        <a *ngIf="authService.currentUser$ | async" routerLink="/profile" class="user-profile cursor-pointer hover:opacity-80 transition-opacity">
+        <!-- User Profile -->
+        <a *ngIf="authService.currentUserSync()" routerLink="/profile" class="user-profile cursor-pointer hover:opacity-80 transition-opacity">
           <div class="user-avatar">
             {{ (username ? username.charAt(0) : 'U') | uppercase }}
           </div>
-          <div class="user-details">
+          <div class="user-details" *ngIf="!sidebarCollapsed()">
             <span class="user-name">{{ username }}</span>
             <span class="user-role badge-role-{{ role }}">{{ role | uppercase }}</span>
           </div>
         </a>
 
         <!-- Login Button if visitor -->
-        <a *ngIf="(authService.currentUser$ | async) === null" routerLink="/login" class="btn-header-login">
+        <a *ngIf="(authService.currentUserSync()) === null" routerLink="/login" class="btn-header-login">
           <span class="material-icons">login</span>
           <span>Se connecter</span>
         </a>
 
-        <div class="header-divider" *ngIf="authService.currentUser$ | async"></div>
-
-        <button *ngIf="authService.currentUser$ | async" (click)="logout()" class="logout-btn" title="Se déconnecter">
-          <span class="material-icons">logout</span>
-          <span>Déconnexion</span>
-        </button>
+        <!-- Command Palette Trigger Hint -->
+        <div class="command-palette-hint" *ngIf="authService.currentUserSync()" title="Ouvrir la palette de commandes (⌘K)">
+          <kbd class="command-hint-kbd">⌘K</kbd>
+        </div>
       </div>
     </header>
 
     <!-- Page Body -->
-    <div class="page-content">
+    <div class="page-content" revealOnScroll revealClass="reveal-up">
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <!-- Global Components -->
+  <app-toast-container />
+  <app-command-palette />
 </div>

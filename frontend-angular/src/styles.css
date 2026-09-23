@@ -2,62 +2,114 @@
 @import 'material-icons/iconfont/material-icons.css';
 
 /* ==========================================================================
-   TransExpress — Palette Naturelle & Élégante (Modern Flat UX)
-   Vert Olive + Beige Crème + Ivoire + Brun Chocolat + Doré Discret
+   TransExpress — Soft Palette Professional SaaS
+   Sage Mauve + Ambre Warm + Cream + Soft Shadows + Subtle Accents
    ========================================================================== */
 
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM — Fluid Typography & Spacing
+   ========================================================================== */
 :root {
-  /* 1. Vert Olive — Navbar, sections clés, boutons principaux */
-  --primary: #5B7036;
-  --primary-hover: #4C5F2B;
-  --primary-strong: #3A4A1F;
-  --primary-light: #EBF0E3;
-  --primary-soft: #F6F9F2;
+  /* Fluid typography scale using clamp() */
+  --fs-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
+  --fs-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
+  --fs-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --fs-md: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+  --fs-lg: clamp(1.15rem, 1.05rem + 0.5vw, 1.3rem);
+  --fs-xl: clamp(1.3rem, 1.15rem + 0.75vw, 1.6rem);
+  --fs-2xl: clamp(1.6rem, 1.4rem + 1vw, 2rem);
+  --fs-3xl: clamp(2rem, 1.7rem + 1.5vw, 2.8rem);
+  --fs-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+  
+  /* Fluid spacing */
+  --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.35rem);
+  --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+  --space-md: clamp(1rem, 0.85rem + 0.75vw, 1.25rem);
+  --space-lg: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
+  --space-xl: clamp(2rem, 1.7rem + 1.5vw, 3rem);
+  --space-2xl: clamp(3rem, 2.5rem + 2.5vw, 4rem);
+  
+  /* Container max-widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1440px;
+  
+  /* Sidebar widths */
+  --sidebar-expanded: 285px;
+  --sidebar-collapsed: 72px;
+  --sidebar-mobile: 280px;
+  
+  /* Header height */
+  --header-height: 64px;
+  --header-height-mobile: 56px;
+}
 
-  /* 2. Doré Discret — Accents, icônes, tags, finitions premium */
-  --gold: #C5A059;
-  --gold-hover: #B89247;
-  --gold-strong: #99752D;
-  --gold-light: #FAF4E5;
-  --gold-soft: #FDFBF5;
+/* ==========================================================================
+   COLOR PALETTE — Soft Professional SaaS Palette
+   ========================================================================== */
+:root {
+  /* 1. Vert Sage Doux — Primaire, éléments clés, boutons principaux */
+  --primary: #5B8A6B;
+  --primary-hover: #4C705A;
+  --primary-strong: #3D6750;
+  --primary-light: #E8F0EB;
+  --primary-soft: #F7F9F7;
 
-  /* 3. Beige Crème — Arrière-plan principal */
-  --bg-main: #F7F4EC;
-  --bg-secondary: #EFE9DC;
-  --bg-tertiary: #E8E0CE;
+  /* 2. Or Ambre — Accents, icônes, tags, finitions premium */
+  --secondary: #C5A059;
+  --secondary-hover: #B89247;
+  --secondary-strong: #99752D;
+  --secondary-light: #FAF4E5;
+  --secondary-soft: #FDFBF5;
 
-  /* 4. Ivoire — Cartes, blocs, tables, fenêtres modales */
-  --card-bg: #FFFFFB;
-  --surface: #FAF7F0;
-  --surface-hover: #F4EFE4;
+  /* 3. Crème Chaud — Arrière-plan principal */
+  --bg-main: #F7F5F0;
+  --bg-secondary: #E8E4DC;
+  --bg-tertiary: #D8D4CF;
 
-  /* 5. Brun Chocolat — Titres, textes, lisibilité chaleureuse */
-  --text-primary: #342419;
-  --text-secondary: #635043;
-  --text-muted: #958477;
+  /* 4. Blanc Carte — Cartes, blocs, tables, fenêtres modales */
+  --card-bg: #FFFFFF;
+  --surface: #F8F6F3;
+  --surface-hover: #F0EDE9;
+
+  /* 5. Vert Forêt Foncé — Titres, textes principaux */
+  --text-primary: #2C3A2F;
+  --text-secondary: #7A8B7E;
+  --text-muted: #AAB8AA;
 
   /* Bordures harmonisées */
-  --border-color: #E2DAC8;
-  --border-strong: #CFC2A8;
-  --border-gold: #DFB76C;
+  --border-color: #E8E4DC;
+  --border-strong: #D8D0CC;
+  --border-gold: #C5A059;
+
+  /* Accents doux */
+  --accent-blue: #6B9ECA;
+  --accent-lavender: #A08EBF;
+  --accent-peach: #E8967A;
 
   /* Statuts organiques */
-  --success: #4E7A42;          /* Vert Sauge */
-  --success-light: #EAF2E8;
-  --warning: #C5A059;          /* Doré ambré */
+  --success: #5B8A6B;          /* Vert Sage */
+  --success-light: #E8F0EB;
+  --warning: #C5A059;          /* Or Ambre */
   --warning-light: #FAF4E5;
-  --danger: #9E4732;           /* Terracotta élégant */
-  --danger-light: #F8EBE8;
-  --info: #48624E;             /* Olive forêt */
-  --info-light: #ECF2ED;
+  --info: #6B9ECA;             /* Bleu Ciel */
+  --info-light: #E8F0EB;
 
-  /* Effets & Ombres teintées chocolat doux (Flat Depth) */
-  --shadow-color: rgba(52, 36, 25, 0.06);
-  --shadow-sm: 0 2px 8px rgba(52, 36, 25, 0.05);
-  --shadow-md: 0 6px 16px var(--shadow-color);
-  --shadow-lg: 0 12px 28px rgba(52, 36, 25, 0.09);
-  --shadow-gold: 0 6px 20px rgba(197, 160, 89, 0.15);
+  /* Effets & Ombres douces (Flat Depth Soft) */
+  --shadow-color: rgba(44, 58, 47, 0.05);
+  --shadow-sm: 0 2px 6px rgba(44, 58, 47, 0.04);
+  --shadow-md: 0 4px 12px var(--shadow-color);
+  --shadow-lg: 0 8px 24px rgba(44, 58, 47, 0.08);
+  --shadow-xl: 0 12px 40px rgba(44, 58, 47, 0.1);
+  --shadow-gold: 0 4px 12px rgba(197, 160, 89, 0.12);
   --shadow-hard: none;
+  
+  /* Card opacity variables */
+  --card-opacity: 1;
+  --card-bg-opacity: 1;
+  --surface-opacity: 0.98;
   
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -67,7 +119,7 @@
   
   /* Typographie Haute Lisibilité UX */
   --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-accent: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
@@ -99,6 +151,24 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
+
+h1 { font-size: var(--fs-4xl); line-height: 1.15; }
+h2 { font-size: var(--fs-3xl); line-height: 1.2; }
+h3 { font-size: var(--fs-2xl); line-height: 1.25; }
+h4 { font-size: var(--fs-xl); line-height: 1.3; }
+h5 { font-size: var(--fs-lg); line-height: 1.35; }
+h6 { font-size: var(--fs-md); line-height: 1.4; }
+
+p, span, li, td, th, button, input, select, textarea {
+  font-family: var(--font-main);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+}
+
+small, .text-xs { font-size: var(--fs-xs); }
+.text-sm { font-size: var(--fs-sm); }
+.text-lg { font-size: var(--fs-lg); }
+.text-xl { font-size: var(--fs-xl); }
 
 /* ---------- Barre de défilement ---------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -175,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
 .search-field input:focus {
   border-color: var(--primary);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(91, 112, 54, 0.15);
+  box-shadow: 0 0 0 4px rgba(#5B8A6B, 0.15);
 }
 
 /* ==========================================================================
@@ -239,15 +309,39 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: none; 
 }
 
-/* 2. Doré Discret — Action Secondaire / Premium */
-.btn-secondary {
-  background: var(--gold);
+/* 1. Vert Sage — Action Principale */
+.btn-primary {
+  background: var(--primary);
   color: #FFFFFB;
-  border-color: var(--gold);
+  border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(91, 138, 79, 0.25);
+  transform: translateY(-1px);
+}
+.btn-primary:active,
+.btn-primary.btn-press {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:disabled { 
+  opacity: 0.55; 
+  cursor: not-allowed; 
+  transform: none; 
+  box-shadow: none; 
+}
+
+/* 2. Or Ambre — Action Secondaire / Premium */
+.btn-secondary {
+  background: var(--secondary);
+  color: #FFFFFB;
+  border-color: var(--secondary);
 }
 .btn-secondary:hover {
-  background: var(--gold-hover);
-  border-color: var(--gold-hover);
+  background: var(--secondary-hover);
+  border-color: var(--secondary-hover);
   box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
   transform: translateY(-1px);
 }
@@ -265,7 +359,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-dark:hover {
   background: var(--text-secondary);
   border-color: var(--text-secondary);
-  box-shadow: 0 4px 12px rgba(52, 36, 25, 0.2);
+  box-shadow: 0 4px 12px rgba(44, 58, 47, 0.2);
   transform: translateY(-1px);
 }
 .btn-dark:active,
@@ -289,7 +383,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
 }
 
-/* 5. Contour Olive */
+/* 5. Contour Sage */
 .btn-outline {
   background: transparent;
   color: var(--primary);
@@ -305,15 +399,15 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
 }
 
-/* 6. Contour Doré */
+/* 6. Contour Ambre */
 .btn-outlineBrown {
   background: transparent;
-  color: var(--gold-strong);
-  border: 1.5px solid var(--gold);
+  color: var(--secondary-strong);
+  border: 1.5px solid var(--secondary);
   box-shadow: none;
 }
 .btn-outlineBrown:hover {
-  background: var(--gold-light);
+  background: var(--secondary-light);
   transform: translateY(-1px);
 }
 .btn-outlineBrown:active,
@@ -369,20 +463,21 @@ h1, h2, h3, h4, h5, h6 {
 .icon-btn:active {
   transform: translateY(0);
 }
-.icon-btn.edit { background: var(--gold-light); color: var(--gold-strong); border-color: #EBDAB4; }
-.icon-btn.delete { background: var(--danger-light); color: var(--danger); border-color: #ECD4CD; }
+.icon-btn.edit { background: var(--secondary-light); color: var(--secondary-strong); border-color: #EBDAB4; }
+.icon-btn.delete { background: #FAF3EE; color: #5B8A6B; border-color: #E8E4DC; }
 .icon-btn.view { background: var(--primary-light); color: var(--primary); border-color: #D2DEBF; }
 
 /* ==========================================================================
-   Cartes de Statistiques (Ivoire & Modern Flat)
+   Cartes de Statistiques (Ivoire & Modern Flat) - Enhanced
    ========================================================================== */
 .card-stat {
   background: var(--card-bg);
+  background-color: color-mix(in srgb, var(--card-bg) var(--card-bg-opacity), transparent);
   border-radius: var(--radius-md);
   padding: 1.4rem;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -403,8 +498,8 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 0;
 }
 .card-stat:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: var(--shadow-xl);
   border-color: var(--border-strong);
 }
 
@@ -470,7 +565,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.88rem;
   font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 2px 0 rgba(52, 36, 25, 0.05);
+  box-shadow: 0 2px 0 rgba(44, 58, 47, 0.05);
 }
 .badge .dot {
   width: 7px;
@@ -480,19 +575,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 .badge-primary { background: var(--primary-light); color: var(--primary-strong); border: 1.5px solid #D2DEBF; }
 .badge-success { background: var(--success-light); color: #2E5325; border: 1.5px solid #CBE0C7; }
-.badge-warning { background: var(--gold-light); color: var(--gold-strong); border: 1.5px solid #EBDAB4; }
-.badge-danger  { background: var(--danger-light); color: var(--danger); border: 1.5px solid #ECCDC6; }
-.badge-info    { background: var(--info-light); color: var(--info); border: 1.5px solid #D1DFD3; }
+.badge-warning { background: var(--secondary-light); color: var(--secondary-strong); border: 1.5px solid #EBDAB4; }
+.badge-info    { background: var(--primary-light); color: var(--primary); border: 1.5px solid #D2DEBF; }
 .badge-neutral { background: var(--bg-secondary); color: var(--text-secondary); border: 1.5px solid var(--border-color); }
 
 /* ==========================================================================
-   Tableaux Ivoire Élégants
+   Tableaux Ivoire Élégants - Enhanced
    ========================================================================== */
 .table-container {
   background: var(--card-bg);
+  background-color: color-mix(in srgb, var(--card-bg) var(--card-bg-opacity), transparent);
   border-radius: var(--radius-lg);
   border: 2px solid var(--border-color);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   padding: 8px;
 }
@@ -544,8 +639,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-table tbody tr:hover { 
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(52, 36, 25, 0.07);
-  background: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(44, 58, 47, 0.07);
+  background: var(--card-bg);
 }
 
 .cell-primary {
@@ -566,7 +661,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #788E4B, #5B7036);
+  background: linear-gradient(135deg, #5B8A6B, #4C705A);
   color: #FFFFFB;
   display: flex;
   align-items: center;
@@ -574,8 +669,8 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 1rem;
-  box-shadow: 0 2px 6px rgba(91, 112, 54, 0.25);
-  border: 2px solid var(--gold-light);
+  box-shadow: 0 2px 6px rgba(91, 138, 79, 0.25);
+  border: 2px solid var(--border-color);
 }
 
 /* ==========================================================================
@@ -626,7 +721,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.4rem;
 }
 .form-label .required {
-  color: var(--danger);
+  color: var(--secondary);
 }
 
 /* ==========================================================================
@@ -732,13 +827,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .deco-blob-olive {
-  background: radial-gradient(circle, #788E4B 0%, #5B7036 80%);
+  background: radial-gradient(circle, #5B8A6B 0%, #4C705A 80%);
 }
 .deco-blob-gold {
-  background: radial-gradient(circle, #DFB76C 0%, #C5A059 80%);
+  background: radial-gradient(circle, #6B9ECA 0%, #A08EBF 80%);
 }
 .deco-blob-cream {
-  background: radial-gradient(circle, #FFFFFF 0%, #EFE9DC 80%);
+  background: radial-gradient(circle, #F7F5F0 0%, #E8E4DC 80%);
 }
 
 .floating-bubble {
@@ -810,18 +905,20 @@ h1, h2, h3, h4, h5, h6 {
 .reveal-delay-400 { transition-delay: 400ms; }
 
 /* ==========================================================================
-   Section Cards (Ivoire & En-têtes Raffinés)
+   Section Cards (Ivoire & En-têtes Raffinés) - Enhanced
    ========================================================================== */
 .section-card {
   background: var(--card-bg);
+  background-color: color-mix(in srgb, var(--card-bg) var(--card-bg-opacity), transparent);
   border-radius: var(--radius-lg);
   border: 2px solid var(--border-color);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 .section-card:hover {
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
   border-color: var(--border-strong);
 }
 .section-card-header {
@@ -840,7 +937,7 @@ h1, h2, h3, h4, h5, h6 {
   border-color: #D2DEBF;
 }
 .section-card-header.header-gold {
-  background: var(--gold-light);
+  background: var(--secondary-light);
   border-color: #EBDAB4;
 }
 .section-card-header.header-cream {
@@ -866,27 +963,29 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.75rem;
 }
 
-/* Fenêtres Modales */
+/* Fenêtres Modales - Enhanced */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(52, 36, 25, 0.45);
-  backdrop-filter: blur(5px);
+  background: rgba(44, 58, 47, 0.5);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
   padding: 1rem;
+  animation: fadeIn 0.2s ease;
 }
 .modal-card {
   background: var(--card-bg);
+  background-color: color-mix(in srgb, var(--card-bg) var(--card-bg-opacity), transparent);
   border-radius: 30px;
   border: 3px solid var(--border-color);
-  box-shadow: 0 24px 60px rgba(52, 36, 25, 0.25);
+  box-shadow: var(--shadow-xl);
   width: min(540px, 94vw);
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .modal-header {
   padding: 1.35rem 1.75rem;
@@ -937,4 +1036,323 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: flex-end;
   gap: 1rem;
   background: var(--surface);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ==========================================================================
+   RESPONSIVE UTILITIES & CONTAINERS
+   ========================================================================== */
+
+/* Container classes */
+.container {
+  width: 100%;
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.container-sm { max-width: var(--container-sm); }
+.container-md { max-width: var(--container-md); }
+.container-lg { max-width: var(--container-lg); }
+.container-xl { max-width: var(--container-xl); }
+.container-2xl { max-width: var(--container-2xl); }
+.container-fluid { max-width: 100%; }
+
+/* Responsive grid utilities */
+.grid-responsive-1 { display: grid; grid-template-columns: repeat(1, 1fr); gap: var(--space-md); }
+.grid-responsive-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+.grid-responsive-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+.grid-responsive-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+.grid-responsive-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md); }
+.grid-responsive-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-md); }
+
+/* Auto-fit grids */
+.grid-auto-fit-sm { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); }
+.grid-auto-fit-md { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-md); }
+.grid-auto-fit-lg { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-md); }
+.grid-auto-fit-xl { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--space-md); }
+
+/* Flex utilities */
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-start { display: flex; align-items: center; justify-content: flex-start; }
+.flex-end { display: flex; align-items: center; justify-content: flex-end; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-gap-sm { gap: var(--space-sm); }
+.flex-gap-md { gap: var(--space-md); }
+.flex-gap-lg { gap: var(--space-lg); }
+.flex-gap-xl { gap: var(--space-xl); }
+.flex-1 { flex: 1; }
+.flex-auto { flex: 1 1 auto; }
+.flex-initial { flex: 0 1 auto; }
+.flex-none { flex: none; }
+
+/* Spacing utilities */
+.m-0 { margin: 0; }
+.m-auto { margin: auto; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.my-auto { margin-top: auto; margin-bottom: auto; }
+
+.p-0 { padding: 0; }
+.px-md { padding-left: var(--space-md); padding-right: var(--space-md); }
+.py-md { padding-top: var(--space-md); padding-bottom: var(--space-md); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+
+/* Text utilities */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-white { color: #FFFFFB; }
+.text-gold { color: var(--gold); }
+
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.break-words { overflow-wrap: break-word; word-wrap: break-word; }
+
+/* Display utilities */
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline-flex { display: inline-flex; }
+.hidden { display: none; }
+.invisible { visibility: hidden; }
+
+/* Overflow */
+.overflow-auto { overflow: auto; }
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+
+/* Position */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+/* Z-index */
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+
+/* Transitions */
+.transition-fast { transition: all 0.15s ease; }
+.transition-normal { transition: all 0.25s ease; }
+.transition-slow { transition: all 0.35s ease; }
+.transition-bounce { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Shadows */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+.shadow-none { box-shadow: none; }
+
+/* Border radius */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+.rounded-none { border-radius: 0; }
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+/* Extra small devices (phones, < 480px) */
+@media (max-width: 479px) {
+  :root {
+    --header-height: 52px;
+  }
+  
+  .hide-xs { display: none !important; }
+  .show-xs { display: block !important; }
+  .flex-col-xs { flex-direction: column !important; }
+  .text-center-xs { text-align: center !important; }
+  .w-full-xs { width: 100% !important; }
+  .grid-1-xs { grid-template-columns: 1fr !important; }
+  .gap-sm-xs { gap: var(--space-sm) !important; }
+  .p-sm-xs { padding: var(--space-sm) !important; }
+}
+
+/* Small devices (phones, 480px - 639px) */
+@media (min-width: 480px) and (max-width: 639px) {
+  .hide-sm { display: none !important; }
+  .show-sm { display: block !important; }
+  .grid-1-sm { grid-template-columns: 1fr !important; }
+  .grid-2-sm { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Medium devices (tablets, 640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  .hide-md { display: none !important; }
+  .show-md { display: block !important; }
+  .grid-2-md { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-3-md { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* Large devices (tablets/laptops, 768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hide-lg { display: none !important; }
+  .show-lg { display: block !important; }
+  .grid-2-lg { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-3-lg { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-4-lg { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* Extra large devices (desktops, 1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hide-xl { display: none !important; }
+  .show-xl { display: block !important; }
+  .grid-3-xl { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-4-xl { grid-template-columns: repeat(4, 1fr) !important; }
+  .grid-5-xl { grid-template-columns: repeat(5, 1fr) !important; }
+}
+
+/* 2XL devices (large desktops, 1280px - 1439px) */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .grid-4-2xl { grid-template-columns: repeat(4, 1fr) !important; }
+  .grid-5-2xl { grid-template-columns: repeat(5, 1fr) !important; }
+  .grid-6-2xl { grid-template-columns: repeat(6, 1fr) !important; }
+}
+
+/* 3XL devices (1440px+) */
+@media (min-width: 1440px) {
+  .grid-5-3xl { grid-template-columns: repeat(5, 1fr) !important; }
+  .grid-6-3xl { grid-template-columns: repeat(6, 1fr) !important; }
+  .grid-8-3xl { grid-template-columns: repeat(8, 1fr) !important; }
+}
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .sidebar, .top-header, .quick-actions-wrapper, .notif-wrapper { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+  .page-content { padding: 0 !important; }
+  .section-card { box-shadow: none; border: 1px solid var(--border-color); }
+  body { background: white; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color: #000;
+    --text-primary: #000;
+    --text-secondary: #333;
+    --primary: #006400;
+    --gold: #8B6914;
+  }
+}
+
+/* Dark mode support (if needed later) */
+@media (prefers-color-scheme: dark) {
+  /* Dark mode variables can be added here if needed */
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(232, 228, 220, 0.5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-blue) 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.soft-shadow {
+  box-shadow: var(--shadow-md);
+}
+
+.premium-shadow {
+  box-shadow: 0 8px 32px rgba(44, 58, 47, 0.1);
+}
+
+/* Focus visible enhancement */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: var(--primary-light);
+  color: var(--primary-strong);
+}
+
+/* Scrollbar for webkit */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) var(--bg-secondary);
+}
+
+/* Form element sizing consistency */
+input, select, textarea, button {
+  font-size: var(--fs-base);
+}
+
+@media (max-width: 479px) {
+  input, select, textarea, button {
+    font-size: var(--fs-sm);
+  }
+}
+
+/* Ensure minimum touch target size on mobile */
+@media (hover: none) and (pointer: coarse) {
+  button, a, [role="button"], input[type="checkbox"], input[type="radio"], select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better text rendering */
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
