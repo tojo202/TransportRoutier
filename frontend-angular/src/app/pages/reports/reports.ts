@@ -1,5 +1,5 @@
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReportService } from '../../services/report';
 import { DashboardService } from '../../services/dashboard';
@@ -17,6 +17,7 @@ import 'jspdf-autotable';
 import { VerticalPaginationComponent } from '../../components/vertical-pagination/vertical-pagination';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-reports',
   standalone: true,
   imports: [

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReservationService, Reservation } from '../../services/reservation';
@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth';
 import { QrCodeService } from '../../services/qrcode.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-my-reservations',
   standalone: true,
   imports: [CommonModule, RouterModule],

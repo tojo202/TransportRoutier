@@ -38,12 +38,12 @@
     <form (ngSubmit)="updateProfile()" class="space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nom complet</label>
-          <input type="text" [(ngModel)]="form.name" name="name" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
+          <label for="profileName" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nom complet</label>
+          <input id="profileName" type="text" [(ngModel)]="form.name" name="name" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
         </div>
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Adresse Email</label>
-          <input type="email" [(ngModel)]="form.email" name="email" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
+          <label for="profileEmail" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Adresse Email</label>
+          <input id="profileEmail" type="email" [(ngModel)]="form.email" name="email" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" required>
         </div>
       </div>
 
@@ -52,12 +52,12 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Mot de passe actuel</label>
-          <input type="password" [(ngModel)]="form.current_password" name="current_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
+          <label for="profileCurrentPassword" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Mot de passe actuel</label>
+          <input id="profileCurrentPassword" type="password" [(ngModel)]="form.current_password" name="current_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
         </div>
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nouveau mot de passe</label>
-          <input type="password" [(ngModel)]="form.new_password" name="new_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
+          <label for="profileNewPassword" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Nouveau mot de passe</label>
+          <input id="profileNewPassword" type="password" [(ngModel)]="form.new_password" name="new_password" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="••••••••">
         </div>
       </div>
 

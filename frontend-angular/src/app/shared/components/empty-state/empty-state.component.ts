@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
@@ -137,6 +137,7 @@ const EMPTY_STATE_CONFIGS: Record<EmptyStateVariant, EmptyStateConfig> = {
 };
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-empty-state',
   standalone: true,
   imports: [CommonModule, RouterModule, RevealOnScrollDirective],

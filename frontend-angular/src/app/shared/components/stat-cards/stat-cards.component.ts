@@ -1,4 +1,4 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
@@ -27,6 +27,7 @@ export interface StatCardGroup {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-stat-cards',
   standalone: true,
   imports: [CommonModule, RouterModule, RevealOnScrollDirective],

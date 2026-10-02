@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -6,6 +6,7 @@ import { TicketService } from '../../services/ticket';
 import { AuthService } from '../../services/auth';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-driver-scan',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],

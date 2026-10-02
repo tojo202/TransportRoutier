@@ -1,5 +1,5 @@
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { BaggageService } from '../../services/baggage';
 import { MatTableModule } from '@angular/material/table';
@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { VerticalPaginationComponent } from '../../components/vertical-pagination/vertical-pagination';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-baggages',
   standalone: true,
   imports: [

@@ -1,5 +1,5 @@
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VehicleService } from '../../services/vehicle';
 import { AgencyService } from '../../services/agency';
@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-vehicles',
   standalone: true,
   imports: [CommonModule, FormsModule, NgxPaginationModule],
@@ -42,7 +43,7 @@ export class VehiclesComponent implements OnInit {
   }
 
   loadAgencies(): void {
-    this.agencyService.getAgencies().subscribe(data => this.agencies = data);
+    this.agencyService.getAgencies().subscribe(data => this.agencies = Array.isArray(data) ? data : data.data);
   }
 
   applyFilter(): void {

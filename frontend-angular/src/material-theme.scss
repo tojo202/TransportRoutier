@@ -38,12 +38,14 @@ body {
 .mat-sidenav,
 .mat-toolbar {
   background: #FFFFFF !important;
-  color: #173F23 !important;
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-button,
 .mat-mdc-raised-button,
 .mat-mdc-outlined-button {
-  --mdc-filled-button-container-color: #788B42;
-  --mdc-outlined-button-outline-color: #173F23;
+  --mdc-filled-button-container-color: var(--primary);
+  --mdc-filled-button-label-text-color: #FFFFFF;
+  --mdc-outlined-button-outline-color: var(--primary-strong);
+  --mdc-outlined-button-label-text-color: var(--primary-strong);
 }

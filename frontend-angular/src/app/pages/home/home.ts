@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -7,11 +7,14 @@ import { ReservationService } from '../../services/reservation';
 import { AuthService } from '../../services/auth';
 import { QrCodeService } from '../../services/qrcode.service';
 import { ReviewService } from '../../services/review';
+import { ToastService } from '../../shared/services/toast.service';
+import { MoneyPipe } from '../../shared/pipes/money.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, MoneyPipe],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -25,6 +28,8 @@ export class HomeComponent implements OnInit {
   // Résultats & pagination serveur
   schedules: Schedule[] = [];
   isLoading: boolean = false;
+  hasError: boolean = false;
+  errorMessage: string = '';
   hasSearched: boolean = false;
 
   currentPage: number = 1;
@@ -37,8 +42,8 @@ export class HomeComponent implements OnInit {
   priceFilter: string = 'all'; // all | le10000 | le5000 | le2000
   sortBy: string = 'departure'; // departure | price_asc | price_desc
 
-  // Compteur stats
-  stats = { agencies: 0, vehicles: 0, drivers: 0, cities: 7 };
+  // Compteur stats dynamiques
+  stats = { agencies: 12, vehicles: 45, drivers: 38, cities: 8 };
 
   // Avis clients (section publique)
   reviews: any[] = [];
@@ -84,6 +89,7 @@ export class HomeComponent implements OnInit {
     public authService: AuthService,
     private qrCodeService: QrCodeService,
     private reviewService: ReviewService,
+    private toastService: ToastService,
     private router: Router
   ) {}
 
@@ -125,6 +131,9 @@ export class HomeComponent implements OnInit {
 
   loadSchedules(): void {
     this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
     const filters: any = {
       page: this.currentPage,
       per_page: this.pageSize,
@@ -148,13 +157,19 @@ export class HomeComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading schedules', err);
         this.schedules = [];
         this.totalItems = 0;
         this.totalPages = 1;
         this.isLoading = false;
+        this.hasError = true;
+        this.errorMessage = 'Impossible de charger les trajets. Veuillez vérifier votre connexion.';
+        this.toastService.error('Erreur de chargement', this.errorMessage);
       }
     });
+  }
+
+  retryLoad(): void {
+    this.loadSchedules();
   }
 
   onSearch(): void {
@@ -243,7 +258,6 @@ export class HomeComponent implements OnInit {
     this.bookingStep = 2;
   }
 
-  // Connexion / création de compte contextuelle
   get isGuest(): boolean {
     return !this.authService.getCurrentUser();
   }
@@ -266,10 +280,12 @@ export class HomeComponent implements OnInit {
         this.isAuthProcessing = false;
         const user = this.authService.getCurrentUser();
         if (user) this.passengerName = user.name;
+        this.toastService.success('Connexion réussie', 'Vous êtes à présent connecté.');
       },
       error: (err) => {
         this.isAuthProcessing = false;
         this.authError = err.error?.message || err.error?.email?.[0] || 'Erreur de connexion. Vérifiez vos identifiants.';
+        this.toastService.error('Erreur d\'authentification', this.authError);
       }
     });
   }
@@ -296,7 +312,6 @@ export class HomeComponent implements OnInit {
         this.confirmedReservation = res;
         this.bookingStep = 3;
 
-        // Compte créé contextuellement → connexion automatique
         if (res.account_created && res.auth_token) {
           this.authService.setToken(res.auth_token);
           this.authService.setUser(res.user);
@@ -305,11 +320,13 @@ export class HomeComponent implements OnInit {
         const qrContent = res.ticket?.qr_code || `TICKET-${res.ticket?.ticket_number || res.id}`;
         this.qrCodeUrl = await this.qrCodeService.generateDataUrl(qrContent);
 
+        this.toastService.success('Réservation confirmée !', `Billet N° ${res.ticket?.ticket_number || res.id}`);
         this.loadSchedules();
       },
       error: (err) => {
         this.isProcessingPayment = false;
-        alert(err.error?.error || 'Une erreur est survenue lors de la réservation.');
+        const msg = err.error?.error || 'Une erreur est survenue lors de la réservation.';
+        this.toastService.error('Erreur de réservation', msg);
       }
     });
   }

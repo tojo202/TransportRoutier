@@ -18,8 +18,8 @@
   <mat-card class="mb-6 hide-on-print">
     <div class="p-4 flex flex-wrap gap-4 items-end">
       <div class="flex flex-col">
-        <label class="text-sm text-gray-600 mb-1">Type de rapport</label>
-        <select [(ngModel)]="reportType" class="border p-2 rounded bg-gray-50 h-[42px] min-w-[200px]" (change)="generateReport()">
+        <label for="reportType" class="text-sm text-gray-600 mb-1">Type de rapport</label>
+        <select id="reportType" [(ngModel)]="reportType" class="border p-2 rounded bg-gray-50 h-[42px] min-w-[200px]" (change)="generateReport()">
           <option value="reservations">Réservations</option>
           <option value="payments">Paiements</option>
           <option value="tickets">Billets</option>
@@ -27,13 +27,13 @@
       </div>
       
       <div class="flex flex-col">
-        <label class="text-sm text-gray-600 mb-1">Date début</label>
-        <input type="date" [(ngModel)]="startDate" class="border p-2 rounded bg-gray-50 h-[42px]">
+        <label for="reportStart" class="text-sm text-gray-600 mb-1">Date début</label>
+        <input id="reportStart" type="date" [(ngModel)]="startDate" class="border p-2 rounded bg-gray-50 h-[42px]">
       </div>
       
       <div class="flex flex-col">
-        <label class="text-sm text-gray-600 mb-1">Date fin</label>
-        <input type="date" [(ngModel)]="endDate" class="border p-2 rounded bg-gray-50 h-[42px]">
+        <label for="reportEnd" class="text-sm text-gray-600 mb-1">Date fin</label>
+        <input id="reportEnd" type="date" [(ngModel)]="endDate" class="border p-2 rounded bg-gray-50 h-[42px]">
       </div>
       
       <button mat-raised-button color="primary" class="h-[42px]" (click)="generateReport()">Générer</button>

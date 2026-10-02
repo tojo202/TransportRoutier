@@ -1,46 +1,109 @@
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AgencyService } from '../../services/agency';
+import { AgencyService, Agency, PaginatedResponse } from '../../services/agency';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../shared/services/toast.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-agencies',
   standalone: true,
   imports: [CommonModule, FormsModule, NgxPaginationModule],
   templateUrl: './agencies.html',
   styleUrls: ['./agencies.css']
 })
-export class AgenciesComponent implements OnInit {
+export class AgenciesComponent implements OnInit, OnDestroy {
   p: number = 1;
-  agencies: any[] = [];
-  filteredAgencies: any[] = [];
+  pageSize: number = 10;
+  totalItems: number = 0;
+  
+  agencies: Agency[] = [];
+  filteredAgencies: Agency[] = [];
   searchTerm = '';
+  
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
 
   showFormModal = false;
   editingId: number | null = null;
   form = { name: '', address: '', phone: '', manager_name: '' };
 
-  constructor(private agencyService: AgencyService) {}
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private agencyService: AgencyService,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(term => {
+      this.searchTerm = term;
+      this.p = 1;
+      this.loadAgencies();
+    });
+
     this.loadAgencies();
   }
 
-  loadAgencies(): void {
-    this.agencyService.getAgencies().subscribe({
-      next: (data) => {
-        this.agencies = data;
-        this.applyFilter();
-      },
-      error: (err) => console.error(err)
-    });
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onSearchChange(value: string): void {
+    this.searchSubject.next(value);
   }
 
   applyFilter(): void {
+    this.onSearchChange(this.searchTerm);
+  }
+
+  loadAgencies(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
+    this.agencyService.getAgencies({
+      search: this.searchTerm,
+      page: this.p,
+      per_page: this.pageSize
+    }).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        if (Array.isArray(res)) {
+          this.agencies = res;
+          this.applyFilterLocally();
+          this.totalItems = this.filteredAgencies.length;
+        } else {
+          const paginated = res as PaginatedResponse<Agency>;
+          this.agencies = paginated.data || [];
+          this.filteredAgencies = [...this.agencies];
+          this.totalItems = paginated.total || this.agencies.length;
+          this.p = paginated.current_page || 1;
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.hasError = true;
+        this.errorMessage = 'Impossible de charger la liste des agences. Veuillez réessayer.';
+        this.toastService.error('Erreur', this.errorMessage);
+      }
+    });
+  }
+
+  applyFilterLocally(): void {
     const term = this.searchTerm.toLowerCase().trim();
-    if (term === '') {
+    if (!term) {
       this.filteredAgencies = [...this.agencies];
       return;
     }
@@ -51,10 +114,19 @@ export class AgenciesComponent implements OnInit {
     );
   }
 
-  openForm(agency?: any): void {
+  retryLoad(): void {
+    this.loadAgencies();
+  }
+
+  openForm(agency?: Agency): void {
     if (agency) {
-      this.editingId = agency.id;
-      this.form = { ...agency };
+      this.editingId = agency.id || null;
+      this.form = {
+        name: agency.name || '',
+        address: agency.address || '',
+        phone: agency.phone || '',
+        manager_name: agency.manager_name || ''
+      };
     } else {
       this.editingId = null;
       this.form = { name: '', address: '', phone: '', manager_name: '' };
@@ -67,33 +139,55 @@ export class AgenciesComponent implements OnInit {
   }
 
   saveAgency(): void {
+    if (!this.form.name || !this.form.phone) {
+      this.toastService.warning('Champs requis', 'Veuillez renseigner au moins le nom et le téléphone.');
+      return;
+    }
+
     if (this.editingId) {
-      this.agencyService.updateAgency(this.editingId, this.form).subscribe(() => {
-        this.loadAgencies();
-        this.closeForm();
-        Swal.fire('Succès', 'Agence modifiée', 'success');
+      this.agencyService.updateAgency(this.editingId, this.form).subscribe({
+        next: () => {
+          this.loadAgencies();
+          this.closeForm();
+          this.toastService.success('Succès', 'L\'agence a été modifiée avec succès.');
+        },
+        error: () => {
+          this.toastService.error('Erreur', 'Impossible de modifier l\'agence.');
+        }
       });
     } else {
-      this.agencyService.createAgency(this.form).subscribe(() => {
-        this.loadAgencies();
-        this.closeForm();
-        Swal.fire('Succès', 'Agence ajoutée', 'success');
+      this.agencyService.createAgency(this.form).subscribe({
+        next: () => {
+          this.loadAgencies();
+          this.closeForm();
+          this.toastService.success('Succès', 'Nouvelle agence ajoutée avec succès.');
+        },
+        error: () => {
+          this.toastService.error('Erreur', 'Impossible de créer l\'agence.');
+        }
       });
     }
   }
 
   deleteAgency(id: number): void {
     Swal.fire({
-      title: 'Supprimer ?',
+      title: 'Supprimer l\'agence ?',
+      text: 'Cette action est irréversible.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Oui',
-      cancelButtonText: 'Non'
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#5B8A6B'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.agencyService.deleteAgency(id).subscribe(() => {
-          this.loadAgencies();
-          Swal.fire('Supprimé!', '', 'success');
+        this.agencyService.deleteAgency(id).subscribe({
+          next: () => {
+            this.loadAgencies();
+            this.toastService.success('Supprimé', 'L\'agence a été supprimée.');
+          },
+          error: () => {
+            this.toastService.error('Erreur', 'Impossible de supprimer cette agence.');
+          }
         });
       }
     });

@@ -1,63 +1,124 @@
 <div class="min-h-screen flex items-center justify-center bg-[var(--bg-main)] p-4">
   <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative overflow-hidden bg-white shadow-xl border border-[#e2e8f0]">
     <!-- Decorative background blobs -->
-    <div class="absolute -top-10 -right-10 w-32 h-32 bg-[var(--primary-light)] rounded-full blur-3xl opacity-50"></div>
-    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-[var(--info-light)] rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-[var(--primary-light)] rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-[var(--secondary-light)] rounded-full blur-3xl opacity-50 pointer-events-none"></div>
     
     <div class="relative z-10">
       <div class="text-center mb-6">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#edf3e6] text-[#788e4b] mb-3">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[var(--primary-light)] text-[var(--primary)] mb-3 shadow-sm">
           <span class="material-icons text-2xl">directions_bus</span>
         </div>
-        <h1 class="text-2xl font-extrabold text-[#0f172a] mb-1">TransExpress</h1>
-        <p class="text-sm text-[#64748b]">Sélectionnez un profil ou connectez-vous</p>
+        <h1 class="text-2xl font-extrabold text-[var(--text-primary)] mb-1">TransExpress</h1>
+        <p class="text-sm text-[var(--text-secondary)] font-medium">Connexion à votre espace professionnel</p>
       </div>
 
-      <!-- Quick Role Switcher Tabs -->
-      <div class="grid grid-cols-4 gap-1 p-1 bg-[#f1f5f9] rounded-xl mb-5">
-        <button 
-          *ngFor="let r of roles"
-          type="button"
-          (click)="selectRole(r.id)"
-          [class.bg-white]="selectedRole === r.id"
-          [class.shadow-sm]="selectedRole === r.id"
-          [class.text-[#788e4b]]="selectedRole === r.id"
-          class="py-2 px-1 text-xs font-bold rounded-lg transition-all text-[#64748b] text-center"
-        >
-          {{ r.label }}
-        </button>
+      <!-- Quick Demo Role Selector -->
+      <div class="mb-5 bg-[var(--surface)] p-2.5 rounded-xl border border-[var(--border-color)]">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Profils de démonstration</span>
+          <span class="text-[10px] font-semibold bg-[var(--secondary-light)] text-[var(--secondary-strong)] px-2 py-0.5 rounded-full">Mode Démo</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1 p-1 bg-[var(--bg-main)] rounded-lg">
+          <button 
+            *ngFor="let r of roles"
+            type="button"
+            (click)="selectRole(r.id)"
+            [class.bg-white]="selectedRole === r.id"
+            [class.shadow-sm]="selectedRole === r.id"
+            [class.text-[var(--primary)]]="selectedRole === r.id"
+            [class.font-extrabold]="selectedRole === r.id"
+            class="py-1.5 px-1 text-xs font-semibold rounded-md transition-all text-[var(--text-secondary)] text-center focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+          >
+            {{ r.label }}
+          </button>
+        </div>
       </div>
 
-      <form (ngSubmit)="onSubmit()" class="space-y-4">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
+        <!-- Email Field -->
         <div>
-          <label class="block text-xs font-bold text-[#475569] uppercase mb-1">Email</label>
-          <input type="email" [(ngModel)]="email" name="email" class="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] focus:outline-none focus:border-[#788e4b] focus:bg-white text-sm" placeholder="nom@transport.com" required>
+          <label class="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider mb-1" for="email">
+            Adresse e-mail <span class="text-[var(--secondary-strong)]">*</span>
+          </label>
+          <div class="relative">
+            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-lg pointer-events-none">email</span>
+            <input 
+              id="email" 
+              type="email" 
+              formControlName="email"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--surface)] focus:outline-none focus:border-[var(--primary)] focus:bg-white text-sm text-[var(--text-primary)] font-medium transition-all"
+              [class.border-red-400]="f['email'].touched && f['email'].invalid"
+              placeholder="nom@transport.com"
+              aria-required="true"
+            >
+          </div>
+          <div *ngIf="f['email'].touched && f['email'].invalid" class="text-xs text-red-500 font-semibold mt-1 flex items-center gap-1">
+            <span class="material-icons text-xs">error</span>
+            <span *ngIf="f['email'].errors?.['required']">L'adresse e-mail est obligatoire.</span>
+            <span *ngIf="f['email'].errors?.['email']">Format d'adresse e-mail invalide.</span>
+          </div>
         </div>
         
+        <!-- Password Field -->
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="block text-xs font-bold text-[#475569] uppercase">Mot de passe</label>
-            <span class="text-xs text-[#788e4b] cursor-pointer">Mot de passe oublié ?</span>
+            <label class="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider" for="password">
+              Mot de passe <span class="text-[var(--secondary-strong)]">*</span>
+            </label>
+            <a routerLink="/forgot-password" class="text-xs text-[var(--primary)] hover:underline font-semibold">Mot de passe oublié ?</a>
           </div>
-          <input type="password" [(ngModel)]="password" name="password" class="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] focus:outline-none focus:border-[#788e4b] focus:bg-white text-sm" placeholder="••••••••" required>
+          <div class="relative">
+            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-lg pointer-events-none">lock</span>
+            <input 
+              id="password" 
+              [type]="showPassword ? 'text' : 'password'" 
+              formControlName="password"
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--surface)] focus:outline-none focus:border-[var(--primary)] focus:bg-white text-sm text-[var(--text-primary)] font-medium transition-all"
+              [class.border-red-400]="f['password'].touched && f['password'].invalid"
+              placeholder="••••••••"
+              aria-required="true"
+            >
+            <button 
+              type="button" 
+              (click)="togglePasswordVisibility()" 
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus:outline-none"
+              [aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+            >
+              <span class="material-icons text-lg">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <div *ngIf="f['password'].touched && f['password'].invalid" class="text-xs text-red-500 font-semibold mt-1 flex items-center gap-1">
+            <span class="material-icons text-xs">error</span>
+            <span *ngIf="f['password'].errors?.['required']">Le mot de passe est obligatoire.</span>
+            <span *ngIf="f['password'].errors?.['minLength']">Au moins 6 caractères requis.</span>
+          </div>
         </div>
 
-        <div *ngIf="error" class="bg-[#fee2e2] text-[#ef4444] px-4 py-2.5 rounded-xl text-xs font-semibold border border-[#fca5a5]">
-          {{ error }}
+        <!-- Global Error Notification -->
+        <div *ngIf="error" class="bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-xs font-semibold border border-red-200 flex items-center gap-2" role="alert">
+          <span class="material-icons text-sm text-red-500">warning</span>
+          <span>{{ error }}</span>
         </div>
 
-        <button type="submit" [disabled]="isLoading" class="w-full bg-[#788e4b] hover:bg-[#677b3e] text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2">
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          [disabled]="isLoading" 
+          class="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <span *ngIf="isLoading" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
           <span>{{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </button>
       </form>
 
-      <div class="mt-6 pt-4 border-t border-[#f1f5f9] text-center space-y-3">
-        <p class="text-sm text-[#475569]">
+      <!-- Footer navigation links -->
+      <div class="mt-6 pt-4 border-t border-[var(--border-color)] text-center space-y-3">
+        <p class="text-sm text-[var(--text-secondary)] font-medium">
           Pas encore de compte ?
-          <a routerLink="/register" class="font-bold text-[#788e4b] hover:underline">Créer un compte</a>
+          <a routerLink="/register" class="font-bold text-[var(--primary)] hover:underline">Créer un compte</a>
         </p>
-        <a routerLink="/platform" class="text-xs font-bold text-[#788e4b] hover:underline inline-flex items-center gap-1">
+        <a routerLink="/platform" class="text-xs font-bold text-[var(--primary)] hover:underline inline-flex items-center gap-1">
           <span class="material-icons text-sm">arrow_back</span>
           <span>Accéder au portail public de réservation</span>
         </a>

@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal, effect, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, Toast } from '../../services/toast.service';
 import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-toast-container',
   standalone: true,
   imports: [CommonModule, RevealOnScrollDirective],

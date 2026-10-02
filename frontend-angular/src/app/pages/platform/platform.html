@@ -68,9 +68,9 @@
 
         <!-- Date -->
         <div class="search-field">
-          <label><span class="material-icons">calendar_today</span> Date de Départ</label>
+          <label for="searchDate"><span class="material-icons">calendar_today</span> Date de Départ</label>
           <div class="input-wrapper">
-            <input type="date" [(ngModel)]="searchDate" (change)="onSearch()" />
+            <input id="searchDate" type="date" [(ngModel)]="searchDate" (change)="onSearch()" />
           </div>
         </div>
 

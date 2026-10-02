@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { DashboardService } from '../../services/dashboard';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-dashboard',
   standalone: true,
   imports: [

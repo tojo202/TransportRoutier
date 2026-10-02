@@ -70,8 +70,8 @@
         </div>
         <div class="stat-label">Volume Recettes</div>
       </div>
-      <div class="stat-value text-[#5B7036]" style="font-size: 2.3rem;">
-        {{ totalRevenue | number }} <span class="text-sm font-bold text-gray-500">Ar</span>
+      <div class="stat-value text-[#5B7036]" style="font-size: 2.1rem;">
+        {{ totalRevenue | money }}
       </div>
       <div class="badge badge-info mt-2">
         <span class="material-icons text-sm">payments</span> Total cumulé
@@ -168,12 +168,12 @@
             <td>
               <span class="badge badge-primary font-bold">
                 <span class="material-icons text-xs">event_seat</span>
-                Place {{ r.seat_number || r.seats || '1' }}
+                Place {{ r.seat_number || '1' }}
               </span>
             </td>
             <td>
               <span class="font-extrabold text-[var(--primary)] text-base" style="font-family: var(--font-heading);">
-                {{ (r.total_amount || r.total_price || 0) | number }} <span class="text-xs font-bold text-gray-500">Ar</span>
+                {{ (r.total_amount || 0) | money }}
               </span>
             </td>
 

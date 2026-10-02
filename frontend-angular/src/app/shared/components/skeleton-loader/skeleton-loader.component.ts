@@ -1,9 +1,10 @@
-import { Component, Input, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 type SkeletonVariant = 'text' | 'card' | 'table-row' | 'stat-card' | 'list-item' | 'avatar' | 'button' | 'chart';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-skeleton-loader',
   standalone: true,
   imports: [CommonModule],

@@ -1,5 +1,5 @@
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { TicketService } from '../../services/ticket';
 import { MatTableModule } from '@angular/material/table';
@@ -15,6 +15,7 @@ import { jsPDF } from 'jspdf';
 import Swal from 'sweetalert2';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-tickets',
   standalone: true,
   imports: [

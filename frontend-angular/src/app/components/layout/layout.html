@@ -1,103 +1,83 @@
-<div class="layout-wrapper" [class.sidebar-collapsed]="sidebarCollapsed()">
+<div class="layout-wrapper" [class.sidebar-collapsed]="sidebarCollapsed()" [class.sidebar-open]="sidebarOpen()">
   <!-- Sidebar Navigation -->
-  <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed()" aria-label="Menu latéral">
     <!-- Logo Header -->
-    <a routerLink="/platform" class="logo-container" style="text-decoration: none;">
-      <div class="logo-icon">
-        <span class="material-icons">directions_bus</span>
-      </div>
-      <div class="logo-text" [class.hidden]="sidebarCollapsed()">
-        <div class="logo-title">TransExpress</div>
-        <div class="logo-subtitle">Plateforme Multi-Rôles</div>
-      </div>
-      <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar" title="Réduire/Agrandir la barre latérale">
-        <span class="material-icons">{{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}</span>
-      </button>
-    </a>
-
-    <!-- Navigation Menu (Dynamique selon le Rôle) -->
-    <nav class="nav-menu" [class.collapsed]="sidebarCollapsed()">
-      
-      @for (section of navSections(); track section.id) {
-        <div class="nav-section" revealOnScroll revealClass="reveal-up" [revealDelay]="50">
-          <!-- Section Header -->
-          <button 
-            class="nav-section-header" 
-            (click)="toggleSection(section.id)"
-            [class.collapsed]="!isSectionExpanded(section.id)"
-            type="button">
-            <span class="material-icons section-icon">{{ section.icon }}</span>
-            <span class="section-title" *ngIf="!sidebarCollapsed()">{{ section.title }}</span>
-            <span class="section-badge" *ngIf="section.notificationCount && section.notificationCount > 0 && !sidebarCollapsed()">{{ section.notificationCount }}</span>
-            <span class="section-new-badge" *ngIf="section.hasNew && !sidebarCollapsed()">New</span>
-            <span class="material-icons section-chevron" [class.rotated]="isSectionExpanded(section.id)">
-              chevron_right
-            </span>
-          </button>
-
-          <!-- Section Items -->
-          <div class="nav-section-content" [class.collapsed]="!isSectionExpanded(section.id)" [class.hidden]="sidebarCollapsed()">
-            <ul class="nav-list">
-              @for (item of section.items; track item.route) {
-                <li>
-                  <a 
-                    [routerLink]="item.route" 
-                    routerLinkActive="active-link" 
-                    [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
-                    class="nav-item"
-                    [class.has-badge]="!!item.badge || (item.notificationCount && item.notificationCount > 0)"
-                    [class.new-item]="item.isNew">
-                    
-                    <span class="material-icons nav-icon">{{ item.icon }}</span>
-                    
-                    <span class="nav-label" *ngIf="!sidebarCollapsed()">{{ item.label }}</span>
-                    
-                    <!-- Notification count on item -->
-                    <span class="nav-item-badge" *ngIf="item.notificationCount && item.notificationCount > 0 && !sidebarCollapsed()">
-                      {{ item.notificationCount }}
-                    </span>
-                    
-                    <!-- Custom badge -->
-                    <span class="nav-custom-badge" [class]="item.badgeColor" *ngIf="item.badge && !sidebarCollapsed()">
-                      {{ item.badge }}
-                    </span>
-                    
-                    <!-- New indicator -->
-                    <span class="nav-new-dot" *ngIf="item.isNew && !sidebarCollapsed()"></span>
-                  </a>
-                </li>
-              }
-            </ul>
-          </div>
+    <div class="logo-container">
+      <a routerLink="/platform" class="logo-link">
+        <div class="logo-icon">
+          <span class="material-icons" aria-hidden="true">directions_bus</span>
         </div>
-      }
+        <div class="logo-text" [class.hidden]="sidebarCollapsed()">
+          <div class="logo-title">TransExpress</div>
+          <div class="logo-subtitle">Plateforme Multi-Rôles</div>
+        </div>
+      </a>
+      <button
+        class="sidebar-toggle"
+        (click)="toggleSidebar()"
+        type="button"
+        [attr.aria-label]="sidebarCollapsed() ? 'Déplier la barre latérale' : 'Replier la barre latérale'"
+        [attr.aria-expanded]="!sidebarCollapsed()"
+        title="Réduire/Agrandir la barre latérale">
+        <span class="material-icons" aria-hidden="true">{{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}</span>
+      </button>
+      <button
+        class="sidebar-close-mobile"
+        (click)="closeSidebarMobile()"
+        type="button"
+        aria-label="Fermer le menu">
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
+    </div>
 
-      <!-- Collapsed sidebar tooltips -->
-      <div class="sidebar-tooltips" *ngIf="sidebarCollapsed()">
-        @for (section of navSections(); track section.id) {
-          @if (isSectionExpanded(section.id)) {
-            <div class="tooltip-group">
-              @for (item of section.items; track item.route) {
-                <a 
-                  [routerLink]="item.route" 
-                  routerLinkActive="active-link" 
-                  class="tooltip-item"
-                  [title]="item.label">
-                  <span class="material-icons">{{ item.icon }}</span>
-                  <span class="tooltip-badge" *ngIf="item.notificationCount && item.notificationCount > 0">{{ item.notificationCount }}</span>
-                </a>
-              }
-            </div>
+    <!-- Navigation Menu (Dynamique selon le Rôle) — Navigation compacte sans titres de section -->
+    <nav id="sidebar-navigation" class="nav-menu" [class.collapsed]="sidebarCollapsed()" aria-label="Navigation principale">
+      @for (section of navSections(); track section.id) {
+        <ul class="nav-group" [attr.aria-label]="section.title">
+          @for (item of section.items; track item.route) {
+            <li>
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+                class="nav-item"
+                [attr.title]="sidebarCollapsed() ? item.label : null"
+                [attr.aria-label]="sidebarCollapsed() ? item.label : null">
+
+                <span class="material-icons nav-icon" aria-hidden="true">{{ item.icon }}</span>
+
+                <span class="nav-label">{{ item.label }}</span>
+
+                <!-- Notification count on item -->
+                <span
+                  class="nav-badge"
+                  *ngIf="item.notificationCount && item.notificationCount > 0"
+                  aria-hidden="true">
+                  {{ item.notificationCount }}
+                </span>
+
+                <!-- Custom badge -->
+                <span
+                  class="nav-custom-badge"
+                  [class]="item.badgeColor"
+                  *ngIf="item.badge"
+                  aria-hidden="true">
+                  {{ item.badge }}
+                </span>
+
+                <!-- New indicator -->
+                <span class="nav-new-dot" *ngIf="item.isNew" aria-hidden="true"></span>
+              </a>
+            </li>
           }
-        }
-      </div>
-
+        </ul>
+      }
     </nav>
 
     <!-- User Status Bar (bottom of sidebar) -->
-    <div class="sidebar-footer" *ngIf="!sidebarCollapsed() && authService.currentUserSync()">
-      <div class="sidebar-user">
-        <div class="user-avatar">
+    <div class="sidebar-footer" *ngIf="authService.currentUserSync()">
+      <div class="sidebar-user" [attr.title]="sidebarCollapsed() ? username : null">
+        <div class="user-avatar" aria-hidden="true">
           {{ (username ? username.charAt(0) : 'U') | uppercase }}
         </div>
         <div class="user-info">
@@ -105,20 +85,29 @@
           <span class="user-role badge-role-{{ role }}">{{ role | uppercase }}</span>
         </div>
       </div>
-      <button class="logout-btn" (click)="logout()" title="Se déconnecter">
-        <span class="material-icons">logout</span>
-        <span>Déconnexion</span>
+      <button class="logout-btn" (click)="logout()" title="Se déconnecter" aria-label="Se déconnecter">
+        <span class="material-icons" aria-hidden="true">logout</span>
+        <span class="logout-label">Déconnexion</span>
       </button>
     </div>
   </aside>
+
+  <!-- Backdrop (tiroir mobile) -->
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen()" (click)="closeSidebarMobile()" aria-hidden="true"></div>
 
   <!-- Main Content Wrapper -->
   <main class="main-content">
     <!-- Header Top Navbar -->
     <header class="top-header">
       <div class="header-left">
-        <button class="sidebar-toggle-mobile" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
-          <span class="material-icons">menu</span>
+        <button
+          class="sidebar-toggle-mobile"
+          (click)="toggleMobileSidebar()"
+          type="button"
+          aria-label="Ouvrir le menu"
+          [attr.aria-expanded]="sidebarOpen()"
+          aria-controls="sidebar-navigation">
+          <span class="material-icons" aria-hidden="true">menu</span>
         </button>
         <a routerLink="/platform" class="quick-brand-link">
           <span class="material-icons text-amber-500">directions_bus</span>

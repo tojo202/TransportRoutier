@@ -10,7 +10,7 @@
     </app-section-badge>
 
     <div class="flex items-center gap-3 flex-wrap">
-      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()" class="form-select text-xs font-bold" style="width: 160px; padding: 0.6rem 1rem; border-radius: 9999px;">
+      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()" aria-label="Période des statistiques" class="form-select text-xs font-bold" style="width: auto; min-width: 190px; max-width: 100%; padding: 0.6rem 1rem; border-radius: 9999px;">
         <option value="all">Période : Global</option>
         <option value="today">Aujourd'hui</option>
         <option value="week">Cette semaine</option>

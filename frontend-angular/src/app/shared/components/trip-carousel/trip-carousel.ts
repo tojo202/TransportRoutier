@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type TripCardVariant = 'gold' | 'sage' | 'blue' | 'lavender' | 'peach';
@@ -20,6 +20,7 @@ export interface TripCardData {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-trip-carousel',
   standalone: true,
   imports: [CommonModule],

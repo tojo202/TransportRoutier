@@ -1,8 +1,9 @@
-import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import lottie, { type AnimationItem } from 'lottie-web';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-lottie-animation',
   standalone: true,
   imports: [CommonModule],

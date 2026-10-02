@@ -139,8 +139,18 @@
       <p>Recherche des meilleurs trajets...</p>
     </div>
 
+    <!-- Error State -->
+    <div class="empty-state" *ngIf="hasError && !isLoading">
+      <span class="material-icons empty-icon text-red-500">error_outline</span>
+      <h3>Une erreur est survenue</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-primary mt-2" (click)="retryLoad()">
+        <span class="material-icons">refresh</span> Réessayer
+      </button>
+    </div>
+
     <!-- Empty -->
-    <div class="empty-state" *ngIf="!isLoading && schedules.length === 0">
+    <div class="empty-state" *ngIf="!isLoading && !hasError && schedules.length === 0">
       <span class="material-icons empty-icon">search_off</span>
       <h3>Aucun trajet ne correspond à vos critères</h3>
       <p>Essayez une autre destination ou élargissez la date recherchée.</p>
@@ -148,7 +158,7 @@
     </div>
 
     <!-- Cards -->
-    <div class="trips-grid" *ngIf="!isLoading && schedules.length > 0">
+    <div class="trips-grid" *ngIf="!isLoading && !hasError && schedules.length > 0">
       <div class="trip-card" *ngFor="let s of getSortedSchedules()">
         <div class="trip-header">
           <div class="agency-badge">
@@ -205,7 +215,7 @@
         <div class="trip-footer">
           <div class="price-box">
             <span class="price-label">Prix par siège</span>
-            <span class="price-val">{{ s.price | number }} <small>FCFA</small></span>
+            <span class="price-val">{{ s.price | money }}</span>
           </div>
           <button class="btn-book" (click)="startBooking(s)">
             <span>Choisir mon siège</span>

@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject, signal, computed, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Router, NavigationEnd, RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -19,8 +19,6 @@ export interface NavSection {
   icon: string;
   items: NavItem[];
   roles: string[];
-  notificationCount?: number;
-  hasNew?: boolean;
 }
 
 export interface NavItem {
@@ -35,6 +33,7 @@ export interface NavItem {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-layout',
   standalone: true,
   imports: [
@@ -59,7 +58,7 @@ export class LayoutComponent implements OnInit {
   
   // Sidebar state
   sidebarCollapsed = signal(false);
-  expandedSections = signal<Set<string>>(new Set(['main', 'operations', 'fleet', 'sales', 'driver', 'passenger', 'public']));
+  sidebarOpen = signal(false);
   
   // Notifications
   showNotifications = false;
@@ -104,8 +103,6 @@ export class LayoutComponent implements OnInit {
           title: 'Flotte & Réseau',
           icon: 'directions_bus',
           roles: ['admin'],
-          notificationCount: 3,
-          hasNew: true,
           items: [
             { label: 'Agences', route: '/agencies', icon: 'apartment', notificationCount: 1 },
             { label: 'Véhicules', route: '/vehicles', icon: 'directions_bus', badge: '2', badgeColor: 'warning' },
@@ -139,8 +136,6 @@ export class LayoutComponent implements OnInit {
         title: 'Opérations Commerciales',
         icon: 'storefront',
         roles: ['agent'],
-        notificationCount: 4,
-        hasNew: true,
         items: [
           { label: 'Réservations Guichet', route: '/reservations', icon: 'confirmation_number', notificationCount: 3 },
           { label: 'Billetterie', route: '/tickets', icon: 'receipt_long' },
@@ -160,7 +155,6 @@ export class LayoutComponent implements OnInit {
         title: 'Espace Chauffeur',
         icon: 'directions_bus',
         roles: ['driver'],
-        hasNew: true,
         items: [
           { label: 'Mes Trajets & Missions', route: '/driver-trips', icon: 'directions_bus', notificationCount: 2 },
           { label: 'Scanner Billets (QR)', route: '/driver-scan', icon: 'qr_code_scanner', badge: 'Actif', badgeColor: 'success' },
@@ -230,6 +224,7 @@ export class LayoutComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.breadcrumbs = this.createBreadcrumbs(this.router.url);
+      this.sidebarOpen.set(false);
     });
   }
 
@@ -241,36 +236,20 @@ export class LayoutComponent implements OnInit {
     if (savedCollapsed !== null) {
       this.sidebarCollapsed.set(savedCollapsed === 'true');
     }
-    
-    const savedExpanded = localStorage.getItem('expandedSections');
-    if (savedExpanded) {
-      try {
-        this.expandedSections.set(new Set(JSON.parse(savedExpanded)));
-      } catch {}
-    }
   }
 
   // Sidebar methods
   toggleSidebar(): void {
     this.sidebarCollapsed.update(v => !v);
-    localStorage.setItem('sidebarCollapsed', String(!this.sidebarCollapsed()));
+    localStorage.setItem('sidebarCollapsed', String(this.sidebarCollapsed()));
   }
 
-  toggleSection(sectionId: string): void {
-    this.expandedSections.update(current => {
-      const next = new Set(current);
-      if (next.has(sectionId)) {
-        next.delete(sectionId);
-      } else {
-        next.add(sectionId);
-      }
-      localStorage.setItem('expandedSections', JSON.stringify([...next]));
-      return next;
-    });
+  toggleMobileSidebar(): void {
+    this.sidebarOpen.update(v => !v);
   }
 
-  isSectionExpanded(sectionId: string): boolean {
-    return this.expandedSections().has(sectionId);
+  closeSidebarMobile(): void {
+    this.sidebarOpen.set(false);
   }
 
   // Notification methods
@@ -381,6 +360,7 @@ export class LayoutComponent implements OnInit {
     if (event.key === 'Escape') {
       this.showNotifications = false;
       this.showQuickActions = false;
+      this.sidebarOpen.set(false);
     }
   }
 }

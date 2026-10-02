@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
+  loginForm!: FormGroup;
+  
   roles = [
     { id: 'admin', label: 'ADMIN', icon: 'shield' },
     { id: 'agent', label: 'AGENT', icon: 'support_agent' },
@@ -19,17 +22,38 @@ export class Login {
     { id: 'client', label: 'CLIENT', icon: 'person' }
   ];
   selectedRole = 'admin';
-  email = 'admin@transport.com';
-  password = 'Admin123!';
-  rememberMe = false;
+  showPassword = false;
   isLoading = false;
   error = '';
+  isDemoMode = true; // Permet de préremplir sur demande ou en mode démo
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false]
+    });
+  }
+
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 
   selectRole(roleId: string) {
     this.selectedRole = roleId;
-    this.fillDemo(roleId as any);
+    if (this.isDemoMode) {
+      this.fillDemo(roleId as any);
+    }
   }
 
   fillDemo(role: 'admin' | 'agent' | 'driver' | 'client') {
@@ -41,16 +65,26 @@ export class Login {
     };
     
     if (demos[role]) {
-      this.email = demos[role].email;
-      this.password = demos[role].password;
+      this.loginForm.patchValue({
+        email: demos[role].email,
+        password: demos[role].password
+      });
+      this.loginForm.markAsTouched();
     }
   }
 
   onSubmit() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
     this.isLoading = true;
     this.error = '';
     
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login({ email, password }).subscribe({
       next: (res) => {
         this.isLoading = false;
         const role = res.user?.role || this.selectedRole;
@@ -67,9 +101,9 @@ export class Login {
       error: (error) => {
         this.isLoading = false;
         if (error.status === 401 || error.status === 422) {
-          this.error = 'Identifiants invalides';
+          this.error = 'Identifiants invalides. Veuillez vérifier votre e-mail et mot de passe.';
         } else {
-          this.error = 'Erreur de connexion au serveur';
+          this.error = 'Erreur de connexion au serveur. Veuillez réessayer ultérieurement.';
         }
       }
     });
